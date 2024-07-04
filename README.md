@@ -1,0 +1,2 @@
+# svetloupravljac
+Idem da diplomiram
