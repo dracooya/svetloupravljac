@@ -1,2 +1,2 @@
-# svetloupravljac
+# Svetloupravljač
 Idem da diplomiram
