@@ -1,0 +1,7 @@
+select, .card {
+    background-color:#0f171f !important;
+}
+
+p, h1, h2, select {
+    font-family: "Oswald", sans-serif !important;
+}

@@ -1,6 +1,7 @@
 import './App.css'
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {Entry} from "./Entry/Entry.tsx";
+import {Entry} from "./Components/Entry/Entry.tsx";
+import {Main} from "./Components/Main/Main.tsx";
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Entry/>}/>
+                <Route path="/main" element={<Main/>}/>
             </Routes>
         </BrowserRouter>
     </>
