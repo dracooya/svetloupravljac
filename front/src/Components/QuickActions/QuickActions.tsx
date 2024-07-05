@@ -1,5 +1,4 @@
 import {Avatar, Grid, List, ListItem, Typography} from "@mui/joy";
-import React from "react";
 import {QuickAction} from "../../Models/QuickAction.ts";
 import "../Main/Main.css"
 
@@ -20,10 +19,14 @@ export function QuickActions({quickActions} : QuickActionsProps) {
                             {quickActions.map((action) => {
                                 return  <Grid container xs={4} sm={4} md={4} lg={4} xl={4} key={action.name}>
                                     <Grid>
-                                        <ListItem sx={{cursor:'pointer'}}>
+                                        <ListItem >
                                             <Grid justifyContent={'center'} justifyItems={'center'} textAlign={'center'}>
                                                 <Grid sx={{display:'flex', justifyContent:'center'}}>
-                                                    <Avatar size="lg" src="src/assets/icons/sun.png" />
+                                                    <Avatar sx={{border:'1px solid #12467b',
+                                                        cursor:'pointer',
+                                                        "&:hover": {
+                                                    backgroundColor:"rgba(255,255,255,0.4)"}
+                                                    }} size="lg" src="src/assets/icons/sun.png" />
                                                 </Grid>
                                                 <Grid>
                                                     {action.name}
@@ -39,7 +42,10 @@ export function QuickActions({quickActions} : QuickActionsProps) {
                                         <ListItem sx={{cursor:'pointer'}}>
                                             <Grid justifyContent={'center'} justifyItems={'center'} textAlign={'center'}>
                                                 <Grid sx={{display:'flex', justifyContent:'center'}}>
-                                                    <Avatar sx={{border:'2px solid white', backgroundColor:'transparent'}}
+                                                    <Avatar sx={{border:'2px solid white',
+                                                        backgroundColor:'#0f171f',
+                                                        "&:hover": {
+                                                            backgroundColor:"rgba(255,255,255,0.4)"}}}
                                                             size="lg" src="src/assets/icons/plus.png" />
                                                 </Grid>
                                                 <Grid>

@@ -2,7 +2,7 @@
 
 import {Button, FormControl, FormHelperText, Grid, Input, Typography} from "@mui/joy";
 import {useForm} from "react-hook-form";
-import {InfoOutlined, Login} from "@mui/icons-material";
+import {InfoOutlined} from "@mui/icons-material";
 import {useNavigate} from "react-router-dom";
 import {mdilLogin} from "@mdi/light-js/mdil";
 import Icon from "@mdi/react";

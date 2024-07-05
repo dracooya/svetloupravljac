@@ -5,6 +5,7 @@ import {KeyboardArrowDown} from "@mui/icons-material";
 import {House} from "../../Models/House.ts";
 import React, {useEffect, useState} from "react";
 import {Room} from "../../Models/Room.ts";
+import {NewRoomDialog} from "../NewRoomDialog/NewRoomDialog.tsx";
 
 interface HomeAndRoomConfigProps {
     houses: House[],
@@ -14,23 +15,29 @@ interface HomeAndRoomConfigProps {
 export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomConfigProps) {
     const [selectedHouse, setSelectedHouse] = useState<House>(houses[0]);
     const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0].rooms[0]);
+    const [openNewHouseDialog, setOpenNewHouseDialog] = useState<boolean>(false);
+    const [openNewRoomDialog, setOpenNewRoomDialog] = useState<boolean>(false);
 
     useEffect(() => {
         setSelectedRoomParent(selectedRoom);
     }, []);
 
-    const handleHouseChange = (event: React.SyntheticEvent | null, selectedHouseId: number) => {
-        const selectedHouse = houses.find(house => house.value === selectedHouseId);
-        setSelectedHouse(selectedHouse);
-        setSelectedRoom(selectedHouse.rooms[0]);
-        setSelectedRoomParent(selectedHouse.rooms[0]);
+    const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
+        const selectedHouse = houses.find(house => house.value === selectedHouseId!);
+        setSelectedHouse(selectedHouse!);
+        setSelectedRoom(selectedHouse!.rooms[0]);
+        setSelectedRoomParent(selectedHouse!.rooms[0]);
     };
 
-    const handleRoomChange = (event: React.SyntheticEvent | null, selectedRoomId: number) => {
+    const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
         const room = selectedHouse.rooms.find(room => room.value === selectedRoomId);
-        setSelectedRoom(room);
-        setSelectedRoomParent(room);
+        setSelectedRoom(room!);
+        setSelectedRoomParent(room!);
     };
+
+    const handleRoomDialogClose = () => {
+        setOpenNewRoomDialog(false);
+    }
 
     return (
         <>
@@ -117,9 +124,13 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                     </Select>
                 </Grid>
                 <Grid xs={4} sm={4} md={3} lg={3} xl={3}>
-                    <Button variant={'outlined'} startDecorator={<Icon path={mdilPlus} size={1} />}>Add</Button>
+                    <Button
+                        onClick={() => {
+                            setOpenNewRoomDialog(true)}}
+                        variant={'outlined'} startDecorator={<Icon path={mdilPlus} size={1} />}>Add</Button>
                 </Grid>
             </Grid>
+            <NewRoomDialog open={openNewRoomDialog} houses={houses} closeModalCallback={handleRoomDialogClose}/>
         </>
     );
 }

@@ -96,9 +96,12 @@ export function LightsState({lights}: LightsStateProps) {
                     </Grid>
                 </Grid>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'} mt={4}>
-                    <Grid justifyContent={'center'} direction={'row'} container alignItems={'center'} sx={{cursor:'pointer'}}>
+                    <Grid justifyContent={'center'} direction={'row'} container alignItems={'center'}>
                         <Grid sx={{display:'flex', justifyContent:'center'}}>
-                            <Avatar sx={{border:'2px solid white', backgroundColor:'transparent'}}
+                            <Avatar sx={{border:'2px solid white', backgroundColor:'transparent',
+                                cursor:'pointer',
+                                "&:hover": {
+                                    backgroundColor:"rgba(255,255,255,0.4)"}}}
                                     size="lg" src="src/assets/icons/plus.png" />
                         </Grid>
                         <Grid sx={{display:'flex', justifyContent:'center'}} pl={2}>
