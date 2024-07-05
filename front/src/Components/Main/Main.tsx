@@ -20,21 +20,21 @@ export function Main() {
                     id: 1,
                     ip: "192.168.0.115",
                     name: "Gooby",
-                    type: LightType.CANDLE,
+                    type: LightType.STRIP,
                     isOn: true
                 },
                 {
                     id: 2,
                     ip: "192.168.0.116",
                     name: "Booby",
-                    type: LightType.A27,
+                    type: LightType.BULB,
                     isOn: true
                 },
                 {
                     id: 3,
                     ip: "192.168.0.116",
                     name: "Scooby",
-                    type: LightType.A27,
+                    type: LightType.LAMP,
                     isOn: true
                 },
 
@@ -58,7 +58,7 @@ export function Main() {
                         id: 1,
                         ip: "192.168.0.115",
                         name: "Gooby",
-                        type: LightType.CANDLE
+                        type: LightType.BULB
                     },
                     scene: {
                         id: 1,
@@ -73,7 +73,7 @@ export function Main() {
                         id: 2,
                         ip: "192.168.0.116",
                         name: "Booby",
-                        type: LightType.A27
+                        type: LightType.LAMP
                     },
                     scene: {
                         id: 1,
@@ -94,7 +94,7 @@ export function Main() {
                         id: 1,
                         ip: "192.168.0.115",
                         name: "Gooby",
-                        type: LightType.CANDLE
+                        type: LightType.BULB
                     },
                     scene: {
                         id: 1,
@@ -109,7 +109,7 @@ export function Main() {
                         id: 2,
                         ip: "192.168.0.116",
                         name: "Booby",
-                        type: LightType.A27
+                        type: LightType.STRIP
                     },
                     scene: {
                         id: 1,
@@ -131,7 +131,7 @@ export function Main() {
                         id: 1,
                         ip: "192.168.0.115",
                         name: "Gooby",
-                        type: LightType.CANDLE
+                        type: LightType.LAMP
                     },
                     scene: {
                         id: 1,
@@ -146,7 +146,7 @@ export function Main() {
                         id: 2,
                         ip: "192.168.0.116",
                         name: "Booby",
-                        type: LightType.A27
+                        type: LightType.BULB
                     },
                     scene: {
                         id: 1,
@@ -168,7 +168,7 @@ export function Main() {
                         id: 1,
                         ip: "192.168.0.115",
                         name: "Gooby",
-                        type: LightType.CANDLE
+                        type: LightType.BULB
                     },
                     scene: {
                         id: 1,
@@ -183,7 +183,7 @@ export function Main() {
                         id: 2,
                         ip: "192.168.0.116",
                         name: "Booby",
-                        type: LightType.A27
+                        type: LightType.BULB
                     },
                     scene: {
                         id: 1,

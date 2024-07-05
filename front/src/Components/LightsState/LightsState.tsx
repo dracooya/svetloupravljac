@@ -1,20 +1,10 @@
-import {
-    Avatar,
-    Card,
-    CardContent,
-    Grid,
-    List,
-    ListItem,
-    Switch,
-    Tab,
-    tabClasses,
-    TabList, TabPanel,
-    Tabs,
-    Typography
-} from "@mui/joy";
+import {Avatar, Card, CardContent, Grid, List, Switch, Typography} from "@mui/joy";
 import React from "react";
 import "../Main/Main.css"
 import {LightBasicInfoWithStatus} from "../../Models/LightBasicInfoWithStatus.ts";
+import {LightType} from "../../Models/Enums/LightType.ts";
+import Icon from "@mdi/react";
+import {mdiLampOutline, mdiLedStripVariant, mdiLightbulbOutline} from '@mdi/js';
 
 interface LightsStateProps {
     lights: LightBasicInfoWithStatus[] | undefined
@@ -72,9 +62,14 @@ export function LightsState({lights}: LightsStateProps) {
                                                         <Card sx={{backgroundColor:'#0f171f', borderRadius:'2em'}}>
                                                             <Grid xs={12} sm={12} lg={12} md={12} xl={12} container alignItems={'center'}>
                                                                     <Grid xs={2} sm={2} md={2} lg={2} xl={2}>
-                                                                        <Avatar size="md" src="src/assets/icons/sun.png" />
+                                                                        {light.type == LightType.BULB?
+                                                                            <Icon path={mdiLightbulbOutline} size={1.5} /> :
+                                                                            light.type == LightType.STRIP ? <Icon path={mdiLedStripVariant} size={1.5} /> :
+                                                                                <Icon path={mdiLampOutline} size={1.5} />
+
+                                                                        }
                                                                     </Grid>
-                                                                    <Grid pl={2} xs={8} sm={8} md={8} lg={8} xl={8} container justifyContent={'flex-start'}>
+                                                                <Grid pl={2} xs={8} sm={8} md={8} lg={8} xl={8} container justifyContent={'flex-start'}>
                                                                         {light.name}
                                                                     </Grid>
                                                                     <Grid xs={2} sm={2} md={2} lg={2} xl={2}>
