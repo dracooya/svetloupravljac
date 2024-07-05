@@ -1,4 +1,4 @@
-import {Avatar, Grid, List, ListDivider, ListItem, ListItemDecorator, Typography} from "@mui/joy";
+import {Avatar, Grid, List, ListItem, Typography} from "@mui/joy";
 import React from "react";
 import {QuickAction} from "../../Models/QuickAction.ts";
 import "../Main/Main.css"
@@ -18,9 +18,9 @@ export function QuickActions({quickActions} : QuickActionsProps) {
                     <List orientation="horizontal">
                         <Grid container xs={12} sm={12} md={12} lg={12} xl={12} direction={'row'} rowSpacing={1}>
                             {quickActions.map((action) => {
-                                return  <Grid container xs={4} sm={4} md={4} lg={4} xl={4}>
+                                return  <Grid container xs={4} sm={4} md={4} lg={4} xl={4} key={action.name}>
                                     <Grid>
-                                        <ListItem>
+                                        <ListItem sx={{cursor:'pointer'}}>
                                             <Grid justifyContent={'center'} justifyItems={'center'} textAlign={'center'}>
                                                 <Grid sx={{display:'flex', justifyContent:'center'}}>
                                                     <Avatar size="lg" src="src/assets/icons/sun.png" />
@@ -36,10 +36,11 @@ export function QuickActions({quickActions} : QuickActionsProps) {
                             {quickActions.length == 6 ? null :
                                 <Grid container xs={4} sm={4} md={4} lg={4} xl={4}>
                                     <Grid>
-                                        <ListItem>
+                                        <ListItem sx={{cursor:'pointer'}}>
                                             <Grid justifyContent={'center'} justifyItems={'center'} textAlign={'center'}>
                                                 <Grid sx={{display:'flex', justifyContent:'center'}}>
-                                                    <Avatar sx={{border:'1px solid white'}} size="lg" src="src/assets/icons/plus.png" />
+                                                    <Avatar sx={{border:'2px solid white', backgroundColor:'transparent'}}
+                                                            size="lg" src="src/assets/icons/plus.png" />
                                                 </Grid>
                                                 <Grid>
                                                     Add New

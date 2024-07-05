@@ -3,27 +3,33 @@ import Icon from "@mdi/react";
 import {mdilHome, mdilPlus} from "@mdi/light-js";
 import {KeyboardArrowDown} from "@mui/icons-material";
 import {House} from "../../Models/House.ts";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Room} from "../../Models/Room.ts";
 
 interface HomeAndRoomConfigProps {
-    houses: House[]
+    houses: House[],
+    setSelectedRoomParent: (room : Room) => void
 }
 
-export function HomeAndRoomConfig({houses} : HomeAndRoomConfigProps) {
+export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomConfigProps) {
     const [selectedHouse, setSelectedHouse] = useState<House>(houses[0]);
     const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0].rooms[0]);
 
-    const handleHouseChange = (event: React.SyntheticEvent | null, selectedHouseId: number) => {
-        console.log(selectedHouseId);
-        const selectedHouse = houses.find(house => house.value === selectedHouseId);
+    useEffect(() => {
+        setSelectedRoomParent(selectedRoom);
+    }, []);
 
+    const handleHouseChange = (event: React.SyntheticEvent | null, selectedHouseId: number) => {
+        const selectedHouse = houses.find(house => house.value === selectedHouseId);
         setSelectedHouse(selectedHouse);
         setSelectedRoom(selectedHouse.rooms[0]);
+        setSelectedRoomParent(selectedHouse.rooms[0]);
     };
 
     const handleRoomChange = (event: React.SyntheticEvent | null, selectedRoomId: number) => {
-        setSelectedRoom(selectedHouse.rooms.find(room => room.value === selectedRoomId));
+        const room = selectedHouse.rooms.find(room => room.value === selectedRoomId);
+        setSelectedRoom(room);
+        setSelectedRoomParent(room);
     };
 
     return (

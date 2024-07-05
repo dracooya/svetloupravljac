@@ -1,9 +1,9 @@
 import {LightType} from "./Enums/LightType.ts";
 
-export interface LightBasicInfo {
+export interface LightBasicInfoWithStatus {
     id: number,
     ip: string,
     name: string,
     type: LightType,
-
+    isOn: boolean
 }
