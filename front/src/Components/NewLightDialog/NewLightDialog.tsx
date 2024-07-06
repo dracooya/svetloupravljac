@@ -129,11 +129,12 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
     }
 
     useEffect(() => {
-        setIsSearching(true);
-        setTimeout(() => {
-            setIsSearching(false);
-            setHasFoundLights(false);
-        }, 5000);
+        setHasFoundLights(true);
+        // setIsSearching(true);
+        // setTimeout(() => {
+        //     setIsSearching(false);
+        //     setHasFoundLights(true);
+        // }, 5000);
     }, []);
     return (
         <>
@@ -165,8 +166,8 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                             sx={{
                                 backgroundColor:'#0f171f',
                                 width: {
-                                    xs:'90vw',
-                                    sm:'90vw',
+                                    xs:'50vw',
+                                    sm:'70vw',
                                     md:'70vw',
                                     lg:'60vw',
                                     xl:'40vw'
@@ -185,7 +186,10 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                         <Grid pr={4}>
                                             <Typography level={'h1'}>Add New Light</Typography>
                                         </Grid>
-                                        <Grid>
+                                        <Grid pt={{
+                                            xs:2,
+                                            sm:0
+                                        }}>
                                             {hasFoundLights?
                                             <Button variant={'soft'} size={'lg'} onClick={finishAll}>Finish All</Button>
                                                 : null}
@@ -206,7 +210,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                         <Typography mb={2} level={'h3'}>Found {foundLights.length} lights:</Typography>
                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} container sx={{overflowY:'scroll', height:'25vh'}}>
                                                             {foundLights.map((light) => {
-                                                                return <Grid xs={3} sm={3} md={3} lg={3} xl={3} pb={1} key={light.mac} container height={'fit-content'} border={selectedLight == light ? '1px solid #12467b' : 'none'} sx={{borderRadius:'1em'}}>
+                                                                return <Grid xs={4} sm={4} md={3} lg={3} xl={3} pb={1} key={light.mac} container height={'fit-content'} border={selectedLight == light ? '1px solid #12467b' : 'none'} sx={{borderRadius:'1em'}}>
                                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} mt={2} container justifyContent={'center'}>
                                                                             <Badge badgeContent={light.isSetup? '✓' : ''}  color={light.isSetup? "success" : "primary"} onClick={() => handleSelectedLightChange(light)}>
                                                                                 {light.isSetup ? light.type == LightType.BULB?
@@ -229,7 +233,14 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                 <Grid xs={1} sm={1} md={1} lg={1} xl={1} sx={{paddingBottom:'1em'}}>
                                                                     <Icon path={mdilLightbulb} size={1.5} color={'white'}/>
                                                                 </Grid>
-                                                                <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}>
+                                                                <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}
+                                                                      pr={{
+                                                                          xl:0,
+                                                                          lg:0,
+                                                                          md:0,
+                                                                          sm:2,
+                                                                          xs:2
+                                                                      }}>
                                                                     <FormControl error={!!errors.name}>
                                                                         <Input placeholder="Light Name"
                                                                                type={'text'}
@@ -251,11 +262,18 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                 </Grid>
                                                             </Grid>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container alignItems={'center'} pt={2}>
-                                                                <Grid xs={6} sm={6} md={6} lg={6} xl={6} pr={4} container alignItems={'center'}>
+                                                                <Grid xs={12} sm={12} md={6} lg={6} xl={6} pr={{
+                                                                    xl:4,
+                                                                    lg:4,
+                                                                    md:4,
+                                                                    sm:2,
+                                                                    xs:2
+                                                                }}
+                                                                      container alignItems={'center'}>
                                                                     <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
                                                                         <Icon path={mdilHome} size={1.5} color={'white'}/>
                                                                     </Grid>
-                                                                    <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={3}>
+                                                                    <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}>
                                                                         <Select
                                                                             slotProps={{
                                                                                 listbox: {
@@ -288,13 +306,27 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                         </Select>
                                                                     </Grid>
                                                                 </Grid>
-                                                                <Grid xs={6} sm={6} md={6} lg={6} xl={6} pr={2} container alignItems={'center'}>
+                                                                <Grid xs={12} sm={12} md={6} lg={6} xl={6}
+                                                                      pr={{
+                                                                          xl:0,
+                                                                          lg:0,
+                                                                          md:0,
+                                                                          sm:2,
+                                                                          xs:2
+                                                                      }}
+                                                                      pt={{
+                                                                          md:0,
+                                                                          sm:4,
+                                                                          xs:4
+                                                                      }}
+                                                                      container alignItems={'center'}>
                                                                     <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
                                                                         <SvgIcon color={'warning'} fill="white" sx={{ paddingTop:'0.2em'}}>
                                                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35"><path d="M34.06,1H1.94A.94.94,0,0,0,1,1.94V34.06a.94.94,0,0,0,.94.94H34.06a.94.94,0,0,0,.94-.94V1.94A.94.94,0,0,0,34.06,1ZM18.94,33.11V30.28a.94.94,0,1,0-1.88,0v2.83H2.89V24.58l8.49,0h0a.95.95,0,0,0,0-1.89l-8.5,0V2.89H11.3l.09,9.45a1,1,0,0,0,.94.94h0a1,1,0,0,0,.94-1l-.09-9.43H33.11v8.5H18a.94.94,0,0,0-.94.94V23.67a.94.94,0,0,0,1.88,0V13.28H33.11V33.11Z"/></svg>
                                                                         </SvgIcon>
                                                                     </Grid>
-                                                                    <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}>
+                                                                    <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}
+                                                                    >
                                                                         <Select
                                                                             slotProps={{
                                                                                 listbox: {
@@ -332,7 +364,14 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                 <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
                                                                     <Icon path={mdilHelp} size={1.5} color={'white'}/>
                                                                 </Grid>
-                                                                <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}>
+                                                                <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}
+                                                                      pr={{
+                                                                          xl:0,
+                                                                          lg:0,
+                                                                          md:0,
+                                                                          sm:2,
+                                                                          xs:2
+                                                                      }}>
                                                                     <Select
                                                                         slotProps={{
                                                                             listbox: {
