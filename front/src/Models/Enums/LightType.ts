@@ -1,3 +1,3 @@
 export enum LightType {
-    BULB, STRIP, LAMP
+    BULB = "BULB", STRIP = "STRIP", LAMP = "LAMP"
 }

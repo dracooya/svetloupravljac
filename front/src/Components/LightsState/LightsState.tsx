@@ -1,17 +1,25 @@
 import {Avatar, Card, CardContent, Grid, List, Switch, Typography} from "@mui/joy";
-import React from "react";
+import React, {useState} from "react";
 import "../Main/Main.css"
 import {LightBasicInfoWithStatus} from "../../Models/LightBasicInfoWithStatus.ts";
 import {LightType} from "../../Models/Enums/LightType.ts";
 import Icon from "@mdi/react";
 import {mdiLampOutline, mdiLedStripVariant, mdiLightbulbOutline} from '@mdi/js';
+import {NewLightDialog} from "../NewLightDialog/NewLightDialog.tsx";
+import {House} from "../../Models/House.ts";
 
 interface LightsStateProps {
-    lights: LightBasicInfoWithStatus[] | undefined
+    lights: LightBasicInfoWithStatus[] | undefined,
+    houses: House[]
 }
 
-export function LightsState({lights}: LightsStateProps) {
+export function LightsState({lights, houses}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
+    const [openNewLightDialog, setOpenNewLightDialog] = useState<boolean>(false);
+    const handleLightDialogClose = () => {
+        setOpenNewLightDialog(false);
+    }
+
     return (
         <>
             <Grid container xs={12} sm={12} lg={12} md={12} xl={12}  justifyContent={'center'}>
@@ -98,11 +106,10 @@ export function LightsState({lights}: LightsStateProps) {
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'} mt={4}>
                     <Grid justifyContent={'center'} direction={'row'} container alignItems={'center'}>
                         <Grid sx={{display:'flex', justifyContent:'center'}}>
-                            <Avatar sx={{border:'2px solid white', backgroundColor:'transparent',
-                                cursor:'pointer',
-                                "&:hover": {
-                                    backgroundColor:"rgba(255,255,255,0.4)"}}}
-                                    size="lg" src="src/assets/icons/plus.png" />
+                            <Avatar sx={{border:'2px solid white', backgroundColor:'transparent'}} className={'clickable'}
+                                    size="lg" src="src/assets/icons/plus.png"
+                                    onClick={() => {
+                                        setOpenNewLightDialog(true)}}/>
                         </Grid>
                         <Grid sx={{display:'flex', justifyContent:'center'}} pl={2}>
                             <Typography sx={{fontFamily:'Inter !important'}}>Add New Light</Typography>
@@ -110,6 +117,7 @@ export function LightsState({lights}: LightsStateProps) {
                     </Grid>
                 </Grid>
             </Grid>
+            <NewLightDialog open={openNewLightDialog} houses={houses} closeModalCallback={handleLightDialogClose}/>
         </>
     );
 }

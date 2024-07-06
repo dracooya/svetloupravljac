@@ -31,11 +31,7 @@ export function Scenes({scenes} : ScenesProps) {
                                         <ListItem >
                                             <Grid>
                                                 <Grid sx={{display:'flex', justifyContent:'center'}}>
-                                                    <Avatar sx={{border:'1px solid #12467b',
-                                                        cursor:'pointer',
-                                                        "&:hover": {
-                                                    backgroundColor:"rgba(255,255,255,0.4)"}
-                                                    }} size="lg" src="src/assets/icons/sun.png" />
+                                                    <Avatar sx={{border:'1px solid #12467b'}} className={'clickable'} size="lg" src="src/assets/icons/sun.png" />
                                                 </Grid>
                                                 <Grid>
                                                     {scene.name}

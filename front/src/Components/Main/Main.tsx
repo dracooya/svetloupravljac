@@ -222,7 +222,7 @@ export function Main() {
                         lg:0,
                         xl:0
                     }} justifyContent={'center'} alignItems={'flex-start'}>
-                        <LightsState lights={selectedRoom?.lights}/>
+                        <LightsState lights={selectedRoom?.lights} houses={houses}/>
                     </Grid>
                 </Grid>
             </Grid>
