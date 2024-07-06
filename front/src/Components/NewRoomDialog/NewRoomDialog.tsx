@@ -29,7 +29,7 @@ interface RoomForm {
     house: number
 }
 export function NewRoomDialog({open, closeModalCallback, houses}: NewRoomDialogProps) {
-    const {register, handleSubmit, setValue, formState: {errors}} = useForm<RoomForm>({
+    const {register, handleSubmit, setValue, reset, formState: {errors}} = useForm<RoomForm>({
         defaultValues: {
             name: "",
             house: houses[0].value
@@ -43,7 +43,8 @@ export function NewRoomDialog({open, closeModalCallback, houses}: NewRoomDialogP
     };
 
     const onSubmit = (data : RoomForm) => {
-        /*TODO: Check password*/
+        /*TODO: Send data */
+        reset();
         console.log(data);
     };
 

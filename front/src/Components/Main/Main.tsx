@@ -2,10 +2,9 @@ import {CssVarsProvider, Grid,} from "@mui/joy";
 import {useState} from "react";
 import {HomeAndRoomConfig} from "../HomeAndRoomConfig/HomeAndRoomConfig.tsx";
 import {House} from "../../Models/House.ts";
-import {QuickActions} from "../QuickActions/QuickActions.tsx";
-import {QuickAction} from "../../Models/QuickAction.ts";
+import {Scenes} from "../Scenes/Scenes.tsx";
+import {Scene} from "../../Models/Scene.ts";
 import {LightType} from "../../Models/Enums/LightType.ts";
-import {SceneType} from "../../Models/Enums/SceneType.ts";
 import {LightsState} from "../LightsState/LightsState.tsx";
 import {Room} from "../../Models/Room.ts";
 
@@ -47,7 +46,7 @@ export function Main() {
     }
 
 
-    const [quickActions, setQuickActions] = useState<QuickAction[]>([
+    const [scenes, setScenes] = useState<Scene[]>([
         {
             id: 1,
             name: 'PulsyBoi',
@@ -60,12 +59,11 @@ export function Main() {
                         name: "Gooby",
                         type: LightType.BULB
                     },
-                    scene: {
+                    mode: {
                         id: 1,
                         name: "Pulse",
                         speed: 100,
                         dimming: 100,
-                        type: SceneType.PREDEFINED
                     }
                 },
                 {
@@ -75,12 +73,11 @@ export function Main() {
                         name: "Booby",
                         type: LightType.LAMP
                     },
-                    scene: {
+                    mode: {
                         id: 1,
                         name: "Pulse",
                         speed: 100,
                         dimming: 100,
-                        type: SceneType.PREDEFINED
                     }
                 }
             ]
@@ -96,12 +93,11 @@ export function Main() {
                         name: "Gooby",
                         type: LightType.BULB
                     },
-                    scene: {
+                    mode: {
                         id: 1,
                         name: "Pulse",
                         speed: 100,
                         dimming: 100,
-                        type: SceneType.PREDEFINED
                     }
                 },
                 {
@@ -111,12 +107,11 @@ export function Main() {
                         name: "Booby",
                         type: LightType.STRIP
                     },
-                    scene: {
+                    mode: {
                         id: 1,
                         name: "Pulse",
                         speed: 100,
                         dimming: 100,
-                        type: SceneType.PREDEFINED
                     }
                 }
             ]
@@ -133,12 +128,11 @@ export function Main() {
                         name: "Gooby",
                         type: LightType.LAMP
                     },
-                    scene: {
+                    mode: {
                         id: 1,
                         name: "Pulse",
                         speed: 100,
                         dimming: 100,
-                        type: SceneType.PREDEFINED
                     }
                 },
                 {
@@ -148,12 +142,11 @@ export function Main() {
                         name: "Booby",
                         type: LightType.BULB
                     },
-                    scene: {
+                    mode: {
                         id: 1,
                         name: "Pulse",
                         speed: 100,
                         dimming: 100,
-                        type: SceneType.PREDEFINED
                     }
                 }
             ]
@@ -170,12 +163,11 @@ export function Main() {
                         name: "Gooby",
                         type: LightType.BULB
                     },
-                    scene: {
+                    mode: {
                         id: 1,
                         name: "Pulse",
                         speed: 100,
                         dimming: 100,
-                        type: SceneType.PREDEFINED
                     }
                 },
                 {
@@ -185,17 +177,16 @@ export function Main() {
                         name: "Booby",
                         type: LightType.BULB
                     },
-                    scene: {
+                    mode: {
                         id: 1,
                         name: "Pulse",
                         speed: 100,
                         dimming: 100,
-                        type: SceneType.PREDEFINED
                     }
                 }
             ]
         }
-    ]);
+    ])
     return (
         <>
             <CssVarsProvider
@@ -221,7 +212,7 @@ export function Main() {
                     <Grid container xs={12} sm={12} md={6} lg={4} xl={4} pl={2} rowSpacing={3} justifyContent={'center'}>
                             <HomeAndRoomConfig houses={houses} setSelectedRoomParent={handleRoomSelectionChange}/>
                         <Grid mt={6}>
-                            <QuickActions quickActions={quickActions}/>
+                            <Scenes scenes={scenes}/>
                         </Grid>
                     </Grid>
                     <Grid pl={8} pr={3} container xs={12} sm={12} md={6} lg={8} xl={8} mt={{

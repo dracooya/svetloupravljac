@@ -6,10 +6,16 @@ import {House} from "../../Models/House.ts";
 import React, {useEffect, useState} from "react";
 import {Room} from "../../Models/Room.ts";
 import {NewRoomDialog} from "../NewRoomDialog/NewRoomDialog.tsx";
+import {NewHouseDialog} from "../NewHouseDialog/NewHouseDialog.tsx";
 
 interface HomeAndRoomConfigProps {
     houses: House[],
     setSelectedRoomParent: (room : Room) => void
+}
+
+interface HouseForm {
+    name: string,
+    house: number
 }
 
 export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomConfigProps) {
@@ -37,6 +43,10 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
 
     const handleRoomDialogClose = () => {
         setOpenNewRoomDialog(false);
+    }
+
+    const handleHouseDialogClose = () => {
+        setOpenNewHouseDialog(false);
     }
 
     return (
@@ -81,7 +91,10 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                     </Select>
                 </Grid>
                 <Grid xs={4} sm={4} md={3} lg={3} xl={3}>
-                    <Button variant={'outlined'} startDecorator={<Icon path={mdilPlus} size={1} />}>Add</Button>
+                    <Button variant={'outlined'}
+                            onClick={() => {
+                                setOpenNewHouseDialog(true)}}
+                            startDecorator={<Icon path={mdilPlus} size={1} />}>Add</Button>
                 </Grid>
             </Grid>
 
@@ -131,6 +144,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                 </Grid>
             </Grid>
             <NewRoomDialog open={openNewRoomDialog} houses={houses} closeModalCallback={handleRoomDialogClose}/>
+            <NewHouseDialog open={openNewHouseDialog} closeModalCallback={handleHouseDialogClose}/>
         </>
     );
 }

@@ -1,9 +1,9 @@
-import {SceneType} from "./Enums/SceneType.ts";
+import {LightCustomColorConfig} from "./LightCustomColorConfig.ts";
+import {LightModeConfig} from "./LightModeConfig.ts";
 
 export interface Scene {
     id: number,
     name: string,
-    speed: number,
-    dimming: number,
-    type: SceneType
+    lightsCustomColorConfig: LightCustomColorConfig[],
+    lightsSceneConfig: LightModeConfig[]
 }
