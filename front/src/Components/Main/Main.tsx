@@ -49,7 +49,7 @@ export function Main() {
     const [scenes, setScenes] = useState<Scene[]>([
         {
             id: 1,
-            name: 'PulsyBoi',
+            name: 'PulsyBoi1',
             lightsCustomColorConfig: [],
             lightsSceneConfig: [
                 {

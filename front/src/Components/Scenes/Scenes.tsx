@@ -1,9 +1,23 @@
-import {Avatar, Button, Grid, IconButton, List, ListItem, Typography} from "@mui/joy";
+import {
+    Avatar,
+    Button,
+    Dropdown,
+    Grid,
+    IconButton,
+    List,
+    ListItem,
+    Menu,
+    MenuButton,
+    MenuItem,
+    Typography
+} from "@mui/joy";
 import {Scene} from "../../Models/Scene.ts";
 import "../Main/Main.css"
 import Icon from "@mdi/react";
-import {mdilPlus} from "@mdi/light-js";
+import {mdilPencil, mdilPlus} from "@mdi/light-js";
 import React from "react";
+import {MoreVert} from "@mui/icons-material";
+import {mdilDelete} from "@mdi/light-js/mdil";
 
 interface ScenesProps {
     scenes: Scene[]
@@ -31,10 +45,26 @@ export function Scenes({scenes} : ScenesProps) {
                                         <ListItem >
                                             <Grid>
                                                 <Grid sx={{display:'flex', justifyContent:'center'}}>
-                                                    <Avatar sx={{border:'1px solid #12467b'}} className={'clickable'} size="lg" src="src/assets/icons/sun.png" />
+                                                    <Avatar  className={'clickable'} size="lg" src="src/assets/icons/modes/club.png" />
                                                 </Grid>
-                                                <Grid>
-                                                    {scene.name}
+                                                <Grid container alignItems={'center'}>
+                                                    <Grid xs={11} sm={11} md={11} lg={11} xl={11}>
+                                                        {scene.name}
+                                                    </Grid>
+                                                    <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
+                                                        <Dropdown>
+                                                            <MenuButton
+                                                                slots={{ root: IconButton }}
+                                                                slotProps={{ root: { variant: 'plain', color: 'neutral', sx:{ ":hover" : {backgroundColor:'transparent'}} } }}
+                                                            >
+                                                                <MoreVert />
+                                                            </MenuButton>
+                                                            <Menu>
+                                                                <MenuItem><Icon path={mdilPencil} size={1}/>Edit</MenuItem>
+                                                                <MenuItem><Icon path={mdilDelete} size={1}/>Delete</MenuItem>
+                                                            </Menu>
+                                                        </Dropdown>
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
                                         </ListItem>

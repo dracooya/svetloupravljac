@@ -30,6 +30,7 @@ import {LightType} from "../../Models/Enums/LightType.ts";
 import {House} from "../../Models/House.ts";
 import {mdilHome} from "@mdi/light-js";
 import {Room} from "../../Models/Room.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 
 interface NewLightDialogProps {
     open: boolean,
@@ -67,6 +68,10 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
         {ip:'192.168.0.102', mac:'mdewpifee3d', isSetup: false},
 
     ]);
+
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
 
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
         const selectedHouse = houses.find(house => house.value === selectedHouseId!);
@@ -108,6 +113,10 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
         setValue("room", room!);
     };
 
+    const handlePopupClose = () => {
+        setPopupOpen(false);
+    }
+
     const handleSelectedLightChange = (selectedLight : NewLight) => {
         setSelectedLight(selectedLight);
         if(selectedLight.isSetup) {
@@ -126,15 +135,29 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
 
     const finishAll = () => {
         console.log(setupLights);
+        if(setupLights.length != 0) {
+            setPopupMessage("Successfully Added Lights!");
+            setIsSuccess(true);
+            setPopupOpen(true);
+        }
+        setIsSearching(false);
+        setHasFoundLights(false);
+        setFoundLights([]);
+        setSetupLights([]);
+        setIsModification(false);
+        setSelectedType(LightType.BULB);
+        setSelectedHouse(houses[0]);
+        setSelectedRoom(houses[0].rooms[0]);
+        closeModalCallback();
     }
 
     useEffect(() => {
-        setHasFoundLights(true);
-        // setIsSearching(true);
-        // setTimeout(() => {
-        //     setIsSearching(false);
-        //     setHasFoundLights(true);
-        // }, 5000);
+        setHasFoundLights(false);
+        setIsSearching(true);
+        setTimeout(() => {
+            setIsSearching(false);
+            setHasFoundLights(true);
+        }, 5000);
     }, []);
     return (
         <>
@@ -207,7 +230,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                             </Grid>
                                             : hasFoundLights?
                                                 <Grid pt={5} xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
-                                                        <Typography mb={2} level={'h3'}>Found {foundLights.length} lights:</Typography>
+                                                        <Typography mb={2} level={'h3'}>Found {foundLights.length} lights</Typography>
                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} container sx={{overflowY:'scroll', height:'25vh'}}>
                                                             {foundLights.map((light) => {
                                                                 return <Grid xs={4} sm={4} md={3} lg={3} xl={3} pb={1} key={light.mac} container height={'fit-content'} border={selectedLight == light ? '1px solid #12467b' : 'none'} sx={{borderRadius:'1em'}}>
@@ -434,6 +457,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                     </Modal>
                 )}
             </Transition>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }

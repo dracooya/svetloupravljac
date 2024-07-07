@@ -1,4 +1,4 @@
-import {Button, Grid, Option, Select, selectClasses, SvgIcon, Typography} from "@mui/joy";
+import {Button, Grid, IconButton, Option, Select, selectClasses, SvgIcon, Typography} from "@mui/joy";
 import Icon from "@mdi/react";
 import {mdilHome, mdilPlus} from "@mdi/light-js";
 import {KeyboardArrowDown} from "@mui/icons-material";
@@ -7,6 +7,7 @@ import React, {useEffect, useState} from "react";
 import {Room} from "../../Models/Room.ts";
 import {NewRoomDialog} from "../NewRoomDialog/NewRoomDialog.tsx";
 import {NewHouseDialog} from "../NewHouseDialog/NewHouseDialog.tsx";
+import {mdilDelete, mdilPencil} from "@mdi/light-js/mdil";
 
 interface HomeAndRoomConfigProps {
     houses: House[],
@@ -58,7 +59,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                 <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
                     <Icon path={mdilHome} size={1.5} />
                 </Grid>
-                <Grid xs={7} sm={7} md={8} lg={8} xl={8} pl={2} >
+                <Grid xs={7} sm={7} md={8} lg={7} xl={7} pl={2} >
                     <Select
                         slotProps={{
                             listbox: {
@@ -90,11 +91,17 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                         })}
                     </Select>
                 </Grid>
-                <Grid xs={4} sm={4} md={3} lg={3} xl={3}>
-                    <Button variant={'outlined'}
-                            onClick={() => {
-                                setOpenNewHouseDialog(true)}}
-                            startDecorator={<Icon path={mdilPlus} size={1} />}>Add</Button>
+                <Grid xs={4} sm={3} md={3} lg={4} xl={4} container pl={1}>
+                    <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
+                        <IconButton  onClick={() => {
+                            setOpenNewHouseDialog(true)}} variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPlus}/></IconButton>
+                    </Grid>
+                    <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
+                        <IconButton variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPencil} size={0.9}/></IconButton>
+                    </Grid>
+                    <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
+                        <IconButton  variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilDelete} size={0.9}/></IconButton>
+                    </Grid>
                 </Grid>
             </Grid>
 
@@ -104,7 +111,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35"><path d="M34.06,1H1.94A.94.94,0,0,0,1,1.94V34.06a.94.94,0,0,0,.94.94H34.06a.94.94,0,0,0,.94-.94V1.94A.94.94,0,0,0,34.06,1ZM18.94,33.11V30.28a.94.94,0,1,0-1.88,0v2.83H2.89V24.58l8.49,0h0a.95.95,0,0,0,0-1.89l-8.5,0V2.89H11.3l.09,9.45a1,1,0,0,0,.94.94h0a1,1,0,0,0,.94-1l-.09-9.43H33.11v8.5H18a.94.94,0,0,0-.94.94V23.67a.94.94,0,0,0,1.88,0V13.28H33.11V33.11Z"/></svg>
                     </SvgIcon>
                 </Grid>
-                <Grid xs={7} sm={7} md={8} lg={8} xl={8} pl={2}>
+                <Grid xs={7} sm={7} md={8} lg={7} xl={7} pl={2}>
                     <Select
                         slotProps={{
                             listbox: {
@@ -136,11 +143,17 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                         })}
                     </Select>
                 </Grid>
-                <Grid xs={4} sm={4} md={3} lg={3} xl={3}>
-                    <Button
-                        onClick={() => {
-                            setOpenNewRoomDialog(true)}}
-                        variant={'outlined'} startDecorator={<Icon path={mdilPlus} size={1} />}>Add</Button>
+                <Grid xs={4} sm={3} md={3} lg={4} xl={4} container pl={1}>
+                    <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
+                         <IconButton  onClick={() => {
+                        setOpenNewRoomDialog(true)}} variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPlus}/></IconButton>
+                    </Grid>
+                    <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
+                        <IconButton variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPencil} size={0.9}/></IconButton>
+                    </Grid>
+                    <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
+                        <IconButton  variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilDelete} size={0.9}/></IconButton>
+                    </Grid>
                 </Grid>
             </Grid>
             <NewRoomDialog open={openNewRoomDialog} houses={houses} closeModalCallback={handleRoomDialogClose}/>
