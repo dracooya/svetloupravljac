@@ -1,34 +1,44 @@
 import {
+    Avatar,
     DialogContent,
     Grid,
     Input,
     Modal,
     ModalClose,
-    ModalDialog, Slider,
+    ModalDialog,
+    Slider,
     Tab,
     tabClasses,
     TabList,
     TabPanel,
-    Tabs, Typography
+    Tabs,
+    Typography
 } from "@mui/joy";
 import {Transition} from "react-transition-group";
-import {useEffect, useState} from "react";
-import {HexColorInput, HexColorPicker, RgbColor, RgbColorPicker} from "react-colorful";
+import React, {useEffect, useState} from "react";
+import {RgbColor, RgbColorPicker} from "react-colorful";
 import {useDebounce} from "use-debounce";
-import {mdiEyedropperVariant, mdiPalette, mdiThermometer, mdiWhiteBalanceSunny} from "@mdi/js";
+import {mdiEyedropperVariant, mdiRabbit, mdiThermometer, mdiTortoise, mdiWhiteBalanceSunny} from "@mdi/js";
 import Icon from "@mdi/react";
+import {AvailableMode} from "../../Models/AvailableMode.ts";
+import {ModeCategory} from "../../Models/Enums/ModeCategory.ts";
+import "./LightColorChangeDialog.css";
 
 interface LightColorChangeDialogProps {
     open: boolean,
     closeModalCallback: () => void,
+    availableModes: AvailableMode[]
 }
 
-export function LightColorChangeDialog({open,closeModalCallback}: LightColorChangeDialogProps) {
+export function LightColorChangeDialog({open,closeModalCallback, availableModes}: LightColorChangeDialogProps) {
     const [color, setColor] = useState<RgbColor>({r:255, g:255, b:255});
     const [debouncedColor] = useDebounce(color, 200);
     const [colorHex, setColorHex] = useState<string>("FFFFFF");
     const [whiteKelvin, setWhiteKelvin] = useState<number>(2200);
     const [brightness, setBrightness] = useState<number>(0);
+    const [modeBrightness, setModeBrightness] = useState<number>(100);
+    const [selectedMode, setSelectedMode] = useState<AvailableMode>();
+    const [modeSpeed, setModeSpeed] = useState<number>(50);
     useEffect(() => {
         console.log(debouncedColor)
     }, [debouncedColor]);
@@ -255,7 +265,164 @@ export function LightColorChangeDialog({open,closeModalCallback}: LightColorChan
                                         </TabPanel>
                                         <TabPanel value={1} sx={{paddingTop:'0'}}>
                                             <Grid height={'75vh'} xs={12} sm={12} md={12} lg={12} xl={12}>
+                                                <Grid sx={{position:'fixed', zIndex:999, bottom:0, background:'#0f171f' }} pb={2} xs={12} sm={12} lg={12} md={12} xl={9} container>
+                                                    {selectedMode?.brightnessChange?
+                                                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} container>
+                                                        <Grid xs={1} sm={1} md={1} lg={1} xl={1} container alignItems={'center'} justifyContent={'center'}>
+                                                            <Icon path={mdiWhiteBalanceSunny} size={0.8} />
+                                                        </Grid>
+                                                        <Grid xs={10} sm={10} md={10} lg={10} xl={10} pl={2} pr={2} container
+                                                              sx={{ background: "linear-gradient(90deg, rgba(2,165,220,1) 0%, rgba(113,224,251,1) 100%);",
+                                                                  height:'20px', borderRadius:'1em'}}>
+                                                            <Slider size="lg"
+                                                                    sx={{
+                                                                        '& .MuiSlider-track': {
+                                                                            background:'transparent',
+                                                                        },
+                                                                        '& .MuiSlider-rail': {
+                                                                            height:'20px',
+                                                                            background: "transparent",
+                                                                        },
+                                                                        '& .MuiSlider-thumb': {
+                                                                            height:'20px',
+                                                                            background:'transparent',
+                                                                            border:'2px solid white'
+                                                                        },
+                                                                    }}
+                                                                    onChange={(event, newValue) => setModeBrightness(newValue)}
+                                                                    value={modeBrightness}
+                                                                    step={1}
+                                                                    min={0}
+                                                                    max={100}/>
+                                                        </Grid>
+                                                        <Grid xs={1} sm={1} md={1} lg={1} xl={1} container justifyContent={'center'} alignItems={'center'}>
+                                                            <Icon path={mdiWhiteBalanceSunny} size={1} />
+                                                        </Grid>
+                                                    </Grid>
+                                                    : null}
+                                                    {selectedMode?.speedChange?
+                                                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} pt={3} container>
+                                                        <Grid xs={1} sm={1} md={1} lg={1} xl={1} container alignItems={'center'} justifyContent={'center'}>
+                                                            <Icon path={mdiTortoise} size={1} />
+                                                        </Grid>
+                                                        <Grid xs={10} sm={10} md={10} lg={10} xl={10} pl={2} pr={2} container
+                                                              sx={{ background: "linear-gradient(90deg, rgba(2,165,220,1) 0%, rgba(113,224,251,1) 100%);",
+                                                                  height:'20px', borderRadius:'1em'}}>
+                                                            <Slider size="lg"
+                                                                    sx={{
+                                                                        '& .MuiSlider-track': {
+                                                                            background:'transparent',
+                                                                        },
+                                                                        '& .MuiSlider-rail': {
+                                                                            height:'20px',
+                                                                            background: "transparent",
+                                                                        },
+                                                                        '& .MuiSlider-thumb': {
+                                                                            height:'20px',
+                                                                            background:'transparent',
+                                                                            border:'2px solid white'
+                                                                        },
+                                                                    }}
+                                                                    onChange={(event, newValue) => setModeSpeed(newValue)}
+                                                                    value={modeSpeed}
+                                                                    step={1}
+                                                                    min={0}
+                                                                    max={100}/>
+                                                        </Grid>
+                                                        <Grid xs={1} sm={1} md={1} lg={1} xl={1} container justifyContent={'center'} alignItems={'center'}>
+                                                            <Icon path={mdiRabbit} size={1} />
+                                                        </Grid>
+                                                    </Grid>
+                                                        : null}
+                                                </Grid>
 
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} pb={4} pl={1}>
+                                                    <Typography level={'h3'}>Basic</Typography>
+                                                </Grid>
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} container>
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.BASIC).map((basic) => {
+                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
+                                                                            <Avatar
+                                                                                onClick={() => setSelectedMode(basic)}
+                                                                                className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                                        </Grid>
+                                                                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
+                                                                            {basic.name}
+                                                                        </Grid>
+                                                            </Grid>
+                                                    })}
+                                                </Grid>
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} pb={4} pt={8}  pl={1}>
+                                                    <Typography level={'h3'}>Functional</Typography>
+                                                </Grid>
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.FUNCTIONAL).map((basic) => {
+                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
+                                                                <Avatar
+                                                                    onClick={() => setSelectedMode(basic)}
+                                                                    className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                            </Grid>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
+                                                                {basic.name}
+                                                            </Grid>
+                                                        </Grid>
+                                                    })}
+                                                </Grid>
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} pb={4} pt={8}  pl={1}>
+                                                    <Typography level={'h3'}>White</Typography>
+                                                </Grid>
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.WHITE).map((basic) => {
+                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
+                                                                <Avatar
+                                                                    onClick={() => setSelectedMode(basic)}
+                                                                    className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                            </Grid>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
+                                                                {basic.name}
+                                                            </Grid>
+                                                        </Grid>
+                                                    })}
+                                                </Grid>
+
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} pb={4} pt={8}  pl={1}>
+                                                    <Typography level={'h3'}>Color</Typography>
+                                                </Grid>
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.COLOR).map((basic) => {
+                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
+                                                                <Avatar
+                                                                    onClick={() => setSelectedMode(basic)}
+                                                                    className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                            </Grid>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
+                                                                {basic.name}
+                                                            </Grid>
+                                                        </Grid>
+                                                    })}
+                                                </Grid>
+
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} pb={4} pt={8} pl={1}>
+                                                    <Typography level={'h3'}>Progressive</Typography>
+                                                </Grid>
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3}  pb={15}>
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.PROGRESSIVE).map((basic) => {
+                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
+                                                                <Avatar
+                                                                    onClick={() => setSelectedMode(basic)}
+                                                                    className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                            </Grid>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
+                                                                {basic.name}
+                                                            </Grid>
+                                                        </Grid>
+                                                    })}
+                                                </Grid>
                                             </Grid>
                                         </TabPanel>
                                     </Tabs>
