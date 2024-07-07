@@ -265,7 +265,7 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                         </TabPanel>
                                         <TabPanel value={1} sx={{paddingTop:'0'}}>
                                             <Grid height={'75vh'} xs={12} sm={12} md={12} lg={12} xl={12}>
-                                                <Grid sx={{position:'fixed', zIndex:999, bottom:0, background:'#0f171f' }} pb={2} xs={12} sm={12} lg={12} md={12} xl={9} container>
+                                                <Grid sx={{position:'fixed', zIndex:999, bottom:0, background:'#0f171f' }} pb={2} xs={8} sm={8} lg={9} md={9} xl={9} container>
                                                     {selectedMode?.brightnessChange?
                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} container>
                                                         <Grid xs={1} sm={1} md={1} lg={1} xl={1} container alignItems={'center'} justifyContent={'center'}>
@@ -339,9 +339,9 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} pb={4} pl={1}>
                                                     <Typography level={'h3'}>Basic</Typography>
                                                 </Grid>
-                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} container>
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3}>
                                                     {availableModes.filter(mode => mode.category == ModeCategory.BASIC).map((basic) => {
-                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
                                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                             <Avatar
                                                                                 onClick={() => setSelectedMode(basic)}
@@ -358,7 +358,7 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                 </Grid>
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
                                                     {availableModes.filter(mode => mode.category == ModeCategory.FUNCTIONAL).map((basic) => {
-                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                 <Avatar
                                                                     onClick={() => setSelectedMode(basic)}
@@ -375,7 +375,7 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                 </Grid>
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
                                                     {availableModes.filter(mode => mode.category == ModeCategory.WHITE).map((basic) => {
-                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                 <Avatar
                                                                     onClick={() => setSelectedMode(basic)}
@@ -393,7 +393,7 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                 </Grid>
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
                                                     {availableModes.filter(mode => mode.category == ModeCategory.COLOR).map((basic) => {
-                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                 <Avatar
                                                                     onClick={() => setSelectedMode(basic)}
@@ -411,7 +411,7 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                 </Grid>
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3}  pb={15}>
                                                     {availableModes.filter(mode => mode.category == ModeCategory.PROGRESSIVE).map((basic) => {
-                                                        return  <Grid container xs={3} sm={3} md={3} lg={3} xl={3} key={basic.id}>
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                 <Avatar
                                                                     onClick={() => setSelectedMode(basic)}
