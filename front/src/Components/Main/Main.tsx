@@ -23,13 +23,6 @@ export function Main() {
                     isOn: true
                 },
                 {
-                    id: 2,
-                    ip: "192.168.0.116",
-                    name: "Booby",
-                    type: LightType.BULB,
-                    isOn: true
-                },
-                {
                     id: 3,
                     ip: "192.168.0.116",
                     name: "Scooby",
@@ -37,7 +30,13 @@ export function Main() {
                     isOn: true
                 },
 
-            ]},{name: "Living Room", value:2, lights: []}]},
+            ]},{name: "Living Room", value:2, lights: [  {
+                    id: 2,
+                    ip: "192.168.0.116",
+                    name: "Booby",
+                    type: LightType.BULB,
+                    isOn: true
+                }]}]},
         {value:2, name: "Gooberung Home", rooms: [ {name: "Bathroom", value:3, lights:[]},{name: "Storage", value:4, lights:[]}]}
     ]);
 
@@ -222,7 +221,7 @@ export function Main() {
                         lg:0,
                         xl:0
                     }} justifyContent={'center'} alignItems={'flex-start'}>
-                        <LightsState lights={selectedRoom?.lights} houses={houses}/>
+                        <LightsState lights={selectedRoom?.lights} houses={houses} currentRoom={selectedRoom}/>
                     </Grid>
                 </Grid>
             </Grid>

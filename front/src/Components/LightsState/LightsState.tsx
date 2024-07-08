@@ -26,21 +26,26 @@ import {LightColorChangeDialog} from "../LightColorChangeDialog/LightColorChange
 import {AvailableMode} from "../../Models/AvailableMode.ts";
 import {ModeCategory} from "../../Models/Enums/ModeCategory.ts";
 import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
+import {EditLightDialog} from "../EditLightDialog/EditLightDialog.tsx";
+import {Room} from "../../Models/Room.ts";
 
 interface LightsStateProps {
     lights: LightBasicInfoWithStatus[] | undefined,
-    houses: House[]
+    houses: House[],
+    currentRoom: Room | undefined
 }
 
-export function LightsState({lights, houses}: LightsStateProps) {
+export function LightsState({lights, houses, currentRoom}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
     const [openNewLightDialog, setOpenNewLightDialog] = useState<boolean>(false);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
     const [selectedLight, setSelectedLight] = useState<LightBasicInfoWithStatus>();
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+    const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
     const [deleteMessage, setDeleteMessage] = useState<string>("");
 
     const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
+    const handleEditDialogClose = () => setOpenEditDialog(false);
 
     const deleteLight = () => {
         //TODO: Delete selected light
@@ -177,7 +182,11 @@ export function LightsState({lights, houses}: LightsStateProps) {
                                                                             <MoreVert />
                                                                         </MenuButton>
                                                                         <Menu>
-                                                                            <MenuItem><Icon path={mdilPencil} size={1}/>Edit</MenuItem>
+                                                                            <MenuItem
+                                                                            onClick={() => {
+                                                                                setSelectedLight(light);
+                                                                                setOpenEditDialog(true);
+                                                                            }}><Icon path={mdilPencil} size={1}/>Edit</MenuItem>
                                                                             <MenuItem
                                                                                 onClick={() => {
                                                                                     setSelectedLight(light);
@@ -185,8 +194,7 @@ export function LightsState({lights, houses}: LightsStateProps) {
                                                                                         " This will also remove it from scenes where it's included." +
                                                                                         " <b>This may cause some scenes to become empty</b> and, therefore, <b>deleted</b>.");
                                                                                     setOpenDeleteDialog(true);
-                                                                                }}
-                                                                            ><Icon path={mdilDelete} size={1}/>Delete</MenuItem>
+                                                                                }}><Icon path={mdilDelete} size={1}/>Delete</MenuItem>
                                                                         </Menu>
                                                                     </Dropdown>
                                                                 </Grid>
@@ -219,6 +227,11 @@ export function LightsState({lights, houses}: LightsStateProps) {
             <DeletionConfirmationDialog open={openDeleteDialog}
                                         closeModalCallback={handleDeleteDialogClose}
                                         message={deleteMessage} deleteConfirmedCallback={deleteLight}/>
+            <EditLightDialog open={openEditDialog}
+                             closeModalCallback={handleEditDialogClose}
+                             currentRoom={currentRoom}
+                             selectedLight={selectedLight}
+                             houses={houses}/>
         </>
     );
 }
