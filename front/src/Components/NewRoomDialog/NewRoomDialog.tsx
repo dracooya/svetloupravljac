@@ -17,18 +17,22 @@ import {InfoOutlined, KeyboardArrowDown} from "@mui/icons-material";
 import {House} from "../../Models/House.ts";
 import Icon from "@mdi/react";
 import {mdilHome} from "@mdi/light-js";
+import {Room} from "../../Models/Room.ts";
+import {useEffect} from "react";
 
 interface NewRoomDialogProps {
     open: boolean,
     closeModalCallback: () => void,
-    houses: House[]
+    houses: House[],
+    isModification: boolean,
+    selectedRoom: Room | undefined
 }
 
 interface RoomForm {
     name: string,
     house: number
 }
-export function NewRoomDialog({open, closeModalCallback, houses}: NewRoomDialogProps) {
+export function NewRoomDialog({open, closeModalCallback, houses, isModification, selectedRoom}: NewRoomDialogProps) {
     const {register, handleSubmit, setValue, reset, formState: {errors}} = useForm<RoomForm>({
         defaultValues: {
             name: "",
@@ -37,13 +41,19 @@ export function NewRoomDialog({open, closeModalCallback, houses}: NewRoomDialogP
         mode: "onChange"
     });
 
+    useEffect(() => {
+        const roomName = isModification? selectedRoom!.name : "";
+        // noinspection TypeScriptValidateTypes
+        setValue("name", roomName);
+    }, [isModification]);
+
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
         // noinspection TypeScriptValidateTypes
         setValue("house", selectedHouseId!);
     };
 
     const onSubmit = (data : RoomForm) => {
-        /*TODO: Send data */
+        /*TODO: Modify/delete room */
         reset();
         console.log(data);
     };
@@ -94,7 +104,7 @@ export function NewRoomDialog({open, closeModalCallback, houses}: NewRoomDialogP
                             <DialogContent>
                                 <Grid container xs={12} sm={12} md={12} lg={12} xl={12} justifyContent={'center'} pb={2}>
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} textAlign={'center'} pb={7}>
-                                        <Typography level={'h1'}>Add New Room</Typography>
+                                        <Typography level={'h1'}>{isModification? "Edit Room" : "Add New Room"}</Typography>
                                     </Grid>
                                     <Grid container xs={12} sm={12} md={8} lg={8} xl={8} justifyContent={'center'}>
                                         <Grid pb={3} xs={12} sm={12} md={12} lg={12} xl={12} container>
@@ -124,6 +134,7 @@ export function NewRoomDialog({open, closeModalCallback, houses}: NewRoomDialogP
                                                 </FormControl>
                                             </Grid>
                                         </Grid>
+                                        {isModification? null :
                                         <Grid pb={3} xs={12} sm={12} md={12} lg={12} xl={12} container alignItems={'center'}>
                                             <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
                                                 <Icon path={mdilHome} size={1.5} />
@@ -162,8 +173,9 @@ export function NewRoomDialog({open, closeModalCallback, houses}: NewRoomDialogP
                                                 </Select>
                                             </Grid>
                                         </Grid>
+                                        }
                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} pt={4} container justifyContent={'center'}>
-                                            <Button onClick={handleSubmit(onSubmit)} variant={'outlined'} size={'lg'}>Add Room</Button>
+                                            <Button onClick={handleSubmit(onSubmit)} variant={'outlined'} size={'lg'}>{isModification? "Edit" : "Add Room"}</Button>
                                         </Grid>
                                     </Grid>
                                 </Grid>

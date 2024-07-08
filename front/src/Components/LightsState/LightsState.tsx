@@ -46,7 +46,7 @@ export function LightsState({lights, houses}: LightsStateProps) {
         //TODO: Delete selected light
     }
 
-    const [availableModes, setAvailableModes] = useState<AvailableMode[]>([
+    const [availableModes] = useState<AvailableMode[]>([
         {id:1, name:'Ocean', speedChange: true, brightnessChange: true, category: ModeCategory.COLOR},
         {id:2, name:'Romance', speedChange: true, brightnessChange: true, category: ModeCategory.COLOR},
         {id:3, name:'Sunset', speedChange: true, brightnessChange: true, category: ModeCategory.COLOR},

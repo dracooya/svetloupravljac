@@ -24,6 +24,8 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
     const [roomDeleteMessage, setRoomDeleteMessage] = useState<string>("");
     const [openHouseDeleteDialog, setOpenHouseDeleteDialog] = useState<boolean>(false);
     const [openRoomDeleteDialog, setOpenRoomDeleteDialog] = useState<boolean>(false);
+    const [isModificationHouse, setIsModificationHouse] = useState<boolean>(false);
+    const [isModificationRoom, setIsModificationRoom] = useState<boolean>(false);
 
     useEffect(() => {
         setSelectedRoomParent(selectedRoom);
@@ -34,12 +36,14 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
         setSelectedHouse(selectedHouse!);
         setSelectedRoom(selectedHouse!.rooms[0]);
         setSelectedRoomParent(selectedHouse!.rooms[0]);
+        setIsModificationHouse(false);
     };
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
         const room = selectedHouse.rooms.find(room => room.value === selectedRoomId);
         setSelectedRoom(room!);
         setSelectedRoomParent(room!);
+        setIsModificationRoom(false);
     };
 
     const handleRoomDialogClose = () => {
@@ -110,10 +114,15 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                 <Grid xs={4} sm={3} md={3} lg={4} xl={4} container pl={1}>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                         <IconButton  onClick={() => {
-                            setOpenNewHouseDialog(true)}} variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPlus}/></IconButton>
+                            setIsModificationHouse(false);
+                            setOpenNewHouseDialog(true);}} variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPlus}/></IconButton>
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
-                        <IconButton variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPencil} size={0.9}/></IconButton>
+                        <IconButton
+                            onClick={() => {
+                                setIsModificationHouse(true);
+                                setOpenNewHouseDialog(true);}}
+                            variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPencil} size={0.9}/></IconButton>
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                         <IconButton  variant="soft"
@@ -172,10 +181,15 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                 <Grid xs={4} sm={3} md={3} lg={4} xl={4} container pl={1}>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                          <IconButton  onClick={() => {
-                        setOpenNewRoomDialog(true)}} variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPlus}/></IconButton>
+                             setIsModificationRoom(false);
+                             setOpenNewRoomDialog(true);}} variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPlus}/></IconButton>
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
-                        <IconButton variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPencil} size={0.9}/></IconButton>
+                        <IconButton
+                            onClick={() => {
+                                setIsModificationRoom(true);
+                                setOpenNewRoomDialog(true);}}
+                            variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPencil} size={0.9}/></IconButton>
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                         <IconButton variant="soft"
@@ -192,8 +206,15 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                     </Grid>
                 </Grid>
             </Grid>
-            <NewRoomDialog open={openNewRoomDialog} houses={houses} closeModalCallback={handleRoomDialogClose}/>
-            <NewHouseDialog open={openNewHouseDialog} closeModalCallback={handleHouseDialogClose}/>
+            <NewRoomDialog open={openNewRoomDialog}
+                           isModification={isModificationRoom}
+                           selectedRoom={selectedRoom}
+                           houses={houses}
+                           closeModalCallback={handleRoomDialogClose}/>
+            <NewHouseDialog open={openNewHouseDialog}
+                            isModification={isModificationHouse}
+                            selectedHouse={selectedHouse}
+                            closeModalCallback={handleHouseDialogClose}/>
             <DeletionConfirmationDialog open={openHouseDeleteDialog}
                                         closeModalCallback={handleHouseDeleteDialogClose}
                                         message={houseDeleteMessage} deleteConfirmedCallback={deleteSelectedHouse}/>

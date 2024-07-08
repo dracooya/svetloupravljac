@@ -16,10 +16,14 @@ import Icon from "@mdi/react";
 import {mdilHome} from "@mdi/light-js";
 import {Transition} from "react-transition-group";
 import {useForm} from "react-hook-form";
+import {House} from "../../Models/House.ts";
+import {useEffect} from "react";
 
 interface NewHouseDialogProps {
     open: boolean,
     closeModalCallback: () => void,
+    isModification: boolean,
+    selectedHouse: House | undefined
 }
 
 interface HouseForm {
@@ -27,8 +31,8 @@ interface HouseForm {
     room: string
 }
 
-export function NewHouseDialog({open, closeModalCallback}: NewHouseDialogProps) {
-    const {register, handleSubmit, reset, formState: {errors}} = useForm<HouseForm>({
+export function NewHouseDialog({open, closeModalCallback, isModification, selectedHouse}: NewHouseDialogProps) {
+    const {register, handleSubmit, reset,setValue, formState: {errors}} = useForm<HouseForm>({
         defaultValues: {
             name: "",
             room: ""
@@ -36,10 +40,16 @@ export function NewHouseDialog({open, closeModalCallback}: NewHouseDialogProps) 
         mode: "onChange"
     });
     const onSubmit = (data : HouseForm) => {
-        /*TODO: Sent data */
+        /*TODO: Modify/delete house */
+        console.log(data)
         reset();
-        console.log(data);
     };
+
+    useEffect(() => {
+        const houseName = isModification? selectedHouse!.name : "";
+        // noinspection TypeScriptValidateTypes
+        setValue("name", houseName);
+    }, [isModification]);
 
     // noinspection TypeScriptValidateTypes
     return (
@@ -87,7 +97,7 @@ export function NewHouseDialog({open, closeModalCallback}: NewHouseDialogProps) 
                             <DialogContent>
                                 <Grid container xs={12} sm={12} md={12} lg={12} xl={12} justifyContent={'center'} pb={2}>
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} textAlign={'center'} pb={7}>
-                                        <Typography level={'h1'}>Add New House</Typography>
+                                        <Typography level={'h1'}>{isModification? "Edit House" : "Add New House"}</Typography>
                                     </Grid>
                                     <Grid container xs={12} sm={12} md={8} lg={8} xl={8} justifyContent={'center'}>
                                         <Grid pb={3} xs={12} sm={12} md={12} lg={12} xl={12} container>
@@ -115,6 +125,7 @@ export function NewHouseDialog({open, closeModalCallback}: NewHouseDialogProps) 
                                                 </FormControl>
                                             </Grid>
                                         </Grid>
+                                        {isModification? null :
                                         <Grid pb={3} xs={12} sm={12} md={12} lg={12} xl={12} container alignItems={'center'}>
                                             <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
                                                 <SvgIcon color={'warning'} fill="white" sx={{paddingLeft:'0.15em', paddingBottom:'0.8em'}}>
@@ -142,8 +153,9 @@ export function NewHouseDialog({open, closeModalCallback}: NewHouseDialogProps) 
                                                 </FormControl>
                                             </Grid>
                                         </Grid>
+                                        }
                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} pt={4} container justifyContent={'center'}>
-                                            <Button onClick={handleSubmit(onSubmit)} variant={'outlined'} size={'lg'}>Add House</Button>
+                                            <Button onClick={handleSubmit(onSubmit)} variant={'outlined'} size={'lg'}>{isModification? "Edit" : "Add House"}</Button>
                                         </Grid>
                                     </Grid>
                                 </Grid>
