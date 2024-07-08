@@ -1,4 +1,4 @@
-import {Button, Grid, IconButton, Option, Select, selectClasses, SvgIcon, Typography} from "@mui/joy";
+import {Grid, IconButton, Option, Select, selectClasses, SvgIcon, Typography} from "@mui/joy";
 import Icon from "@mdi/react";
 import {mdilHome, mdilPlus} from "@mdi/light-js";
 import {KeyboardArrowDown} from "@mui/icons-material";
@@ -8,15 +8,11 @@ import {Room} from "../../Models/Room.ts";
 import {NewRoomDialog} from "../NewRoomDialog/NewRoomDialog.tsx";
 import {NewHouseDialog} from "../NewHouseDialog/NewHouseDialog.tsx";
 import {mdilDelete, mdilPencil} from "@mdi/light-js/mdil";
+import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
 
 interface HomeAndRoomConfigProps {
     houses: House[],
     setSelectedRoomParent: (room : Room) => void
-}
-
-interface HouseForm {
-    name: string,
-    house: number
 }
 
 export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomConfigProps) {
@@ -24,6 +20,10 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
     const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0].rooms[0]);
     const [openNewHouseDialog, setOpenNewHouseDialog] = useState<boolean>(false);
     const [openNewRoomDialog, setOpenNewRoomDialog] = useState<boolean>(false);
+    const [houseDeleteMessage, setHouseDeleteMessage] = useState<string>("");
+    const [roomDeleteMessage, setRoomDeleteMessage] = useState<string>("");
+    const [openHouseDeleteDialog, setOpenHouseDeleteDialog] = useState<boolean>(false);
+    const [openRoomDeleteDialog, setOpenRoomDeleteDialog] = useState<boolean>(false);
 
     useEffect(() => {
         setSelectedRoomParent(selectedRoom);
@@ -48,6 +48,22 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
 
     const handleHouseDialogClose = () => {
         setOpenNewHouseDialog(false);
+    }
+
+    const handleHouseDeleteDialogClose = () => {
+        setOpenHouseDeleteDialog(false);
+    }
+
+    const handleRoomDeleteDialogClose = () => {
+        setOpenRoomDeleteDialog(false);
+    }
+
+    const deleteSelectedRoom = () => {
+        //TODO: Delete room
+    }
+
+    const deleteSelectedHouse = () => {
+        //TODO: Delete room
     }
 
     return (
@@ -100,7 +116,17 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                         <IconButton variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPencil} size={0.9}/></IconButton>
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
-                        <IconButton  variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilDelete} size={0.9}/></IconButton>
+                        <IconButton  variant="soft"
+                                     sx={{border:'1px solid #12467b'}}
+                                     onClick={() => {
+                                         setHouseDeleteMessage(" <b>Are you sure you want to remove " + selectedHouse.name + "?</b> This action will: <br/> <br/>\n" +
+                                             "                                        - <b>Remove all the rooms</b> associated with the house <br/>\n" +
+                                             "                                        - <b>Remove lights from rooms </b> that have been removed <br/>\n" +
+                                             "                                        - <b>Removed scenes that have become empty</b> as a result of lights removal <br/>\n"
+                                                                                  );
+                                         setOpenHouseDeleteDialog(true);
+                                     }}
+                        ><Icon path={mdilDelete} size={0.9}/></IconButton>
                     </Grid>
                 </Grid>
             </Grid>
@@ -152,12 +178,28 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                         <IconButton variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPencil} size={0.9}/></IconButton>
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
-                        <IconButton  variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilDelete} size={0.9}/></IconButton>
+                        <IconButton variant="soft"
+                                    sx={{border:'1px solid #12467b'}}
+                                    onClick={() => {
+                                        setRoomDeleteMessage(" <b>Are you sure you want to remove " +  selectedRoom.name + "?</b> This action will: <br/> <br/>\n" +
+                                            "                                        - <b>Remove all the lights</b> associated with the room <br/>\n" +
+                                            "                                        - <b>Remove those lights from scenes</b> where they are included <br/>\n" +
+                                            "                                        - <b>Remove scenes that have become empty</b> as a result of lights removal <br/>\n" +
+                                            "                                        - <b>Remove houses that have become empty</b> as a result of this action <br/>");
+                                        setOpenRoomDeleteDialog(true);
+                                    }}
+                        ><Icon path={mdilDelete} size={0.9}/></IconButton>
                     </Grid>
                 </Grid>
             </Grid>
             <NewRoomDialog open={openNewRoomDialog} houses={houses} closeModalCallback={handleRoomDialogClose}/>
             <NewHouseDialog open={openNewHouseDialog} closeModalCallback={handleHouseDialogClose}/>
+            <DeletionConfirmationDialog open={openHouseDeleteDialog}
+                                        closeModalCallback={handleHouseDeleteDialogClose}
+                                        message={houseDeleteMessage} deleteConfirmedCallback={deleteSelectedHouse}/>
+            <DeletionConfirmationDialog open={openRoomDeleteDialog}
+                                        closeModalCallback={handleRoomDeleteDialogClose}
+                                        message={roomDeleteMessage} deleteConfirmedCallback={deleteSelectedRoom}/>
         </>
     );
 }

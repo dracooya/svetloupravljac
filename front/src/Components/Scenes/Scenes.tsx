@@ -1,6 +1,5 @@
 import {
     Avatar,
-    Button,
     Dropdown,
     Grid,
     IconButton,
@@ -15,15 +14,24 @@ import {Scene} from "../../Models/Scene.ts";
 import "../Main/Main.css"
 import Icon from "@mdi/react";
 import {mdilPencil, mdilPlus} from "@mdi/light-js";
-import React from "react";
+import React, {useState} from "react";
 import {MoreVert} from "@mui/icons-material";
 import {mdilDelete} from "@mdi/light-js/mdil";
+import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
 
 interface ScenesProps {
     scenes: Scene[]
 }
 
 export function Scenes({scenes} : ScenesProps) {
+    const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+    const [deleteMessage, setDeleteMessage] = useState<string>("");
+    const [selectedScene, setSelectedScene] = useState<Scene>();
+    const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
+    const deleteScene = () => {
+        //TODO: Delete scene
+    }
+
     return (
         <>
             <Grid container justifyContent={'center'} alignItems={'center'} pb={3}>
@@ -61,7 +69,12 @@ export function Scenes({scenes} : ScenesProps) {
                                                             </MenuButton>
                                                             <Menu>
                                                                 <MenuItem><Icon path={mdilPencil} size={1}/>Edit</MenuItem>
-                                                                <MenuItem><Icon path={mdilDelete} size={1}/>Delete</MenuItem>
+                                                                <MenuItem
+                                                                    onClick={() => {
+                                                                        setSelectedScene(scene);
+                                                                        setDeleteMessage(" <b>Are you sure you want to remove " + scene.name + "?</b> The scene won't appear on the page and you won't be able to activate it afterwards.");
+                                                                        setOpenDeleteDialog(true);
+                                                                    }}><Icon path={mdilDelete} size={1}/>Delete</MenuItem>
                                                             </Menu>
                                                         </Dropdown>
                                                     </Grid>
@@ -75,6 +88,9 @@ export function Scenes({scenes} : ScenesProps) {
                     </List>
                 </Grid>
             </Grid>
+            <DeletionConfirmationDialog open={openDeleteDialog}
+                                        closeModalCallback={handleDeleteDialogClose}
+                                        message={deleteMessage} deleteConfirmedCallback={deleteScene}/>
         </>
     );
 }

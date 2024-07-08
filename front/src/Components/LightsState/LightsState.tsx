@@ -25,6 +25,7 @@ import {mdilDelete, mdilPencil} from "@mdi/light-js";
 import {LightColorChangeDialog} from "../LightColorChangeDialog/LightColorChangeDialog.tsx";
 import {AvailableMode} from "../../Models/AvailableMode.ts";
 import {ModeCategory} from "../../Models/Enums/ModeCategory.ts";
+import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
 
 interface LightsStateProps {
     lights: LightBasicInfoWithStatus[] | undefined,
@@ -35,6 +36,16 @@ export function LightsState({lights, houses}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
     const [openNewLightDialog, setOpenNewLightDialog] = useState<boolean>(false);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
+    const [selectedLight, setSelectedLight] = useState<LightBasicInfoWithStatus>();
+    const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+    const [deleteMessage, setDeleteMessage] = useState<string>("");
+
+    const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
+
+    const deleteLight = () => {
+        //TODO: Delete selected light
+    }
+
     const [availableModes, setAvailableModes] = useState<AvailableMode[]>([
         {id:1, name:'Ocean', speedChange: true, brightnessChange: true, category: ModeCategory.COLOR},
         {id:2, name:'Romance', speedChange: true, brightnessChange: true, category: ModeCategory.COLOR},
@@ -167,7 +178,15 @@ export function LightsState({lights, houses}: LightsStateProps) {
                                                                         </MenuButton>
                                                                         <Menu>
                                                                             <MenuItem><Icon path={mdilPencil} size={1}/>Edit</MenuItem>
-                                                                            <MenuItem><Icon path={mdilDelete} size={1}/>Delete</MenuItem>
+                                                                            <MenuItem
+                                                                                onClick={() => {
+                                                                                    setSelectedLight(light);
+                                                                                    setDeleteMessage(" <b>Are you sure you want to remove " + light.name + "?</b>" +
+                                                                                        " This will also remove it from scenes where it's included." +
+                                                                                        " <b>This may cause some scenes to become empty</b> and, therefore, <b>deleted</b>.");
+                                                                                    setOpenDeleteDialog(true);
+                                                                                }}
+                                                                            ><Icon path={mdilDelete} size={1}/>Delete</MenuItem>
                                                                         </Menu>
                                                                     </Dropdown>
                                                                 </Grid>
@@ -197,6 +216,9 @@ export function LightsState({lights, houses}: LightsStateProps) {
             </Grid>
             <NewLightDialog open={openNewLightDialog} houses={houses} closeModalCallback={handleLightDialogClose}/>
             <LightColorChangeDialog open={openLightColorChangeDialog} availableModes={availableModes} closeModalCallback={handleLightColorChangeDialogClose}/>
+            <DeletionConfirmationDialog open={openDeleteDialog}
+                                        closeModalCallback={handleDeleteDialogClose}
+                                        message={deleteMessage} deleteConfirmedCallback={deleteLight}/>
         </>
     );
 }

@@ -265,6 +265,7 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                         </TabPanel>
                                         <TabPanel value={1} sx={{paddingTop:'0'}}>
                                             <Grid height={'75vh'} xs={12} sm={12} md={12} lg={12} xl={12}>
+                                                {selectedMode != undefined?
                                                 <Grid sx={{position:'fixed', zIndex:999, bottom:0, background:'#0f171f' }} pb={2} xs={8} sm={8} lg={9} md={9} xl={9} container>
                                                     {selectedMode?.brightnessChange?
                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} container>
@@ -334,7 +335,7 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                         </Grid>
                                                     </Grid>
                                                         : null}
-                                                </Grid>
+                                                </Grid> : null}
 
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} pb={4} pl={1}>
                                                     <Typography level={'h3'}>Basic</Typography>
