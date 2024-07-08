@@ -28,7 +28,7 @@ export function Main() {
                     name: "Scooby",
                     type: LightType.LAMP,
                     isOn: true
-                },
+                }
 
             ]},{name: "Living Room", value:2, lights: [  {
                     id: 2,
@@ -211,7 +211,7 @@ export function Main() {
                     <Grid container xs={12} sm={12} md={6} lg={4} xl={4} pl={2} rowSpacing={3} justifyContent={'center'}>
                             <HomeAndRoomConfig houses={houses} setSelectedRoomParent={handleRoomSelectionChange}/>
                         <Grid mt={6}>
-                            <Scenes scenes={scenes}/>
+                            <Scenes scenes={scenes} houses={houses}/>
                         </Grid>
                     </Grid>
                     <Grid pl={8} pr={3} container xs={12} sm={12} md={6} lg={8} xl={8} mt={{

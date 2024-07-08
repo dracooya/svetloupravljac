@@ -17,31 +17,119 @@ import {
 import {Transition} from "react-transition-group";
 import React, {useEffect, useState} from "react";
 import {RgbColor, RgbColorPicker} from "react-colorful";
-import {useDebounce} from "use-debounce";
+import {useDebouncedCallback} from "use-debounce";
 import {mdiEyedropperVariant, mdiRabbit, mdiThermometer, mdiTortoise, mdiWhiteBalanceSunny} from "@mdi/js";
 import Icon from "@mdi/react";
 import {AvailableMode} from "../../Models/AvailableMode.ts";
 import {ModeCategory} from "../../Models/Enums/ModeCategory.ts";
 import "./LightColorChangeDialog.css";
+import {availableModes} from "../Utils/AvailableModes.ts";
+import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 
 interface LightColorChangeDialogProps {
     open: boolean,
     closeModalCallback: () => void,
-    availableModes: AvailableMode[]
+    valueChangeCallback: (_ : ColorOrModeParams) => void
 }
 
-export function LightColorChangeDialog({open,closeModalCallback, availableModes}: LightColorChangeDialogProps) {
+export function LightColorChangeDialog({open,closeModalCallback, valueChangeCallback}: LightColorChangeDialogProps) {
     const [color, setColor] = useState<RgbColor>({r:255, g:255, b:255});
-    const [debouncedColor] = useDebounce(color, 200);
+    const debouncedColor = useDebouncedCallback(
+        (value : RgbColor) => {
+            setColorHex(rgbToHex(value.r, value.g, value.b));
+            const change : ColorOrModeParams = {
+                r: value.r,
+                g: value.g,
+                b: value.b,
+                brightness: -1,
+                temperature: -1,
+                speed: -1,
+                mode: -1
+            }
+            valueChangeCallback(change);
+        },
+        200
+    );
     const [colorHex, setColorHex] = useState<string>("FFFFFF");
     const [whiteKelvin, setWhiteKelvin] = useState<number>(2200);
+    const debouncedKelvin = useDebouncedCallback(
+        (value : number) => {
+            const change : ColorOrModeParams = {
+                r: -1,
+                g: -1,
+                b: -1,
+                brightness: -1,
+                temperature: value,
+                speed: -1,
+                mode: -1
+            }
+            valueChangeCallback(change);
+        },
+        100
+    );
     const [brightness, setBrightness] = useState<number>(0);
+    const debouncedBrightness = useDebouncedCallback(
+        (value : number) => {
+            const change : ColorOrModeParams = {
+                r: -1,
+                g: -1,
+                b: -1,
+                brightness: value,
+                temperature: -1,
+                speed: -1,
+                mode: -1
+            }
+            valueChangeCallback(change);
+        },
+        100
+    );
     const [modeBrightness, setModeBrightness] = useState<number>(100);
+    const debouncedModeBrightness = useDebouncedCallback(
+        (value : number) => {
+            const change : ColorOrModeParams = {
+                r: -1,
+                g: -1,
+                b: -1,
+                brightness: value,
+                temperature: -1,
+                speed: -1,
+                mode: -1
+            }
+            valueChangeCallback(change);
+        },
+        100
+    );
     const [selectedMode, setSelectedMode] = useState<AvailableMode>();
-    const [modeSpeed, setModeSpeed] = useState<number>(50);
     useEffect(() => {
-        console.log(debouncedColor)
-    }, [debouncedColor]);
+        if(selectedMode == undefined) return;
+        const change : ColorOrModeParams = {
+            r: -1,
+            g: -1,
+            b: -1,
+            brightness:-1,
+            temperature: -1,
+            speed: -1,
+            mode: selectedMode.id
+        }
+        valueChangeCallback(change);
+
+    }, [selectedMode]);
+    const [modeSpeed, setModeSpeed] = useState<number>(50);
+    const debouncedSpeed = useDebouncedCallback(
+        (value : number) => {
+            const change : ColorOrModeParams = {
+                r: -1,
+                g: -1,
+                b: -1,
+                brightness:-1,
+                temperature: -1,
+                speed: value,
+                mode: -1
+            }
+            valueChangeCallback(change);
+        },
+        100
+    );
 
     const  rgbToHex = (r: number, g: number, b: number) => {
         const toHex = (n: number) => n.toString(16).padStart(2, '0').toUpperCase();
@@ -133,7 +221,9 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                     <div className={'responsive'}>
                                                         <RgbColorPicker color={color} onChange={(newColor: RgbColor) => {
                                                             setColor(newColor);
-                                                            setColorHex(rgbToHex(newColor.r, newColor.g, newColor.b));}
+                                                            setColorHex(rgbToHex(newColor.r, newColor.g, newColor.b));
+                                                            debouncedColor(newColor);
+                                                        }
                                                         } />
                                                     </div>
                                                 </Grid>
@@ -154,8 +244,10 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                                    const regex = new RegExp("^[0-9a-fA-F]*$");
                                                                    const val = event.target.value;
                                                                    if (regex.test(val)) {
-                                                                       setColor(hexToRgb(event.target.value));
+                                                                       const converted = hexToRgb(event.target.value)
+                                                                       setColor(converted);
                                                                        setColorHex(event.target.value);
+                                                                       debouncedColor(converted as RgbColor);
                                                                    }
 
                                                                }}
@@ -190,7 +282,9 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                                             border:'2px solid white'
                                                                         },
                                                                     }}
-                                                                    onChange={(event, newValue) => setBrightness(newValue)}
+                                                                    onChange={(event, newValue) => {
+                                                                        setBrightness(newValue);
+                                                                        debouncedBrightness(newValue);}}
                                                                     value={brightness}
                                                                     step={1}
                                                                     min={0}
@@ -221,7 +315,10 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                                     border:'2px solid white'
                                                                 },
                                                             }}
-                                                            onChange={(event, newValue) => setWhiteKelvin(newValue)}
+                                                            onChange={(event, newValue) => {
+                                                                setWhiteKelvin(newValue);
+                                                                debouncedKelvin(newValue);
+                                                            }}
                                                             value={whiteKelvin}
                                                             step={100}
                                                             min={2200}
@@ -251,6 +348,7 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                                            if (num < 2200) num = 2200;
                                                                        }
                                                                        setWhiteKelvin(num);
+                                                                       debouncedKelvin(num);
                                                                    }}
                                                                    sx={{
                                                                        backgroundColor:'transparent',
@@ -290,7 +388,10 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                                             border:'2px solid white'
                                                                         },
                                                                     }}
-                                                                    onChange={(event, newValue) => setModeBrightness(newValue)}
+                                                                    onChange={(event, newValue) => {
+                                                                        setModeBrightness(newValue);
+                                                                        debouncedModeBrightness(newValue);
+                                                                    }}
                                                                     value={modeBrightness}
                                                                     step={1}
                                                                     min={0}
@@ -324,7 +425,10 @@ export function LightColorChangeDialog({open,closeModalCallback, availableModes}
                                                                             border:'2px solid white'
                                                                         },
                                                                     }}
-                                                                    onChange={(event, newValue) => setModeSpeed(newValue)}
+                                                                    onChange={(event, newValue) => {
+                                                                        setModeSpeed(newValue);
+                                                                        debouncedSpeed(newValue);
+                                                                    }}
                                                                     value={modeSpeed}
                                                                     step={1}
                                                                     min={0}
