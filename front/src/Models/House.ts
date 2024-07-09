@@ -1,7 +1,6 @@
 import {Room} from "./Room.ts";
-import {ItemToDelete} from "./ItemToDelete.ts";
 
-export interface House extends ItemToDelete{
+export interface House{
     name: string,
     value: number,
     rooms: Room[]

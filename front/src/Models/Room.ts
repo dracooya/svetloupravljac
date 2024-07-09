@@ -1,7 +1,6 @@
 import {LightBasicInfoWithStatus} from "./LightBasicInfoWithStatus.ts";
-import {ItemToDelete} from "./ItemToDelete.ts";
 
-export interface Room extends ItemToDelete{
+export interface Room{
     name: string,
     value: number,
     lights: LightBasicInfoWithStatus[]

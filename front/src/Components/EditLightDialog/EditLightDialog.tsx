@@ -46,7 +46,6 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
     const [selectedRoomId, setSelectedRoomId] = useState<number>(currentRoom?.value);
     const onSubmit = (data : LightForm) => {
         /*TODO: Modify/delete light */
-        console.log(data)
         reset();
         setSelectedRoomId(houses[0].rooms[0].value);
     };

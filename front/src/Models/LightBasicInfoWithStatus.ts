@@ -1,7 +1,6 @@
 import {LightType} from "./Enums/LightType.ts";
-import {ItemToDelete} from "./ItemToDelete.ts";
 
-export interface LightBasicInfoWithStatus extends ItemToDelete{
+export interface LightBasicInfoWithStatus{
     id: number,
     ip: string,
     name: string,

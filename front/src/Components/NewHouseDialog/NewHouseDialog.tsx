@@ -41,7 +41,6 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
     });
     const onSubmit = (data : HouseForm) => {
         /*TODO: Modify/delete house */
-        console.log(data)
         reset();
     };
 

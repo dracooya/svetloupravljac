@@ -1,10 +1,8 @@
-import {LightCustomColorConfig} from "./LightCustomColorConfig.ts";
-import {LightModeConfig} from "./LightModeConfig.ts";
-import {ItemToDelete} from "./ItemToDelete.ts";
+import {ColorOrModeParams} from "./ColorOrModeParams.ts";
+import {LightColorConfig} from "./LightColorConfig.ts";
 
-export interface Scene extends ItemToDelete{
+export interface Scene{
     id: number,
     name: string,
-    lightsCustomColorConfig: LightCustomColorConfig[],
-    lightsSceneConfig: LightModeConfig[]
+    lightsConfig: LightColorConfig[]
 }

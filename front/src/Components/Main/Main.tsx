@@ -46,145 +46,49 @@ export function Main() {
 
 
     const [scenes, setScenes] = useState<Scene[]>([
+
         {
             id: 1,
-            name: 'PulsyBoi1',
-            lightsCustomColorConfig: [],
-            lightsSceneConfig: [
+            name: 'PulsyBoi',
+            lightsConfig: [
                 {
                     light: {
                         id: 1,
                         ip: "192.168.0.115",
                         name: "Gooby",
-                        type: LightType.BULB
+                        type: LightType.BULB,
                     },
-                    mode: {
-                        id: 1,
-                        name: "Pulse",
-                        speed: 100,
-                        dimming: 100,
+                    config: {
+                        r: -1,
+                        g: -1,
+                        b: -1,
+                        brightness: 100,
+                        temperature: -1,
+                        speed: -1,
+                        mode: 6
                     }
                 },
                 {
                     light: {
                         id: 2,
-                        ip: "192.168.0.116",
-                        name: "Booby",
-                        type: LightType.LAMP
-                    },
-                    mode: {
-                        id: 1,
-                        name: "Pulse",
-                        speed: 100,
-                        dimming: 100,
-                    }
-                }
-            ]
-        }, {
-            id: 2,
-            name: 'PulsyBoi2',
-            lightsCustomColorConfig: [],
-            lightsSceneConfig: [
-                {
-                    light: {
-                        id: 1,
                         ip: "192.168.0.115",
-                        name: "Gooby",
+                        name: "Booby",
                         type: LightType.BULB
                     },
-                    mode: {
-                        id: 1,
-                        name: "Pulse",
-                        speed: 100,
-                        dimming: 100,
+                    config: {
+                        r: -1,
+                        g: -1,
+                        b: -1,
+                        brightness: 100,
+                        temperature: -1,
+                        speed: -1,
+                        mode: 6
                     }
                 },
-                {
-                    light: {
-                        id: 2,
-                        ip: "192.168.0.116",
-                        name: "Booby",
-                        type: LightType.STRIP
-                    },
-                    mode: {
-                        id: 1,
-                        name: "Pulse",
-                        speed: 100,
-                        dimming: 100,
-                    }
-                }
             ]
         },
-        {
-            id: 3,
-            name: 'PulsyBoi3',
-            lightsCustomColorConfig: [],
-            lightsSceneConfig: [
-                {
-                    light: {
-                        id: 1,
-                        ip: "192.168.0.115",
-                        name: "Gooby",
-                        type: LightType.LAMP
-                    },
-                    mode: {
-                        id: 1,
-                        name: "Pulse",
-                        speed: 100,
-                        dimming: 100,
-                    }
-                },
-                {
-                    light: {
-                        id: 2,
-                        ip: "192.168.0.116",
-                        name: "Booby",
-                        type: LightType.BULB
-                    },
-                    mode: {
-                        id: 1,
-                        name: "Pulse",
-                        speed: 100,
-                        dimming: 100,
-                    }
-                }
-            ]
-        },
-        {
-            id: 4,
-            name: 'PulsyBoi4',
-            lightsCustomColorConfig: [],
-            lightsSceneConfig: [
-                {
-                    light: {
-                        id: 1,
-                        ip: "192.168.0.115",
-                        name: "Gooby",
-                        type: LightType.BULB
-                    },
-                    mode: {
-                        id: 1,
-                        name: "Pulse",
-                        speed: 100,
-                        dimming: 100,
-                    }
-                },
-                {
-                    light: {
-                        id: 2,
-                        ip: "192.168.0.116",
-                        name: "Booby",
-                        type: LightType.BULB
-                    },
-                    mode: {
-                        id: 1,
-                        name: "Pulse",
-                        speed: 100,
-                        dimming: 100,
-                    }
-                }
-            ]
-        }
+
+
     ])
     return (
         <>
@@ -210,7 +114,7 @@ export function Main() {
                 <Grid container  pt={4} pb={2} pl={2}>
                     <Grid container xs={12} sm={12} md={6} lg={4} xl={4} pl={2} rowSpacing={3} justifyContent={'center'}>
                             <HomeAndRoomConfig houses={houses} setSelectedRoomParent={handleRoomSelectionChange}/>
-                        <Grid mt={6}>
+                        <Grid mt={6} xs={12} sm={12} md={12} lg={12} xl={12}>
                             <Scenes scenes={scenes} houses={houses}/>
                         </Grid>
                     </Grid>

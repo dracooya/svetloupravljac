@@ -134,7 +134,6 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
     }
 
     const finishAll = () => {
-        console.log(setupLights);
         if(setupLights.length != 0) {
             setPopupMessage("Successfully Added Lights!");
             setIsSuccess(true);

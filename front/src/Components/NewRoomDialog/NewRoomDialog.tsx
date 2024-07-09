@@ -55,7 +55,6 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
     const onSubmit = (data : RoomForm) => {
         /*TODO: Modify/delete room */
         reset();
-        console.log(data);
     };
 
     // noinspection TypeScriptValidateTypes

@@ -22,14 +22,19 @@ import {mdiLampOutline, mdiLedStripVariant, mdiLightbulbOutline, mdiMoviePlayOut
 import React, {useEffect, useState} from "react";
 import {LightType} from "../../Models/Enums/LightType.ts";
 import {Room} from "../../Models/Room.ts";
+import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 import {LightColorChangeDialog} from "../LightColorChangeDialog/LightColorChangeDialog.tsx";
-import {LightBasicInfoWithStatus} from "../../Models/LightBasicInfoWithStatus.ts";
+import {availableModes} from "../Utils/AvailableModes.ts";
+import {Scene} from "../../Models/Scene.ts";
+import {LightBasicInfo} from "../../Models/LightBasicInfo.ts";
+import {kelvinToRgb} from "../Utils/KelvinsToRgbConversionTable.ts";
 
 interface NewSceneDialogProps {
     open: boolean,
     closeModalCallback: () => void,
     houses: House[],
     isModification: boolean,
+    selectedScene: Scene | undefined
 }
 
 interface SceneForm {
@@ -38,12 +43,13 @@ interface SceneForm {
 }
 
 interface LightIncluded {
-    light: LightBasicInfoWithStatus,
-    included: boolean
+    light: LightBasicInfo,
+    included: boolean,
+    mode: ColorOrModeParams | undefined,
 }
 
-export function NewSceneDialog({open, closeModalCallback, houses, isModification}: NewSceneDialogProps) {
-    const {register, handleSubmit, setValue, reset, formState: {errors}} = useForm<SceneForm>({
+export function NewSceneDialog({open, closeModalCallback, houses, isModification, selectedScene}: NewSceneDialogProps) {
+    const {register, handleSubmit, setValue, reset,trigger, formState: {errors}} = useForm<SceneForm>({
         defaultValues: {
             name: "",
             room: houses[0].rooms[0].value
@@ -54,10 +60,15 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0].rooms[0]);
     const [includedLights, setIncludedLights] = useState<LightIncluded[]>([]);
     const [activeStep, setActiveStep] = useState<number>(0);
-    const [openColorDialog, setOpenColorDialog] = useState<boolean>(false);
+    const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
+    const [selectedLight, setSelectedLight] = useState<LightIncluded>();
+    const handleLightColorChangeDialogClose = () => setOpenLightColorChangeDialog(false);
 
-    const handleColorDialogClose = () => {
-        setOpenColorDialog(false);
+    const handleColorChangeCallback = (change: ColorOrModeParams) => {
+        if(change.mode == -1 && change.r == -1 && change.temperature == -1) return;
+        const update = includedLights.map(lightOld =>
+            lightOld.light.id == selectedLight?.light.id ? { ...lightOld, mode: change } : lightOld);
+        setIncludedLights(update);
     }
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
@@ -68,13 +79,37 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
 
     };
 
+    const addScene = () => {
+        //TODO: add/edit scene
+        reset();
+        setSelectedRoom(houses[0].rooms[0]);
+        setIncludedLights([]);
+        setActiveStep(0);
+        closeModalCallback();
+    }
+
     useEffect(() => {
-        setIncludedLights(selectedRoom.lights.map((light) => {return {light: light, included: true}}));
+        setIncludedLights(selectedRoom.lights.map((light) => {return {light: light, included: true, mode: undefined}}));
     }, [selectedRoom]);
+
+    useEffect(() => {
+        const name = isModification? selectedScene?.name : "";
+        // noinspection TypeScriptValidateTypes
+        setValue("name", name);
+        if(isModification) {
+            const includedLights = selectedScene?.lightsConfig.map(
+                (config) => {
+                    return {light: config.light, included: true, mode: config.config}
+                });
+            setIncludedLights(includedLights);
+        }
+        else {
+            setIncludedLights(selectedRoom.lights.map((light) => {return {light: light, included: true, mode: undefined}}));
+        }
+    }, [isModification]);
 
     const onSubmit = (data : SceneForm) => {
         setActiveStep(1);
-        console.log(data);
     };
 
     return (
@@ -84,7 +119,9 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                     <Modal
                         keepMounted
                         open={!['exited', 'exiting'].includes(state)}
-                        onClose={() => closeModalCallback()}
+                        onClose={() => {
+                            setActiveStep(0);
+                            closeModalCallback();}}
                         slotProps={{
                             backdrop: {
                                 sx: {
@@ -136,7 +173,11 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                                                     </StepIndicator>
                                                 }>Basic Info</Step>
                                             <Step
-                                                onClick={() => setActiveStep(1)}
+                                                onClick={() => {
+                                                    trigger(["name","room"]).then((valid) => {
+                                                        if(valid) setActiveStep(1);
+                                                    })
+                                                }}
                                                 indicator={
                                                     <StepIndicator variant="soft" color="primary" className={'clickable'}>
                                                         2
@@ -212,68 +253,89 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                                                         )}
                                                     </Select>
                                                 </Grid>
-                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} pt={6}
-                                                      container justifyContent={'center'}>
-                                                    <Button onClick={handleSubmit(onSubmit)} variant={'outlined'} size={'lg'}>Next</Button>
-                                                </Grid>
                                             </Grid>
                                         }
+                                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} pt={6}
+                                              container justifyContent={'center'}>
+                                            <Button onClick={handleSubmit(onSubmit)} variant={'outlined'} size={'lg'}>Next</Button>
+                                        </Grid>
                                     </Grid> :
-                                    <Grid height={'40vh'} xs={12} sm={12} md={12} lg={12} xl={12}
-                                          alignContent={'flex-start'}
-                                          sx={{overflowY:'auto'}} container pl={3} pr={3} rowGap={2} justifyContent={'center'}>
-                                        {includedLights.map((light) => {
-                                            return <Grid container xs={12} sm={12} md={12} lg={9} xl={9}
-                                                         key={light.light.name}>
-                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
-                                                    <Card sx={{
-                                                        backgroundColor: '#0f171f',
-                                                        borderRadius: '2em',
-                                                    }}>
-                                                        <Grid xs={12} sm={12} lg={12} md={12} xl={12} container
-                                                              alignItems={'center'}>
-                                                            <Grid xs={2} sm={2} md={2} lg={1} xl={1}>
-                                                                {light.light.type == LightType.BULB ?
-                                                                    <Icon path={mdiLightbulbOutline} size={1.5}/> :
-                                                                    light.light.type == LightType.STRIP ?
-                                                                        <Icon path={mdiLedStripVariant} size={1.5}/> :
-                                                                        <Icon path={mdiLampOutline} size={1.5}/>
-                                                                }
+                                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} container>
+                                            <Grid height={'40vh'} xs={12} sm={12} md={12} lg={12} xl={12}
+                                                  alignContent={'flex-start'}
+                                                  sx={{overflowY:'auto'}} container pl={3} pr={3} rowGap={2} justifyContent={'center'}>
+                                                    {includedLights.map((light) => {
+                                                        return <Grid container xs={12} sm={12} md={9} lg={9} xl={9}
+                                                                     key={light.light.name}>
+                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
+                                                                <Card sx={{
+                                                                    backgroundColor: '#0f171f',
+                                                                    borderRadius: '2em',
+                                                                }}>
+                                                                    <Grid xs={12} sm={12} lg={12} md={12} xl={12} container
+                                                                          alignItems={'center'}>
+                                                                        <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
+                                                                            {light.light.type == LightType.BULB ?
+                                                                                <Icon path={mdiLightbulbOutline} size={1.5}/> :
+                                                                                light.light.type == LightType.STRIP ?
+                                                                                    <Icon path={mdiLedStripVariant} size={1.5}/> :
+                                                                                    <Icon path={mdiLampOutline} size={1.5}/>
+                                                                            }
+                                                                        </Grid>
+                                                                        <Grid pl={3} xs={6} sm={6} md={6} lg={6} xl={6} container
+                                                                              alignItems={'center'} justifyContent={'flex-start'}>
+                                                                            <Grid>
+                                                                                {light.light.name}
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                        <Grid xs={2} sm={2} md={2} lg={2} xl={2}>
+                                                                            { light.mode == undefined ? <Grid>Off</Grid> :
+                                                                            light.mode?.mode !== -1 ?
+                                                                            <Avatar size={'sm'}  src={"src/assets/icons/modes/" + availableModes.find(mode => mode.id === light.mode?.mode)?.name + ".png"}></Avatar>
+                                                                         :
+                                                                                light.mode.temperature !== -1 ?
+                                                                                <Grid width={'25px'} height={'25px'}
+                                                                                borderRadius={'50%'}
+                                                                                container bgcolor={`rgb(${kelvinToRgb[light.mode.temperature].r}, ${kelvinToRgb[light.mode.temperature].g}, ${kelvinToRgb[light.mode.temperature].b})`} color={'transparent'}>_</Grid> :
+                                                                                <Grid width={'25px'} height={'25px'}
+                                                                                      borderRadius={'50%'}
+                                                                                      container bgcolor={`rgb(${light.mode?.r}, ${light.mode?.g}, ${light.mode?.b})`} color={'transparent'}>_</Grid>
+                                                                            }
+                                                                        </Grid>
+                                                                        <Grid xs={3} sm={3} md={3} lg={2} xl={3} alignItems={'center'} container pl={{
+                                                                            md: 2,
+                                                                            sm: 2,
+                                                                        }}>
+                                                                            {isModification?
+                                                                            <Grid xs={6} sm={6} md={6} lg={6} xl={6} container justifyContent={'center'} alignItems={'center'}>
+                                                                                <Checkbox
+                                                                                          onChange={(event) => {
+                                                                                              const update = includedLights.map(lightOld =>
+                                                                                                  lightOld === light? { ...lightOld, included: event.target.checked } : lightOld);
+                                                                                              setIncludedLights(update);
+                                                                                          }}
+                                                                                          variant="solid"
+                                                                                          checked={light.included} />
+                                                                            </Grid>
+                                                                            : null }
+                                                                            <Grid xs={6} sm={6} md={6} lg={6} xl={6} container alignItems={'center'}>
+                                                                                <IconButton onClick={() => {
+                                                                                    setSelectedLight(light);
+                                                                                    setOpenLightColorChangeDialog(true);
+                                                                                }}><Icon path={mdiPalette}/></IconButton>
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                </Card>
                                                             </Grid>
-                                                            <Grid pl={3} xs={6} sm={6} md={6} lg={6} xl={6} container
-                                                                  alignItems={'center'} justifyContent={'flex-start'}>
-                                                                <Grid>
-                                                                    {light.light.name}
-                                                                </Grid>
-                                                            </Grid>
-                                                            <Grid xs={1} sm={1} md={1} lg={2} xl={2}>
-                                                                <Avatar size={'sm'} src="src/assets/icons/modes/Custom.png" />
-                                                            </Grid>
-                                                            <Grid xs={2} sm={2} md={3} lg={3} xl={3} alignItems={'center'} container pl={{
-                                                                md: 1,
-                                                                sm: 2,
-                                                            }}>
-                                                                <Grid xs={6} sm={6} md={6} lg={6} xl={6}>
-                                                                    <Checkbox
-                                                                              onChange={(event) => {
-                                                                                  light.included = event.target.checked;
-                                                                                  setIncludedLights(includedLights);
-                                                                              }}
-                                                                              variant="solid"
-                                                                              checked={light.included} />
-                                                                </Grid>
-                                                                <Grid xs={6} sm={6} md={6} lg={6} xl={6}>
-                                                                    <IconButton
-                                                                                onClick={() => setOpenColorDialog(true)}
-                                                                                variant="outlined"
-                                                                                sx={{border:'none', paddingBottom:'0.2em'}}><Icon path={mdiPalette} size={1} /></IconButton>
-                                                                </Grid>
-                                                                </Grid>
                                                         </Grid>
-                                                    </Card>
-                                                </Grid>
+                                                    })}
                                             </Grid>
-                                        })}
+
+                                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} pt={3} container justifyContent={'center'}>
+                                            <Button variant={'outlined'} size={'lg'} onClick={addScene}>{isModification? 'Edit Scene' : 'Add Scene'}</Button>
+                                        </Grid>
+
                                     </Grid>
                                     }
                                 </Grid>
@@ -282,7 +344,9 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                     </Modal>
                 )}
             </Transition>
-            <LightColorChangeDialog open={openColorDialog} closeModalCallback={handleColorDialogClose}/>
+            <LightColorChangeDialog open={openLightColorChangeDialog}
+                                    valueChangeCallback={handleColorChangeCallback}
+                                    closeModalCallback={handleLightColorChangeDialogClose}/>
         </>
     );
 }

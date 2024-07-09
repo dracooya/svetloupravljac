@@ -32,7 +32,7 @@ interface LightColorChangeDialogProps {
     valueChangeCallback: (_ : ColorOrModeParams) => void
 }
 
-export function LightColorChangeDialog({open,closeModalCallback, valueChangeCallback}: LightColorChangeDialogProps) {
+export function LightColorChangeDialog({open, closeModalCallback, valueChangeCallback}: LightColorChangeDialogProps) {
     const [color, setColor] = useState<RgbColor>({r:255, g:255, b:255});
     const debouncedColor = useDebouncedCallback(
         (value : RgbColor) => {
@@ -296,7 +296,7 @@ export function LightColorChangeDialog({open,closeModalCallback, valueChangeCall
                                                     </Grid>
                                                 </Grid>
                                                 <Grid xs={11} sm={11} md={11} lg={11} xl={11}  pl={3} pr={3}
-                                                      sx={{ background: "linear-gradient(90deg, rgba(255,190,127,1) 0%, rgba(255,213,179,1) 50%, rgba(215,246,249,1) 100%)",
+                                                      sx={{ background: "linear-gradient(90deg, rgba(255,147,44,1) 0%, rgba(255,219,186,1) 50%, rgba(215,249,253,1) 100%)",
                                                       height:'50px', borderRadius:'2em'}}
                                                       container alignItems={'center'}>
                                                     <Slider size="lg"
@@ -307,7 +307,7 @@ export function LightColorChangeDialog({open,closeModalCallback, valueChangeCall
                                                                 },
                                                                 '& .MuiSlider-rail': {
                                                                     height:'50px',
-                                                                    background: "linear-gradient(90deg, rgba(255,190,127,1) 0%, rgba(255,213,179,1) 50%, rgba(215,246,249,1) 100%)",
+                                                                    background: "linear-gradient(90deg, rgba(255,147,44,1) 0%, rgba(255,219,186,1) 50%, rgba(215,249,253,1) 100%)",
                                                                 },
                                                                 '& .MuiSlider-thumb': {
                                                                     height:'50px',

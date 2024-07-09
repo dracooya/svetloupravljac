@@ -26,6 +26,7 @@ import {LightColorChangeDialog} from "../LightColorChangeDialog/LightColorChange
 import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
 import {EditLightDialog} from "../EditLightDialog/EditLightDialog.tsx";
 import {Room} from "../../Models/Room.ts";
+import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 
 interface LightsStateProps {
     lights: LightBasicInfoWithStatus[] | undefined,
@@ -44,6 +45,10 @@ export function LightsState({lights, houses, currentRoom}: LightsStateProps) {
 
     const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
     const handleEditDialogClose = () => setOpenEditDialog(false);
+
+    const handleColorChange = (config: ColorOrModeParams) => {
+        //TODO: send commands
+    }
 
     const deleteLight = () => {
         //TODO: Delete selected light
@@ -75,6 +80,7 @@ export function LightsState({lights, houses, currentRoom}: LightsStateProps) {
                                                 </Grid>
                                                 <Grid alignItems={'center'} container>
                                                     <Switch
+                                                        disabled={lights?.length == 0}
                                                         sx={{
                                                             "--Switch-trackWidth": "55px"
                                                         }}
@@ -185,7 +191,9 @@ export function LightsState({lights, houses, currentRoom}: LightsStateProps) {
                 </Grid>
             </Grid>
             <NewLightDialog open={openNewLightDialog} houses={houses} closeModalCallback={handleLightDialogClose}/>
-            <LightColorChangeDialog open={openLightColorChangeDialog} closeModalCallback={handleLightColorChangeDialogClose}/>
+            <LightColorChangeDialog open={openLightColorChangeDialog}
+                                    valueChangeCallback={handleColorChange}
+                                    closeModalCallback={handleLightColorChangeDialogClose}/>
             <DeletionConfirmationDialog open={openDeleteDialog}
                                         closeModalCallback={handleDeleteDialogClose}
                                         message={deleteMessage} deleteConfirmedCallback={deleteLight}/>
