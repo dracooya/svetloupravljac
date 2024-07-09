@@ -1,6 +1,8 @@
-select, .card {
+select {
     background-color:#0f171f !important;
 }
+
+
 
 p, h1, h2,h3,h4, select {
     font-family: "Oswald", sans-serif !important;

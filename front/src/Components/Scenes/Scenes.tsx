@@ -1,5 +1,4 @@
 import {
-    Avatar,
     Dropdown,
     Grid,
     IconButton,

@@ -4,9 +4,6 @@
   font-weight: 300;
 
   color: rgba(255, 255, 255, 1);
-  background: linear-gradient(90deg, hsla(191, 75%, 60%, 1) 0%, hsla(248, 100%, 46%, 1) 100%);
-  background: -moz-linear-gradient(45deg, hsla(192, 94%, 72%, 1) 0%, hsla(248, 100%, 46%, 1) 100%);
-  background: -webkit-linear-gradient(45deg, hsla(192, 94%, 72%, 1) 0%, hsla(248, 100%, 46%, 1) 100%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,11 +21,6 @@ body {
   align-items: flex-start;
   background-color: #0f171f;
 }
-
-.width-100 {
-  width: 100%;
-}
-
 
 ::-webkit-scrollbar {
   width: 5px;
@@ -59,9 +51,6 @@ body {
   width: auto;
 }
 
-.idk {
-  padding-left: 50px;
-}
 
 .MuiSlider-root {
   padding: 0 !important;
@@ -69,6 +58,12 @@ body {
 
 .pointer {
   cursor: pointer;
+}
+
+.gradient-bg {
+  background: linear-gradient(90deg, hsla(191, 75%, 60%, 1) 0%, hsla(248, 100%, 46%, 1) 100%);
+  background: -moz-linear-gradient(45deg, hsla(192, 94%, 72%, 1) 0%, hsla(248, 100%, 46%, 1) 100%);
+  background: -webkit-linear-gradient(45deg, hsla(192, 94%, 72%, 1) 0%, hsla(248, 100%, 46%, 1) 100%);
 }
 
 

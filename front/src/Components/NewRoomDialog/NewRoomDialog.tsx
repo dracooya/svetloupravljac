@@ -18,7 +18,7 @@ import {House} from "../../Models/House.ts";
 import Icon from "@mdi/react";
 import {mdilHome} from "@mdi/light-js";
 import {Room} from "../../Models/Room.ts";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 
 interface NewRoomDialogProps {
     open: boolean,
