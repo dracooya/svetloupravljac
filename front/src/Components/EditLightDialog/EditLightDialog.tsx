@@ -39,15 +39,15 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
     const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<LightForm>({
         defaultValues: {
             name: "",
-            room: houses[0].rooms[0].value
+            room: houses[0].rooms[0].id
         },
         mode: "onChange"
     });
-    const [selectedRoomId, setSelectedRoomId] = useState<number>(currentRoom?.value);
+    const [selectedRoomId, setSelectedRoomId] = useState<number>(currentRoom?.id);
     const onSubmit = (data : LightForm) => {
         /*TODO: Modify/delete light */
         reset();
-        setSelectedRoomId(houses[0].rooms[0].value);
+        setSelectedRoomId(houses[0].rooms[0].id);
     };
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
@@ -59,8 +59,8 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
     useEffect(() => {
         // noinspection TypeScriptValidateTypes
         setValue("name", selectedLight?.name);
-        setValue("room", currentRoom?.value);
-        setSelectedRoomId(currentRoom?.value);
+        setValue("room", currentRoom?.id);
+        setSelectedRoomId(currentRoom?.id);
     }, [open]);
 
     return (
@@ -173,7 +173,7 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
                                                     onChange={handleRoomChange}
                                                     indicator={<KeyboardArrowDown />}>
                                                     {houses.flatMap(house =>  house.rooms.map(room => {
-                                                        return <Option value={room.value} key={room.value}>{house.name} - {room.name}</Option>
+                                                        return <Option value={room.id} key={room.id}>{house.name} - {room.name}</Option>
                                                     })
                                                     )}
                                                 </Select>

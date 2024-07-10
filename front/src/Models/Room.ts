@@ -2,6 +2,6 @@ import {LightBasicInfoWithStatus} from "./LightBasicInfoWithStatus.ts";
 
 export interface Room{
     name: string,
-    value: number,
+    id: number,
     lights: LightBasicInfoWithStatus[]
 }

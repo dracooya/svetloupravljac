@@ -32,7 +32,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
     }, []);
 
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
-        const selectedHouse = houses.find(house => house.value === selectedHouseId!);
+        const selectedHouse = houses.find(house => house.id === selectedHouseId!);
         setSelectedHouse(selectedHouse!);
         setSelectedRoom(selectedHouse!.rooms[0]);
         setSelectedRoomParent(selectedHouse!.rooms[0]);
@@ -40,7 +40,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
     };
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
-        const room = selectedHouse.rooms.find(room => room.value === selectedRoomId);
+        const room = selectedHouse.rooms.find(room => room.id === selectedRoomId);
         setSelectedRoom(room!);
         setSelectedRoomParent(room!);
         setIsModificationRoom(false);
@@ -104,10 +104,10 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                         }}
                         variant={'outlined'}
                         onChange={handleHouseChange}
-                        value={selectedHouse.value}
+                        value={selectedHouse.id}
                         indicator={<KeyboardArrowDown />}>
                         {houses.map((house) => {
-                            return <Option value={house.value} key={house.value}>{house.name}</Option>
+                            return <Option value={house.id} key={house.id}>{house.name}</Option>
                         })}
                     </Select>
                 </Grid>
@@ -170,11 +170,11 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                             },
                         }}
                         variant={'outlined'}
-                        value={selectedRoom.value}
+                        value={selectedRoom.id}
                         onChange={handleRoomChange}
                         indicator={<KeyboardArrowDown />}>
                         {selectedHouse.rooms.map((room) => {
-                            return <Option value={room.value} key={room.value}>{room.name}</Option>
+                            return <Option value={room.id} key={room.id}>{room.name}</Option>
                         })}
                     </Select>
                 </Grid>

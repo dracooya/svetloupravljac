@@ -74,7 +74,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
     const [popupMessage, setPopupMessage] = useState<string>("");
 
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
-        const selectedHouse = houses.find(house => house.value === selectedHouseId!);
+        const selectedHouse = houses.find(house => house.id === selectedHouseId!);
         setSelectedHouse(selectedHouse!);
         setSelectedRoom(selectedHouse!.rooms[0]);
     };
@@ -108,7 +108,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
     };
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
-        const room = selectedHouse.rooms.find(room => room.value === selectedRoomId);
+        const room = selectedHouse.rooms.find(room => room.id === selectedRoomId);
         setSelectedRoom(room!);
         setValue("room", room!);
     };
@@ -126,7 +126,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
             setValue("type", selectedLight.type);
             setSelectedType(selectedLight.type);
             setSelectedRoom(selectedLight.room);
-            setSelectedHouse(houses.find(house => house.rooms.some(room => room.value === selectedLight.room.value)));
+            setSelectedHouse(houses.find(house => house.rooms.some(room => room.id === selectedLight.room.id)));
         }
         else {
             setIsModification(false);
@@ -320,10 +320,10 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                             }}
                                                                             variant={'outlined'}
                                                                             onChange={handleHouseChange}
-                                                                            value={selectedHouse.value}
+                                                                            value={selectedHouse.id}
                                                                             indicator={<KeyboardArrowDown />}>
                                                                             {houses?.map((house) => {
-                                                                                return <Option value={house.value} key={house.value}>{house.name}</Option>
+                                                                                return <Option value={house.id} key={house.id}>{house.name}</Option>
                                                                             })}
                                                                         </Select>
                                                                     </Grid>
@@ -373,10 +373,10 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                             }}
                                                                             variant={'outlined'}
                                                                             onChange={handleRoomChange}
-                                                                            value={selectedRoom.value}
+                                                                            value={selectedRoom.id}
                                                                             indicator={<KeyboardArrowDown />}>
                                                                             {selectedHouse.rooms.map((room) => {
-                                                                                return <Option value={room.value} key={room.value}>{room.name}</Option>
+                                                                                return <Option value={room.id} key={room.id}>{room.name}</Option>
                                                                             })}
                                                                         </Select>
                                                                     </Grid>

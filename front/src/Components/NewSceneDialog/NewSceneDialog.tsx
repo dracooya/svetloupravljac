@@ -52,7 +52,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const {register, handleSubmit, setValue, reset,trigger, formState: {errors}} = useForm<SceneForm>({
         defaultValues: {
             name: "",
-            room: houses[0].rooms[0].value
+            room: houses[0].rooms[0].id
         },
         mode: "onChange"
     });
@@ -74,7 +74,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
         // noinspection TypeScriptValidateTypes
         setValue("room", selectedRoomId!);
-        const room = houses.flatMap(house => house.rooms).find(room => room.value === selectedRoomId)
+        const room = houses.flatMap(house => house.rooms).find(room => room.id === selectedRoomId)
         setSelectedRoom(room);
 
     };
@@ -244,11 +244,11 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                                                             },
                                                         }}
                                                         variant={'outlined'}
-                                                        value={selectedRoom.value}
+                                                        value={selectedRoom.id}
                                                         onChange={handleRoomChange}
                                                         indicator={<KeyboardArrowDown />}>
                                                         {houses.flatMap(house =>  house.rooms.map(room => {
-                                                                return <Option value={room.value} key={room.value}>{house.name} - {room.name}</Option>
+                                                                return <Option value={room.id} key={room.id}>{house.name} - {room.name}</Option>
                                                             })
                                                         )}
                                                     </Select>

@@ -13,7 +13,7 @@ export function Main() {
 
     const [selectedRoom, setSelectedRoom] = useState<Room>();
     const [houses, setHouses] = useState<House[]>([
-        {value:1, name: "Goober Home", rooms: [ {name: "Bedroom", value:1,
+        {id:1, name: "Goober Home", rooms: [ {name: "Bedroom", id:1,
             lights:[
                 {
                     id: 1,
@@ -30,14 +30,14 @@ export function Main() {
                     isOn: true
                 }
 
-            ]},{name: "Living Room", value:2, lights: [  {
+            ]},{name: "Living Room", id:2, lights: [  {
                     id: 2,
                     ip: "192.168.0.116",
                     name: "Booby",
                     type: LightType.BULB,
                     isOn: true
                 }]}]},
-        {value:2, name: "Gooberung Home", rooms: [ {name: "Bathroom", value:3, lights:[]},{name: "Storage", value:4, lights:[]}]}
+        {id:2, name: "Gooberung Home", rooms: [ {name: "Bathroom", id:3, lights:[]},{name: "Storage", id:4, lights:[]}]}
     ]);
 
     const handleRoomSelectionChange = (room : Room) => {
