@@ -58,7 +58,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
     const [hasFoundLights, setHasFoundLights] = useState<boolean>(false);
     const [selectedHouse, setSelectedHouse] = useState<House>(houses[0]);
     const [setupLights, setSetupLights] = useState<NewLight[]>([]);
-    const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0].rooms[0]);
+    const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0]?.rooms[0]);
     const [selectedType, setSelectedType] = useState<LightType>(LightType.BULB);
     const [selectedLight, setSelectedLight] = useState<NewLight>();
     const [isModification, setIsModification] = useState<boolean>(false);
@@ -82,7 +82,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
     const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<LightForm>({
         defaultValues: {
             name: "",
-            room: houses[0].rooms[0],
+            room: houses[0]?.rooms[0],
             type: LightType.BULB,
         },
         mode: "onChange"
@@ -320,7 +320,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                             }}
                                                                             variant={'outlined'}
                                                                             onChange={handleHouseChange}
-                                                                            value={selectedHouse.id}
+                                                                            value={selectedHouse?.id}
                                                                             indicator={<KeyboardArrowDown />}>
                                                                             {houses?.map((house) => {
                                                                                 return <Option value={house.id} key={house.id}>{house.name}</Option>
@@ -373,9 +373,9 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                             }}
                                                                             variant={'outlined'}
                                                                             onChange={handleRoomChange}
-                                                                            value={selectedRoom.id}
+                                                                            value={selectedRoom?.id}
                                                                             indicator={<KeyboardArrowDown />}>
-                                                                            {selectedHouse.rooms.map((room) => {
+                                                                            {selectedHouse?.rooms.map((room) => {
                                                                                 return <Option value={room.id} key={room.id}>{room.name}</Option>
                                                                             })}
                                                                         </Select>

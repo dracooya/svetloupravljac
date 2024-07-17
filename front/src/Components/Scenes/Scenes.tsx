@@ -44,6 +44,7 @@ export function Scenes({scenes, houses} : ScenesProps) {
                 </Grid>
                 <Grid pl={3}>
                     <IconButton
+                        disabled={houses.length == 0}
                         onClick={() => {
                             setIsModification(false);
                             setOpenNewDialog(true);

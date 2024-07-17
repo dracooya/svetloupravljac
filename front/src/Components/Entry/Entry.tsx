@@ -6,13 +6,27 @@ import {InfoOutlined} from "@mui/icons-material";
 import {useNavigate} from "react-router-dom";
 import {mdilLogin} from "@mdi/light-js/mdil";
 import Icon from "@mdi/react";
+import {EntryService} from "../../Services/EntryService.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
+import React, {useState} from "react";
+import {Password} from "../../Models/DTOs/Password.ts";
 
 
 interface EntryForm {
     password: string
 }
 
-export function Entry() {
+interface EntryProps {
+    entryService: EntryService
+}
+
+export function Entry({entryService} : EntryProps) {
+
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const navigation = useNavigate();
+    const handlePopupClose = () => { setPopupOpen(false); }
     const {register, handleSubmit, formState: {errors}} = useForm<EntryForm>({
         defaultValues: {
             password: "",
@@ -21,12 +35,17 @@ export function Entry() {
     });
 
     const onSubmit = (data : EntryForm) => {
-        /*TODO: Check password*/
-        navigation('/main');
+        const password : Password = {
+            password: data.password
+        }
+        entryService.enter(password).then(_ => {
+            navigation('/main');
+        }).catch((err) => {
+            setPopupMessage(err.response.data);
+            setIsSuccess(false);
+            setPopupOpen(true);
+        });
     };
-
-    const navigation = useNavigate();
-
 
     return (
         <>
@@ -79,6 +98,7 @@ export function Entry() {
                 </Grid>
             </Grid>
             </CssVarsProvider>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }

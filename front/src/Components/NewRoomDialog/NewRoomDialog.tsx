@@ -36,7 +36,7 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
     const {register, handleSubmit, setValue, reset, formState: {errors}} = useForm<RoomForm>({
         defaultValues: {
             name: "",
-            house: houses[0].id
+            house: houses[0]?.id
         },
         mode: "onChange"
     });
@@ -163,7 +163,7 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
                                                         },
                                                     }}
                                                     variant={'outlined'}
-                                                    defaultValue={houses[0].id}
+                                                    defaultValue={houses[0]?.id}
                                                     onChange={handleHouseChange}
                                                     indicator={<KeyboardArrowDown />}>
                                                     {houses.map((house) => {

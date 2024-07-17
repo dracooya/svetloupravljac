@@ -52,12 +52,12 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const {register, handleSubmit, setValue, reset,trigger, formState: {errors}} = useForm<SceneForm>({
         defaultValues: {
             name: "",
-            room: houses[0].rooms[0].id
+            room: houses[0]?.rooms[0].id
         },
         mode: "onChange"
     });
 
-    const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0].rooms[0]);
+    const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0]?.rooms[0]);
     const [includedLights, setIncludedLights] = useState<LightIncluded[]>([]);
     const [activeStep, setActiveStep] = useState<number>(0);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
@@ -89,7 +89,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     }
 
     useEffect(() => {
-        setIncludedLights(selectedRoom.lights.map((light) => {return {light: light, included: true, mode: undefined}}));
+        setIncludedLights(selectedRoom?.lights.map((light) => {return {light: light, included: true, mode: undefined}}));
     }, [selectedRoom]);
 
     useEffect(() => {
@@ -104,7 +104,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
             setIncludedLights(includedLights);
         }
         else {
-            setIncludedLights(selectedRoom.lights.map((light) => {return {light: light, included: true, mode: undefined}}));
+            setIncludedLights(selectedRoom?.lights.map((light) => {return {light: light, included: true, mode: undefined}}));
         }
     }, [isModification]);
 
@@ -244,7 +244,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                                                             },
                                                         }}
                                                         variant={'outlined'}
-                                                        value={selectedRoom.id}
+                                                        value={selectedRoom?.id}
                                                         onChange={handleRoomChange}
                                                         indicator={<KeyboardArrowDown />}>
                                                         {houses.flatMap(house =>  house.rooms.map(room => {

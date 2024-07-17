@@ -39,7 +39,7 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
     const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<LightForm>({
         defaultValues: {
             name: "",
-            room: houses[0].rooms[0].id
+            room: houses[0]?.rooms[0].id
         },
         mode: "onChange"
     });

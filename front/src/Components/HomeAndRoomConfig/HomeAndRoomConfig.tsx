@@ -12,12 +12,12 @@ import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/Deletion
 
 interface HomeAndRoomConfigProps {
     houses: House[],
-    setSelectedRoomParent: (room : Room) => void
+    setSelectedRoomParent: (room : Room | undefined) => void
 }
 
 export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomConfigProps) {
-    const [selectedHouse, setSelectedHouse] = useState<House>(houses[0]);
-    const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0].rooms[0]);
+    const [selectedHouse, setSelectedHouse] = useState<House | undefined>(houses[0]);
+    const [selectedRoom, setSelectedRoom] = useState<Room | undefined>(houses[0]?.rooms[0]);
     const [openNewHouseDialog, setOpenNewHouseDialog] = useState<boolean>(false);
     const [openNewRoomDialog, setOpenNewRoomDialog] = useState<boolean>(false);
     const [houseDeleteMessage, setHouseDeleteMessage] = useState<string>("");
@@ -40,7 +40,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
     };
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
-        const room = selectedHouse.rooms.find(room => room.id === selectedRoomId);
+        const room = selectedHouse!.rooms.find(room => room.id === selectedRoomId);
         setSelectedRoom(room!);
         setSelectedRoomParent(room!);
         setIsModificationRoom(false);
@@ -104,7 +104,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                         }}
                         variant={'outlined'}
                         onChange={handleHouseChange}
-                        value={selectedHouse.id}
+                        value={selectedHouse?.id}
                         indicator={<KeyboardArrowDown />}>
                         {houses.map((house) => {
                             return <Option value={house.id} key={house.id}>{house.name}</Option>
@@ -119,6 +119,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                         <IconButton
+                            disabled={selectedHouse == undefined}
                             onClick={() => {
                                 setIsModificationHouse(true);
                                 setOpenNewHouseDialog(true);}}
@@ -126,9 +127,10 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                         <IconButton  variant="soft"
+                                     disabled={selectedHouse == undefined}
                                      sx={{border:'1px solid #12467b'}}
                                      onClick={() => {
-                                         setHouseDeleteMessage(" <b>Are you sure you want to remove " + selectedHouse.name + "?</b> This action will: <br/> <br/>\n" +
+                                         setHouseDeleteMessage(" <b>Are you sure you want to remove " + selectedHouse!.name + "?</b> This action will: <br/> <br/>\n" +
                                              "                                        - <b>Remove all the rooms</b> associated with the house <br/>\n" +
                                              "                                        - <b>Remove lights from rooms </b> that have been removed <br/>\n" +
                                              "                                        - <b>Removed scenes that have become empty</b> as a result of lights removal <br/>\n"
@@ -170,22 +172,24 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                             },
                         }}
                         variant={'outlined'}
-                        value={selectedRoom.id}
+                        value={selectedRoom?.id}
                         onChange={handleRoomChange}
                         indicator={<KeyboardArrowDown />}>
-                        {selectedHouse.rooms.map((room) => {
+                        {selectedHouse?.rooms.map((room) => {
                             return <Option value={room.id} key={room.id}>{room.name}</Option>
                         })}
                     </Select>
                 </Grid>
                 <Grid xs={4} sm={3} md={3} lg={4} xl={4} container pl={1}>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
-                         <IconButton  onClick={() => {
+                         <IconButton
+                             onClick={() => {
                              setIsModificationRoom(false);
                              setOpenNewRoomDialog(true);}} variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPlus}/></IconButton>
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                         <IconButton
+                            disabled={selectedRoom == undefined}
                             onClick={() => {
                                 setIsModificationRoom(true);
                                 setOpenNewRoomDialog(true);}}
@@ -193,9 +197,10 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                     </Grid>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                         <IconButton variant="soft"
+                                    disabled={selectedRoom == undefined}
                                     sx={{border:'1px solid #12467b'}}
                                     onClick={() => {
-                                        setRoomDeleteMessage(" <b>Are you sure you want to remove " +  selectedRoom.name + "?</b> This action will: <br/> <br/>\n" +
+                                        setRoomDeleteMessage(" <b>Are you sure you want to remove " +  selectedRoom!.name + "?</b> This action will: <br/> <br/>\n" +
                                             "                                        - <b>Remove all the lights</b> associated with the room <br/>\n" +
                                             "                                        - <b>Remove those lights from scenes</b> where they are included <br/>\n" +
                                             "                                        - <b>Remove scenes that have become empty</b> as a result of lights removal <br/>\n" +

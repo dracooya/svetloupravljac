@@ -13,7 +13,7 @@ export function Main() {
 
     const [selectedRoom, setSelectedRoom] = useState<Room>();
     const [houses, setHouses] = useState<House[]>([
-        {id:1, name: "Goober Home", rooms: [ {name: "Bedroom", id:1,
+        /*id:1, name: "Goober Home", rooms: [ {name: "Bedroom", id:1,
             lights:[
                 {
                     id: 1,
@@ -37,7 +37,7 @@ export function Main() {
                     type: LightType.BULB,
                     isOn: true
                 }]}]},
-        {id:2, name: "Gooberung Home", rooms: [ {name: "Bathroom", id:3, lights:[]},{name: "Storage", id:4, lights:[]}]}
+        {id:2, name: "Gooberung Home", rooms: [ {name: "Bathroom", id:3, lights:[]},{name: "Storage", id:4, lights:[]}]}*/
     ]);
 
     const handleRoomSelectionChange = (room : Room) => {
@@ -47,7 +47,7 @@ export function Main() {
 
     const [scenes, setScenes] = useState<Scene[]>([
 
-        {
+        /*{
             id: 1,
             name: 'PulsyBoi',
             lightsConfig: [
@@ -86,7 +86,7 @@ export function Main() {
                     }
                 },
             ]
-        },
+        },*/
 
 
     ])
