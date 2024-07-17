@@ -1,7 +1,7 @@
-import {LightBasicInfoWithStatus} from "./LightBasicInfoWithStatus.ts";
+import {Light} from "./Light.ts";
 
 export interface Room{
     name: string,
     id: number,
-    lights: LightBasicInfoWithStatus[]
+    lights: Light[]
 }

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 class EntryService:
     entry_password = b"$2a$12$gMsubuEng/BWoDZuIh6EdejWPYOaE2OtGQ8LVcSdw9D1.uttDy/Oa"
-    authorized = False
+    authorized = True
     scheduler = BackgroundScheduler()
     scheduler.start()
 

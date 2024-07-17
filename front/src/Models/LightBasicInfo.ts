@@ -5,5 +5,4 @@ export interface LightBasicInfo {
     ip: string,
     name: string,
     type: LightType,
-
 }

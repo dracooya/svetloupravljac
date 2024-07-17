@@ -9,13 +9,15 @@ import {NewRoomDialog} from "../NewRoomDialog/NewRoomDialog.tsx";
 import {NewHouseDialog} from "../NewHouseDialog/NewHouseDialog.tsx";
 import {mdilDelete, mdilPencil} from "@mdi/light-js/mdil";
 import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
+import {HouseService} from "../../Services/HouseService.ts";
 
 interface HomeAndRoomConfigProps {
     houses: House[],
-    setSelectedRoomParent: (room : Room | undefined) => void
+    setSelectedRoomParent: (room : Room | undefined) => void,
+    houseService: HouseService
 }
 
-export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomConfigProps) {
+export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} : HomeAndRoomConfigProps) {
     const [selectedHouse, setSelectedHouse] = useState<House | undefined>(houses[0]);
     const [selectedRoom, setSelectedRoom] = useState<Room | undefined>(houses[0]?.rooms[0]);
     const [openNewHouseDialog, setOpenNewHouseDialog] = useState<boolean>(false);
@@ -30,6 +32,11 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
     useEffect(() => {
         setSelectedRoomParent(selectedRoom);
     }, []);
+
+    useEffect(() => {
+        setSelectedHouse(houses[0]);
+        setSelectedRoom(houses[0]?.rooms[0]);
+    }, [houses]);
 
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
         const selectedHouse = houses.find(house => house.id === selectedHouseId!);
@@ -217,6 +224,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent} : HomeAndRoomC
                            houses={houses}
                            closeModalCallback={handleRoomDialogClose}/>
             <NewHouseDialog open={openNewHouseDialog}
+                            houseService={houseService}
                             isModification={isModificationHouse}
                             selectedHouse={selectedHouse}
                             closeModalCallback={handleHouseDialogClose}/>

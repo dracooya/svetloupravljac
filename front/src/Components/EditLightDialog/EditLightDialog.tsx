@@ -1,6 +1,4 @@
 // noinspection TypeScriptValidateTypes
-
-import {LightBasicInfoWithStatus} from "../../Models/LightBasicInfoWithStatus.ts";
 import {
     Button,
     DialogContent,
@@ -21,11 +19,12 @@ import {useForm} from "react-hook-form";
 import {House} from "../../Models/House.ts";
 import {mdiLightbulbOutline} from "@mdi/js";
 import {Room} from "../../Models/Room.ts";
+import {Light} from "../../Models/Light.ts";
 
 interface EditLightDialog {
     open: boolean,
     closeModalCallback: () => void,
-    selectedLight: LightBasicInfoWithStatus | undefined,
+    selectedLight: Light | undefined,
     houses: House[],
     currentRoom: Room | undefined
 }

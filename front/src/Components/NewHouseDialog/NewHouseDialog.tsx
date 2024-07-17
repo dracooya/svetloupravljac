@@ -18,12 +18,15 @@ import {Transition} from "react-transition-group";
 import {useForm} from "react-hook-form";
 import {House} from "../../Models/House.ts";
 import {useEffect} from "react";
+import {HouseService} from "../../Services/HouseService.ts";
+import {NewHouse} from "../../Models/DTOs/NewHouse.ts";
 
 interface NewHouseDialogProps {
     open: boolean,
     closeModalCallback: () => void,
     isModification: boolean,
-    selectedHouse: House | undefined
+    selectedHouse: House | undefined,
+    houseService: HouseService
 }
 
 interface HouseForm {
@@ -31,8 +34,8 @@ interface HouseForm {
     room: string
 }
 
-export function NewHouseDialog({open, closeModalCallback, isModification, selectedHouse}: NewHouseDialogProps) {
-    const {register, handleSubmit, reset,setValue, formState: {errors}} = useForm<HouseForm>({
+export function NewHouseDialog({open, closeModalCallback, isModification, selectedHouse, houseService}: NewHouseDialogProps) {
+    const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<HouseForm>({
         defaultValues: {
             name: "",
             room: ""
@@ -40,8 +43,15 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
         mode: "onChange"
     });
     const onSubmit = (data : HouseForm) => {
-        /*TODO: Modify/delete house */
-        reset();
+        const newHouse : NewHouse = {
+            houseName: data.name.trim(),
+            roomName: data.room.trim()
+        }
+        houseService.add(newHouse).then((houses) => {
+            reset();
+            window.location.reload();
+        });
+
     };
 
     useEffect(() => {

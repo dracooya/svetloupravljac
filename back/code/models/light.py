@@ -14,3 +14,16 @@ class Light(db.Model):
     minKelvin: Mapped[int] = mapped_column(nullable=False)
     maxKelvin: Mapped[int] = mapped_column(nullable=False)
     room_id: Mapped[int] = mapped_column(ForeignKey("room.id"))
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'ip': self.ip,
+            'name': self.name,
+            'type': self.type,
+            'brightnessChange': self.brightnessChange,
+            'colorChange': self.colorChange,
+            'temperatureChange': self.temperatureChange,
+            'minKelvin': self.minKelvin,
+            'maxKelvin': self.maxKelvin,
+        }

@@ -7,7 +7,7 @@ export interface Light {
     type: LightType,
     brightnessChange: boolean,
     colorChange: boolean,
-    temperatures: boolean,
+    temperatureChange: boolean,
     minKelvin: number,
     maxKelvin: number
 }

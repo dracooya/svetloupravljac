@@ -1,10 +1,12 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from code.utils.db_config import db
 from code.models.dtos.password import passwordSchema, Password
 from code.utils.request_parser import request_parser
 from code.services.entry_service import EntryService
 from code.utils.validation_exception import ValidationException
 from flask_cors import CORS
+import code.services.house_service as house_service
+from code.models.dtos.new_house import newHouseSchema, NewHouse
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/svetloupravljac'
@@ -32,9 +34,29 @@ def before_request_func():
 @app.route('/enter', methods=['POST'])
 def enter():
     try:
-        data = request_parser(passwordSchema)
-        message = entry_service.enter_app(Password(**data))
+        data = request_parser(passwordSchema, Password)
+        message = entry_service.enter_app(data)
         return message, 200
 
     except ValidationException as ex:
         return ex.message, ex.status_code
+
+
+@app.route('/houses/all', methods=['GET'])
+def get_all_houses():
+    houses = house_service.get_all()
+    return jsonify([house.serialize() for house in houses]), 200
+
+
+@app.route('/houses/add', methods=['POST'])
+def add_house():
+    try:
+        data = request_parser(newHouseSchema, NewHouse)
+        message = house_service.add(data)
+        return message, 201
+
+    except ValidationException as ex:
+        return ex.message, ex.status_code
+
+
+

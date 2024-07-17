@@ -10,3 +10,10 @@ class Room(db.Model):
     name: Mapped[str] = mapped_column(nullable=False)
     lights: Mapped[List["Light"]] = relationship()
     house_id: Mapped[int] = mapped_column(ForeignKey("house.id"))
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'lights': [light.serialize() for light in self.lights]
+        }

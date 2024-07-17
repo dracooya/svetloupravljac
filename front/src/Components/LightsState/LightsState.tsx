@@ -14,7 +14,6 @@ import {
 } from "@mui/joy";
 import React, {useState} from "react";
 import "../Main/Main.css"
-import {LightBasicInfoWithStatus} from "../../Models/LightBasicInfoWithStatus.ts";
 import {LightType} from "../../Models/Enums/LightType.ts";
 import Icon from "@mdi/react";
 import {mdiLampOutline, mdiLedStripVariant, mdiLightbulbOutline} from '@mdi/js';
@@ -27,9 +26,10 @@ import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/Deletion
 import {EditLightDialog} from "../EditLightDialog/EditLightDialog.tsx";
 import {Room} from "../../Models/Room.ts";
 import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
+import {Light} from "../../Models/Light.ts";
 
 interface LightsStateProps {
-    lights: LightBasicInfoWithStatus[] | undefined,
+    lights: Light[] | undefined,
     houses: House[],
     currentRoom: Room | undefined
 }
@@ -38,7 +38,7 @@ export function LightsState({lights, houses, currentRoom}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
     const [openNewLightDialog, setOpenNewLightDialog] = useState<boolean>(false);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
-    const [selectedLight, setSelectedLight] = useState<LightBasicInfoWithStatus>();
+    const [selectedLight, setSelectedLight] = useState<Light>();
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
     const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
     const [deleteMessage, setDeleteMessage] = useState<string>("");
