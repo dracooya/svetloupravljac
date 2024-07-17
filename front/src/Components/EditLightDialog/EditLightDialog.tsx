@@ -1,4 +1,6 @@
 // noinspection TypeScriptValidateTypes
+// noinspection TypeScriptValidateTypes
+
 import {
     Button,
     DialogContent,
@@ -38,11 +40,11 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
     const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<LightForm>({
         defaultValues: {
             name: "",
-            room: houses[0]?.rooms[0].id
+            room: houses[0]?.rooms[0]?.id
         },
         mode: "onChange"
     });
-    const [selectedRoomId, setSelectedRoomId] = useState<number>(currentRoom?.id);
+    const [selectedRoomId, setSelectedRoomId] = useState<number>();
     const onSubmit = (data : LightForm) => {
         /*TODO: Modify/delete light */
         reset();

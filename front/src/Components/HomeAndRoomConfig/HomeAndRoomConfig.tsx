@@ -10,6 +10,7 @@ import {NewHouseDialog} from "../NewHouseDialog/NewHouseDialog.tsx";
 import {mdilDelete, mdilPencil} from "@mdi/light-js/mdil";
 import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
 import {HouseService} from "../../Services/HouseService.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 
 interface HomeAndRoomConfigProps {
     houses: House[],
@@ -28,6 +29,11 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
     const [openRoomDeleteDialog, setOpenRoomDeleteDialog] = useState<boolean>(false);
     const [isModificationHouse, setIsModificationHouse] = useState<boolean>(false);
     const [isModificationRoom, setIsModificationRoom] = useState<boolean>(false);
+
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const handlePopupClose = () => { setPopupOpen(false); }
 
     useEffect(() => {
         setSelectedRoomParent(selectedRoom);
@@ -74,7 +80,13 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
     }
 
     const deleteSelectedHouse = () => {
-        //TODO: Delete room
+        houseService.delete(selectedHouse!.id).then((_) => {
+            window.location.reload();
+        }).catch((err) => {
+            setPopupMessage(err.response.data);
+            setIsSuccess(false);
+            setPopupOpen(true);
+        });
     }
 
     return (
@@ -234,6 +246,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
             <DeletionConfirmationDialog open={openRoomDeleteDialog}
                                         closeModalCallback={handleRoomDeleteDialogClose}
                                         message={roomDeleteMessage} deleteConfirmedCallback={deleteSelectedRoom}/>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }

@@ -63,7 +63,7 @@ export function DeletionConfirmationDialog({open, closeModalCallback, message, d
                                     </Grid>
                                     <Grid pt={5} xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'} columnGap={2}>
                                         <Grid>
-                                            <Button color={'danger'} variant={'solid'}>Yes</Button>
+                                            <Button onClick={deleteConfirmedCallback} color={'danger'} variant={'solid'}>Yes</Button>
                                         </Grid>
                                         <Grid>
                                             <Button color={'neutral'}

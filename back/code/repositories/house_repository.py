@@ -11,3 +11,17 @@ def add(house_name: str):
     db.session.add(house)
     db.session.commit()
     return house
+
+
+def get_by_id(house_id: int):
+    return House.query.filter_by(id=house_id).first()
+
+
+def modify(house: House, newName: str):
+    house.name = newName
+    db.session.commit()
+
+
+def delete(house: House):
+    db.session.delete(house)
+    db.session.commit()

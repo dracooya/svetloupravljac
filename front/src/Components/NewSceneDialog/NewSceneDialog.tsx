@@ -52,7 +52,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const {register, handleSubmit, setValue, reset,trigger, formState: {errors}} = useForm<SceneForm>({
         defaultValues: {
             name: "",
-            room: houses[0]?.rooms[0].id
+            room: houses[0]?.rooms[0]?.id
         },
         mode: "onChange"
     });

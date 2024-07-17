@@ -17,9 +17,11 @@ import {mdilHome} from "@mdi/light-js";
 import {Transition} from "react-transition-group";
 import {useForm} from "react-hook-form";
 import {House} from "../../Models/House.ts";
-import {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {HouseService} from "../../Services/HouseService.ts";
 import {NewHouse} from "../../Models/DTOs/NewHouse.ts";
+import {ModifyHouse} from "../../Models/DTOs/ModifyHouse.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 
 interface NewHouseDialogProps {
     open: boolean,
@@ -35,23 +37,42 @@ interface HouseForm {
 }
 
 export function NewHouseDialog({open, closeModalCallback, isModification, selectedHouse, houseService}: NewHouseDialogProps) {
-    const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<HouseForm>({
+    const {register, handleSubmit, setValue, formState: {errors}} = useForm<HouseForm>({
         defaultValues: {
             name: "",
             room: ""
         },
         mode: "onChange"
     });
-    const onSubmit = (data : HouseForm) => {
-        const newHouse : NewHouse = {
-            houseName: data.name.trim(),
-            roomName: data.room.trim()
-        }
-        houseService.add(newHouse).then((houses) => {
-            reset();
-            window.location.reload();
-        });
 
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const handlePopupClose = () => { setPopupOpen(false); }
+
+    const onSubmit = (data : HouseForm) => {
+        if(isModification) {
+            const editHouse: ModifyHouse = {
+                id: selectedHouse!.id,
+                name: data.name
+            }
+            houseService.edit(editHouse).then((_) => {
+                window.location.reload();
+            }).catch((err) => {
+                setPopupMessage(err.response.data);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            });
+        }
+        else {
+            const newHouse: NewHouse = {
+                houseName: data.name.trim(),
+                roomName: data.room.trim()
+            }
+            houseService.add(newHouse).then((_) => {
+                window.location.reload();
+            });
+        }
     };
 
     useEffect(() => {
@@ -173,6 +194,7 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
                     </Modal>
                 )}
             </Transition>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }
