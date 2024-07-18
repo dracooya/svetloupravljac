@@ -20,7 +20,7 @@ import {
     SvgIcon,
     Typography
 } from "@mui/joy";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Icon from "@mdi/react";
 import {mdiLampOutline, mdiLedStripVariant, mdiLightbulbOutline, mdiReload} from "@mdi/js";
 import {mdilCheck, mdilHelp, mdilHelpCircle, mdilLightbulb} from "@mdi/light-js/mdil";
@@ -29,73 +29,116 @@ import {useForm} from "react-hook-form";
 import {LightType} from "../../Models/Enums/LightType.ts";
 import {House} from "../../Models/House.ts";
 import {mdilHome} from "@mdi/light-js";
-import {Room} from "../../Models/Room.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
+import {Light} from "../../Models/Light.ts";
+import {LightService} from "../../Services/LightService.ts";
+import {NewLights} from "../../Models/DTOs/NewLights.ts";
+import {NewLight} from "../../Models/DTOs/NewLight.ts";
 
 interface NewLightDialogProps {
     open: boolean,
     closeModalCallback: () => void,
     houses: House[],
+    lightService: LightService
 }
 
-interface NewLight {
+interface NewLightSetup {
     ip: string,
     mac: string,
     name: string,
-    room: Room,
+    roomId: number,
     type: LightType,
+    brightnessChange: boolean,
+    colorChange: boolean,
+    temperatureChange: boolean,
+    minKelvin: number,
+    maxKelvin: number,
     isSetup: boolean
 }
 
 interface LightForm {
     name: string,
-    room: Room,
+    room: number,
     type: LightType
 }
 
-export function NewLightDialog({open, houses, closeModalCallback} : NewLightDialogProps) {
+export function NewLightDialog({open, houses, closeModalCallback, lightService} : NewLightDialogProps) {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [hasFoundLights, setHasFoundLights] = useState<boolean>(false);
     const [selectedHouse, setSelectedHouse] = useState<House>(houses[0]);
-    const [setupLights, setSetupLights] = useState<NewLight[]>([]);
-    const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0]?.rooms[0]);
+    const [setupLights, setSetupLights] = useState<NewLightSetup[]>([]);
+    const [selectedRoomId, setSelectedRoomId] = useState<number>(houses[0]?.rooms[0].id);
     const [selectedType, setSelectedType] = useState<LightType>(LightType.BULB);
-    const [selectedLight, setSelectedLight] = useState<NewLight>();
+    const [selectedLight, setSelectedLight] = useState<Light>();
     const [isModification, setIsModification] = useState<boolean>(false);
-    const [foundLights, setFoundLights] = useState<NewLight[]>([
-        {ip:'192.168.0.101', mac:'a8bs4090193d', isSetup:false},
-        {ip:'192.168.0.102', mac:'qewjixmdwe3d', isSetup: false},
-        {ip:'192.168.0.102', mac:'mdewpifee3d', isSetup: false},
-
-    ]);
-
+    const [foundLights, setFoundLights] = useState<NewLightSetup[]>([]);
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
 
+    useEffect(() => {
+        setSelectedHouse(houses[0]);
+        setSelectedRoomId(houses[0]?.rooms[0].id);
+        setValue("room", houses[0]?.rooms[0].id);
+    }, [houses]);
+
+    const fetchLights = async () => {
+        setIsSearching(true);
+        const lights = await lightService.discover();
+        setIsSearching(false);
+        if (lights.length !== 0) {
+            const transformedLights : NewLightSetup[] = lights.map(light => ({
+                ip: light.ip,
+                mac: light.mac,
+                name: light.name,
+                roomId: selectedRoomId,
+                brightnessChange: light.brightnessChange,
+                colorChange: light.colorChange,
+                temperatureChange: light.temperatureChange,
+                minKelvin: light.minKelvin,
+                maxKelvin: light.maxKelvin,
+                type: light.type,
+                isSetup: false,
+            }));
+            setFoundLights(transformedLights);
+            setHasFoundLights(true);
+        }
+    };
+
+    useEffect(() => {
+        if (!open) return;
+        fetchLights();
+    }, [open]);
+
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
         const selectedHouse = houses.find(house => house.id === selectedHouseId!);
         setSelectedHouse(selectedHouse!);
-        setSelectedRoom(selectedHouse!.rooms[0]);
+        setSelectedRoomId(selectedHouse!.rooms[0].id);
     };
 
     const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<LightForm>({
         defaultValues: {
             name: "",
-            room: houses[0]?.rooms[0],
+            room: houses[0]?.rooms[0].id,
             type: LightType.BULB,
         },
         mode: "onChange"
     });
     const onSubmit = (data : LightForm) => {
-        const setupLight : NewLight = {
+        const setupLight : NewLightSetup = {
             ip: selectedLight?.ip,
             mac: selectedLight?.mac,
             name: data.name,
-            room: data.room,
+            roomId: selectedRoomId,
+            brightnessChange: selectedLight?.brightnessChange,
+            colorChange: selectedLight?.colorChange,
+            temperatureChange: selectedLight?.temperatureChange,
+            minKelvin: selectedLight?.minKelvin,
+            maxKelvin: selectedLight?.maxKelvin,
             type: data.type,
             isSetup: true
         }
+
         setFoundLights(foundLights.map(light => light.mac === selectedLight?.mac ? setupLight : light));
         if(isModification) setSetupLights(setupLights.map(light => light.mac === selectedLight?.mac ? setupLight : light));
         else setSetupLights(prevList => [...prevList, setupLight])
@@ -108,25 +151,25 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
     };
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
-        const room = selectedHouse.rooms.find(room => room.id === selectedRoomId);
-        setSelectedRoom(room!);
-        setValue("room", room!);
+        setSelectedRoomId(selectedRoomId);
+        setValue("room", selectedRoomId);
     };
 
     const handlePopupClose = () => {
         setPopupOpen(false);
     }
 
-    const handleSelectedLightChange = (selectedLight : NewLight) => {
+    const handleSelectedLightChange = (selectedLight : NewLightSetup) => {
         setSelectedLight(selectedLight);
         if(selectedLight.isSetup) {
             setIsModification(true);
             setValue("name", selectedLight.name);
-            setValue("room", selectedLight.room);
+            setValue("room", selectedLight.roomId);
             setValue("type", selectedLight.type);
             setSelectedType(selectedLight.type);
-            setSelectedRoom(selectedLight.room);
-            setSelectedHouse(houses.find(house => house.rooms.some(room => room.id === selectedLight.room.id)));
+            setSelectedRoomId(selectedLight.roomId);
+            setSelectedHouse(houses.find(house => house.rooms.some(room => room.id === selectedLight.roomId)));
+            console.log(selectedLight.roomId)
         }
         else {
             setIsModification(false);
@@ -135,29 +178,35 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
 
     const finishAll = () => {
         if(setupLights.length != 0) {
-            setPopupMessage("Successfully Added Lights!");
-            setIsSuccess(true);
-            setPopupOpen(true);
+            const transformedLights : NewLight[] = setupLights.map(light => ({
+                ip: light.ip,
+                mac: light.mac,
+                name: light.name,
+                roomId: light.roomId,
+                brightnessChange: light.brightnessChange,
+                colorChange: light.colorChange,
+                temperatureChange: light.temperatureChange,
+                minKelvin: light.minKelvin,
+                maxKelvin: light.maxKelvin,
+                type: light.type,
+            }));
+            const newLights : NewLights = {
+                lights: transformedLights
+            }
+            console.log(newLights)
+            lightService.add(newLights).then((_) => {
+                window.location.reload();
+            }).catch((err) => {
+                setPopupMessage(err.response.data);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            })
         }
-        setIsSearching(false);
-        setHasFoundLights(false);
-        setFoundLights([]);
-        setSetupLights([]);
-        setIsModification(false);
-        setSelectedType(LightType.BULB);
-        setSelectedHouse(houses[0]);
-        setSelectedRoom(houses[0].rooms[0]);
-        closeModalCallback();
+        else {
+            closeModalCallback();
+        }
     }
 
-    useEffect(() => {
-        setHasFoundLights(false);
-        setIsSearching(true);
-        setTimeout(() => {
-            setIsSearching(false);
-            setHasFoundLights(true);
-        }, 5000);
-    }, []);
     return (
         <>
             <Transition in={open} timeout={400}>
@@ -373,7 +422,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                                             }}
                                                                             variant={'outlined'}
                                                                             onChange={handleRoomChange}
-                                                                            value={selectedRoom?.id}
+                                                                            value={selectedRoomId}
                                                                             indicator={<KeyboardArrowDown />}>
                                                                             {selectedHouse?.rooms.map((room) => {
                                                                                 return <Option value={room.id} key={room.id}>{room.name}</Option>
@@ -444,6 +493,7 @@ export function NewLightDialog({open, houses, closeModalCallback} : NewLightDial
                                                         <Button
                                                             onClick={() => {
                                                                 setIsSearching(true);
+                                                                fetchLights();
                                                                 }}
                                                             variant={'outlined'} startDecorator={<Icon path={mdiReload} size={1} />}>Try Again</Button>
                                                     </Grid>

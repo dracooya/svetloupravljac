@@ -32,4 +32,4 @@ def delete(room_id: int):
             house_repository.delete(house)
         else:
             room_repository.delete(room)
-        return "Room successfully deleted!"
+        return "Room successfully removed!"

@@ -10,13 +10,13 @@ house_blueprint = Blueprint('house_blueprint', __name__)
 
 
 @house_blueprint.route('/all', methods=['GET'])
-def get_all_houses():
+def get_all():
     houses = house_service.get_all()
     return jsonify([house.serialize() for house in houses]), 200
 
 
 @house_blueprint.route('/add', methods=['POST'])
-def add_house():
+def add():
     try:
         data = request_parser(newHouseSchema, NewHouse)
         message = house_service.add(data)
@@ -27,7 +27,7 @@ def add_house():
 
 
 @house_blueprint.route('/modify', methods=['PUT'])
-def modify_house():
+def modify():
     try:
         data = request_parser(modifyHouseOrRoomSchema, ModifyHouseOrRoom)
         message = house_service.modify(data)
@@ -38,7 +38,7 @@ def modify_house():
 
 
 @house_blueprint.route('/delete/<house_id>', methods=['DELETE'])
-def delete_house(house_id):
+def delete(house_id):
     try:
         message = house_service.delete(house_id)
         return message, 200

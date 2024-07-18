@@ -27,14 +27,16 @@ import {EditLightDialog} from "../EditLightDialog/EditLightDialog.tsx";
 import {Room} from "../../Models/Room.ts";
 import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 import {Light} from "../../Models/Light.ts";
+import {LightService} from "../../Services/LightService.ts";
 
 interface LightsStateProps {
     lights: Light[] | undefined,
     houses: House[],
-    currentRoom: Room | undefined
+    currentRoom: Room | undefined,
+    lightService: LightService
 }
 
-export function LightsState({lights, houses, currentRoom}: LightsStateProps) {
+export function LightsState({lights, houses, currentRoom, lightService}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
     const [openNewLightDialog, setOpenNewLightDialog] = useState<boolean>(false);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
@@ -191,7 +193,10 @@ export function LightsState({lights, houses, currentRoom}: LightsStateProps) {
                     </Grid>
                 </Grid>
             </Grid>
-            <NewLightDialog open={openNewLightDialog} houses={houses} closeModalCallback={handleLightDialogClose}/>
+            <NewLightDialog open={openNewLightDialog}
+                            lightService={lightService}
+                            houses={houses}
+                            closeModalCallback={handleLightDialogClose}/>
             <LightColorChangeDialog open={openLightColorChangeDialog}
                                     valueChangeCallback={handleColorChange}
                                     closeModalCallback={handleLightColorChangeDialogClose}/>

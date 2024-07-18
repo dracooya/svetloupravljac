@@ -9,7 +9,7 @@ room_blueprint = Blueprint('room_blueprint', __name__)
 
 
 @room_blueprint.route('/add', methods=['POST'])
-def add_room():
+def add():
     try:
         data = request_parser(newRoomSchema, NewRoom)
         message = room_service.add(data)
@@ -20,7 +20,7 @@ def add_room():
 
 
 @room_blueprint.route('/modify', methods=['PUT'])
-def modify_room():
+def modify():
     try:
         data = request_parser(modifyHouseOrRoomSchema, ModifyHouseOrRoom)
         message = room_service.modify(data)
@@ -31,7 +31,7 @@ def modify_room():
 
 
 @room_blueprint.route('/delete/<room_id>', methods=['DELETE'])
-def delete_room(room_id):
+def delete(room_id):
     try:
         message = room_service.delete(room_id)
         return message, 200

@@ -12,4 +12,3 @@ class ColorOrModeConfig(db.Model):
     temperature: Mapped[int] = mapped_column()
     speed: Mapped[int] = mapped_column()
     mode: Mapped[int] = mapped_column()
-    scene_id: Mapped[int] = mapped_column(ForeignKey("scene.id"))

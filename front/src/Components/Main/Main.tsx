@@ -9,13 +9,15 @@ import {Room} from "../../Models/Room.ts";
 import {HouseService} from "../../Services/HouseService.ts";
 import {RoomService} from "../../Services/RoomService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
+import {LightService} from "../../Services/LightService.ts";
 
 interface MainProps {
     houseService: HouseService,
-    roomService: RoomService
+    roomService: RoomService,
+    lightService: LightService
 }
 
-export function Main({houseService, roomService} : MainProps) {
+export function Main({houseService, roomService, lightService} : MainProps) {
 
     const [selectedRoom, setSelectedRoom] = useState<Room>();
     const [houses, setHouses] = useState<House[]>([]);
@@ -39,6 +41,10 @@ export function Main({houseService, roomService} : MainProps) {
         });
         shouldLoad.current = false;
     }, []);
+
+    useEffect(() => {
+        setSelectedRoom(houses[0]?.rooms[0])
+    }, [houses]);
 
 
     const handleRoomSelectionChange = (room : Room) => {
@@ -129,7 +135,10 @@ export function Main({houseService, roomService} : MainProps) {
                         lg:0,
                         xl:0
                     }} justifyContent={'center'} alignItems={'flex-start'}>
-                        <LightsState lights={selectedRoom?.lights} houses={houses} currentRoom={selectedRoom}/>
+                        <LightsState lights={selectedRoom?.lights}
+                                     lightService={lightService}
+                                     houses={houses}
+                                     currentRoom={selectedRoom}/>
                     </Grid>
                 </Grid>
             </Grid>

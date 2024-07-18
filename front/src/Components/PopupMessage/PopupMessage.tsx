@@ -28,7 +28,7 @@ export function PopupMessage({isError, isOpen, handleClose, message} : PopupMess
                     <ModalClose variant="plain"  onClick={handleClose}/>
                 }>
                 <Grid textAlign={'center'}>
-                    {parse(message)}
+                    { message.includes("<") ? parse(message) : message}
                 </Grid>
             </Snackbar>
         </>

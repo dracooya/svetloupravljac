@@ -4,7 +4,7 @@ from sqlalchemy import ForeignKey
 
 
 class Light(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
+    mac: Mapped[str] = mapped_column(primary_key=True)
     ip: Mapped[str] = mapped_column(nullable=False)
     name: Mapped[str] = mapped_column(nullable=False)
     type: Mapped[str] = mapped_column(nullable=False)
@@ -17,7 +17,7 @@ class Light(db.Model):
 
     def serialize(self):
         return {
-            'id': self.id,
+            'mac': self.mac,
             'ip': self.ip,
             'name': self.name,
             'type': self.type,

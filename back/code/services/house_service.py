@@ -30,4 +30,4 @@ def delete(house_id: int):
         raise ValidationException("House with the specified ID does not exist!", 404)
     else:
         house_repository.delete(house)
-        return "House successfully deleted!"
+        return "House successfully removed!"
