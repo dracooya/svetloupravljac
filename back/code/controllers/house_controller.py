@@ -3,7 +3,7 @@ from code.utils.validation_exception import ValidationException
 from code.utils.request_parser import request_parser
 import code.services.house_service as house_service
 from code.models.dtos.new_house import newHouseSchema, NewHouse
-from code.models.dtos.modify_house import modifyHouseSchema, ModifyHouse
+from code.models.dtos.modify_house_or_room import modifyHouseOrRoomSchema, ModifyHouseOrRoom
 
 
 house_blueprint = Blueprint('house_blueprint', __name__)
@@ -29,7 +29,7 @@ def add_house():
 @house_blueprint.route('/modify', methods=['PUT'])
 def modify_house():
     try:
-        data = request_parser(modifyHouseSchema, ModifyHouse)
+        data = request_parser(modifyHouseOrRoomSchema, ModifyHouseOrRoom)
         message = house_service.modify(data)
         return message, 200
 

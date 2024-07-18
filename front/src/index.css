@@ -66,5 +66,10 @@ body {
   background: -webkit-linear-gradient(45deg, hsla(192, 94%, 72%, 1) 0%, hsla(248, 100%, 46%, 1) 100%);
 }
 
+.disabled {
+  color: #9FA6AD !important;
+  border: 2px solid #9FA6AD !important;
+}
+
 
 

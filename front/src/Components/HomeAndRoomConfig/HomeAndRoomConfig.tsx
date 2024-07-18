@@ -11,14 +11,16 @@ import {mdilDelete, mdilPencil} from "@mdi/light-js/mdil";
 import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
 import {HouseService} from "../../Services/HouseService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
+import {RoomService} from "../../Services/RoomService.ts";
 
 interface HomeAndRoomConfigProps {
     houses: House[],
     setSelectedRoomParent: (room : Room | undefined) => void,
-    houseService: HouseService
+    houseService: HouseService,
+    roomService: RoomService
 }
 
-export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} : HomeAndRoomConfigProps) {
+export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, roomService} : HomeAndRoomConfigProps) {
     const [selectedHouse, setSelectedHouse] = useState<House | undefined>(houses[0]);
     const [selectedRoom, setSelectedRoom] = useState<Room | undefined>(houses[0]?.rooms[0]);
     const [openNewHouseDialog, setOpenNewHouseDialog] = useState<boolean>(false);
@@ -34,6 +36,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
     const handlePopupClose = () => { setPopupOpen(false); }
+    const message_401 = import.meta.env.VITE_401_MESSAGE;
 
     useEffect(() => {
         setSelectedRoomParent(selectedRoom);
@@ -76,14 +79,22 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
     }
 
     const deleteSelectedRoom = () => {
-        //TODO: Delete room
+        roomService.delete(selectedRoom!.id).then((_) => {
+            window.location.reload();
+        }).catch((err) => {
+            if(err.response.status == 401) setPopupMessage(message_401)
+            else setPopupMessage(err.response.data);
+            setIsSuccess(false);
+            setPopupOpen(true);
+        });
     }
 
     const deleteSelectedHouse = () => {
         houseService.delete(selectedHouse!.id).then((_) => {
             window.location.reload();
         }).catch((err) => {
-            setPopupMessage(err.response.data);
+            if(err.response.status == 401) setPopupMessage(message_401)
+            else setPopupMessage(err.response.data);
             setIsSuccess(false);
             setPopupOpen(true);
         });
@@ -100,6 +111,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
                 </Grid>
                 <Grid xs={7} sm={7} md={8} lg={7} xl={7} pl={2} >
                     <Select
+                        disabled={houses.length == 0}
                         slotProps={{
                             listbox: {
                                 sx: {
@@ -169,6 +181,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
                 </Grid>
                 <Grid xs={7} sm={7} md={8} lg={7} xl={7} pl={2}>
                     <Select
+                        disabled={houses.length == 0}
                         slotProps={{
                             listbox: {
                                 sx: {
@@ -202,6 +215,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
                 <Grid xs={4} sm={3} md={3} lg={4} xl={4} container pl={1}>
                     <Grid xs={4} sm={4} md={4} lg={4} xl={4}>
                          <IconButton
+                             disabled={houses.length == 0}
                              onClick={() => {
                              setIsModificationRoom(false);
                              setOpenNewRoomDialog(true);}} variant="soft" sx={{border:'1px solid #12467b'}}><Icon path={mdilPlus}/></IconButton>
@@ -231,6 +245,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService} 
                 </Grid>
             </Grid>
             <NewRoomDialog open={openNewRoomDialog}
+                           roomService={roomService}
                            isModification={isModificationRoom}
                            selectedRoom={selectedRoom}
                            houses={houses}

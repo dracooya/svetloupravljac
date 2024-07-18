@@ -179,9 +179,8 @@ export function LightsState({lights, houses, currentRoom}: LightsStateProps) {
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'} mt={4}>
                     <Grid justifyContent={'center'} direction={'row'} container alignItems={'center'}>
                         <Grid sx={{display:'flex', justifyContent:'center'}}>
-                            <Avatar sx={{border:'2px solid white', backgroundColor:'transparent'}} className={houses.length == 0 ? '' : 'clickable'}
+                            <Avatar sx={{border:'2px solid white', backgroundColor:'transparent'}} className={houses.length == 0 ? 'disabled' : 'clickable'}
                                     size="lg" src="src/assets/icons/plus.png"
-
                                     onClick={() => {
                                         if(houses.length == 0) return;
                                         setOpenNewLightDialog(true)}}/>

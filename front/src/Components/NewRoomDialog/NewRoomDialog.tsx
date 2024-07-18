@@ -18,28 +18,38 @@ import {House} from "../../Models/House.ts";
 import Icon from "@mdi/react";
 import {mdilHome} from "@mdi/light-js";
 import {Room} from "../../Models/Room.ts";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
+import {ModifyHouseOrRoom} from "../../Models/DTOs/ModifyHouseOrRoom.ts";
+import {RoomService} from "../../Services/RoomService.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
+import {NewRoom} from "../../Models/DTOs/NewRoom.ts";
 
 interface NewRoomDialogProps {
     open: boolean,
     closeModalCallback: () => void,
     houses: House[],
     isModification: boolean,
-    selectedRoom: Room | undefined
+    selectedRoom: Room | undefined,
+    roomService: RoomService
 }
 
 interface RoomForm {
     name: string,
-    house: number
 }
-export function NewRoomDialog({open, closeModalCallback, houses, isModification, selectedRoom}: NewRoomDialogProps) {
-    const {register, handleSubmit, setValue, reset, formState: {errors}} = useForm<RoomForm>({
+export function NewRoomDialog({open, closeModalCallback, houses, isModification, selectedRoom, roomService}: NewRoomDialogProps) {
+    const [selectedHouseId, setSelectedHouseId] = useState<number | undefined>();
+    const {register, handleSubmit, setValue, formState: {errors}} = useForm<RoomForm>({
         defaultValues: {
             name: "",
-            house: houses[0]?.id
         },
         mode: "onChange"
     });
+
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const handlePopupClose = () => { setPopupOpen(false); }
+    const message_401 = import.meta.env.VITE_401_MESSAGE;
 
     useEffect(() => {
         const roomName = isModification? selectedRoom!.name : "";
@@ -47,14 +57,44 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
         setValue("name", roomName);
     }, [isModification]);
 
+    useEffect(() => {
+        setSelectedHouseId(houses[0]?.id)
+    }, [houses]);
+
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
         // noinspection TypeScriptValidateTypes
-        setValue("house", selectedHouseId!);
+        setSelectedHouseId(selectedHouseId);
     };
 
     const onSubmit = (data : RoomForm) => {
-        /*TODO: Modify/delete room */
-        reset();
+        if(isModification) {
+            const editRoom: ModifyHouseOrRoom = {
+                id: selectedRoom!.id,
+                name: data.name
+            }
+            roomService.edit(editRoom).then((_) => {
+                window.location.reload();
+            }).catch((err) => {
+                if(err.response.status == 401) setPopupMessage(message_401)
+                else setPopupMessage(err.response.data);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            });
+        }
+        else {
+            const newRoom : NewRoom = {
+                name: data.name.trim(),
+                houseId: selectedHouseId!
+            }
+            roomService.add(newRoom).then((_) => {
+                window.location.reload();
+            }).catch((err) => {
+                if(err.response.status == 401) setPopupMessage(message_401)
+                else setPopupMessage(err.response.data);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            });;
+        }
     };
 
     // noinspection TypeScriptValidateTypes
@@ -163,7 +203,7 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
                                                         },
                                                     }}
                                                     variant={'outlined'}
-                                                    defaultValue={houses[0]?.id}
+                                                    value={selectedHouseId}
                                                     onChange={handleHouseChange}
                                                     indicator={<KeyboardArrowDown />}>
                                                     {houses.map((house) => {
@@ -183,6 +223,7 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
                     </Modal>
                 )}
             </Transition>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }

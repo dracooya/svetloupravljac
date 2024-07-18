@@ -20,7 +20,7 @@ import {House} from "../../Models/House.ts";
 import React, {useEffect, useState} from "react";
 import {HouseService} from "../../Services/HouseService.ts";
 import {NewHouse} from "../../Models/DTOs/NewHouse.ts";
-import {ModifyHouse} from "../../Models/DTOs/ModifyHouse.ts";
+import {ModifyHouseOrRoom} from "../../Models/DTOs/ModifyHouseOrRoom.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 
 interface NewHouseDialogProps {
@@ -49,17 +49,19 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
     const handlePopupClose = () => { setPopupOpen(false); }
+    const message_401 = import.meta.env.VITE_401_MESSAGE;
 
     const onSubmit = (data : HouseForm) => {
         if(isModification) {
-            const editHouse: ModifyHouse = {
+            const editHouse: ModifyHouseOrRoom = {
                 id: selectedHouse!.id,
                 name: data.name
             }
             houseService.edit(editHouse).then((_) => {
                 window.location.reload();
             }).catch((err) => {
-                setPopupMessage(err.response.data);
+                if(err.response.status == 401) setPopupMessage(message_401)
+                else setPopupMessage(err.response.data);
                 setIsSuccess(false);
                 setPopupOpen(true);
             });
@@ -71,6 +73,12 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
             }
             houseService.add(newHouse).then((_) => {
                 window.location.reload();
+            }).catch((err) => {
+                console.log(err)
+                if(err.response.status == 401) setPopupMessage(message_401)
+                else setPopupMessage(err.response.data);
+                setIsSuccess(false);
+                setPopupOpen(true);
             });
         }
     };

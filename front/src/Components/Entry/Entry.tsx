@@ -8,7 +8,7 @@ import {mdilLogin} from "@mdi/light-js/mdil";
 import Icon from "@mdi/react";
 import {EntryService} from "../../Services/EntryService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Password} from "../../Models/DTOs/Password.ts";
 
 
@@ -26,6 +26,7 @@ export function Entry({entryService} : EntryProps) {
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
     const navigation = useNavigate();
+    const shouldCheck = useRef(true);
     const handlePopupClose = () => { setPopupOpen(false); }
     const {register, handleSubmit, formState: {errors}} = useForm<EntryForm>({
         defaultValues: {
@@ -33,6 +34,14 @@ export function Entry({entryService} : EntryProps) {
         },
         mode: "onChange"
     });
+
+    useEffect(() => {
+        if(!shouldCheck.current) return;
+        entryService.isAuthorized().then((isAuthorized) => {
+            if(isAuthorized) navigation('/main')
+        })
+        shouldCheck.current = false;
+    }, []);
 
     const onSubmit = (data : EntryForm) => {
         const password : Password = {

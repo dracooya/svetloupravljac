@@ -1,4 +1,6 @@
 from marshmallow import Schema, fields
+
+
 class NewHouse:
     __slots__ = ['houseName', 'roomName']
 

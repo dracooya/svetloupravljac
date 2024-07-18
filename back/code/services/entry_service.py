@@ -15,6 +15,10 @@ def __cancel_authorization():
     authorized = False
 
 
+def is_authorized():
+    return authorized
+
+
 def enter_app(password: Password):
     global authorized
     if bcrypt.checkpw(str.encode(password.password), entry_password):

@@ -3,6 +3,7 @@ from code.utils.db_config import db
 from flask_cors import CORS
 from code.controllers.entry_controller import entry_blueprint
 from code.controllers.house_controller import house_blueprint
+from code.controllers.room_controller import room_blueprint
 import code.services.entry_service as entry_service
 
 app = Flask(__name__)
@@ -14,6 +15,7 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 app.register_blueprint(entry_blueprint, url_prefix='/enter')
 app.register_blueprint(house_blueprint, url_prefix='/houses')
+app.register_blueprint(room_blueprint, url_prefix='/rooms')
 
 
 with app.app_context():
@@ -23,7 +25,11 @@ with app.app_context():
 
 @app.before_request
 def before_request_func():
-    if 'enter' in request.endpoint:
+    print(request.endpoint)
+    if request.method == 'OPTIONS':
+        return '', 204
+
+    if 'enter' in request.endpoint or 'check' in request.endpoint:
         return
 
     if not entry_service.authorized:

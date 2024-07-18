@@ -1,38 +1,26 @@
 import axios from "axios";
-import {House} from "../Models/House.ts";
-import {NewHouse} from "../Models/DTOs/NewHouse.ts";
+import {NewRoom} from "../Models/DTOs/NewRoom.ts";
 import {ModifyHouseOrRoom} from "../Models/DTOs/ModifyHouseOrRoom.ts";
 
-export class HouseService {
+export class RoomService {
     private API_URL = import.meta.env.VITE_API_URL;
 
-    public getAll() : Promise<House[]> {
-        return axios({
-            method: 'GET',
-            url: `${this.API_URL}houses/all`,
-        }).then((chart) => chart.data).catch((err) => {
-            console.log(err);
-            throw err;
-        });
-    }
-
-
-    public add(house: NewHouse) : Promise<string> {
+    public add(room: NewRoom) : Promise<string> {
         return axios({
             method: 'POST',
-            url: `${this.API_URL}houses/add`,
-            data: house
+            url: `${this.API_URL}rooms/add`,
+            data: room
         }).then((success) => success.data).catch((err) => {
             console.log(err);
             throw err;
         });
     }
 
-    public edit(house: ModifyHouseOrRoom) : Promise<string> {
+    public edit(room: ModifyHouseOrRoom) : Promise<string> {
         return axios({
             method: 'PUT',
-            url: `${this.API_URL}houses/modify`,
-            data: house
+            url: `${this.API_URL}rooms/modify`,
+            data: room
         }).then((success) => success.data).catch((err) => {
             console.log(err);
             throw err;
@@ -42,7 +30,7 @@ export class HouseService {
     public delete(id: number) : Promise<string> {
         return axios({
             method: 'DELETE',
-            url: `${this.API_URL}houses/delete/${id}`,
+            url: `${this.API_URL}rooms/delete/${id}`,
         }).then((success) => success.data).catch((err) => {
             console.log(err);
             throw err;

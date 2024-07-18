@@ -1,5 +1,5 @@
 import {CssVarsProvider, Grid} from "@mui/joy";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {HomeAndRoomConfig} from "../HomeAndRoomConfig/HomeAndRoomConfig.tsx";
 import {House} from "../../Models/House.ts";
 import {Scenes} from "../Scenes/Scenes.tsx";
@@ -7,23 +7,35 @@ import {Scene} from "../../Models/Scene.ts";
 import {LightsState} from "../LightsState/LightsState.tsx";
 import {Room} from "../../Models/Room.ts";
 import {HouseService} from "../../Services/HouseService.ts";
-
+import {RoomService} from "../../Services/RoomService.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 
 interface MainProps {
-    houseService: HouseService
+    houseService: HouseService,
+    roomService: RoomService
 }
 
-export function Main({houseService} : MainProps) {
+export function Main({houseService, roomService} : MainProps) {
 
     const [selectedRoom, setSelectedRoom] = useState<Room>();
     const [houses, setHouses] = useState<House[]>([]);
     const shouldLoad = useRef(true);
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const handlePopupClose = () => { setPopupOpen(false); }
+    const message_401 = import.meta.env.VITE_401_MESSAGE
 
     useEffect(() => {
         if(!shouldLoad.current) return;
         houseService.getAll().then((houses) => {
-            console.log("getting houses");
             setHouses(houses);
+        }).catch((err) => {
+            if(err.response.status == 401) {
+                setPopupMessage(message_401);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            }
         });
         shouldLoad.current = false;
     }, []);
@@ -103,6 +115,7 @@ export function Main({houseService} : MainProps) {
                 <Grid container  pt={4} pb={2} pl={2}>
                     <Grid container xs={12} sm={12} md={6} lg={4} xl={4} pl={2} rowSpacing={3} justifyContent={'center'}>
                             <HomeAndRoomConfig houses={houses}
+                                               roomService={roomService}
                                                houseService={houseService}
                                                setSelectedRoomParent={handleRoomSelectionChange}/>
                         <Grid mt={6} xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -121,6 +134,7 @@ export function Main({houseService} : MainProps) {
                 </Grid>
             </Grid>
             </CssVarsProvider>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }
