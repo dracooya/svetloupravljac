@@ -93,7 +93,7 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
                 else setPopupMessage(err.response.data);
                 setIsSuccess(false);
                 setPopupOpen(true);
-            });;
+            });
         }
     };
 

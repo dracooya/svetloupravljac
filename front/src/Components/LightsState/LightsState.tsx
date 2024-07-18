@@ -28,6 +28,7 @@ import {Room} from "../../Models/Room.ts";
 import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 import {Light} from "../../Models/Light.ts";
 import {LightService} from "../../Services/LightService.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 
 interface LightsStateProps {
     lights: Light[] | undefined,
@@ -45,6 +46,12 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
     const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
     const [deleteMessage, setDeleteMessage] = useState<string>("");
 
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const handlePopupClose = () => { setPopupOpen(false); }
+    const message_401 = import.meta.env.VITE_401_MESSAGE;
+
     const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
     const handleEditDialogClose = () => setOpenEditDialog(false);
 
@@ -53,7 +60,14 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
     }
 
     const deleteLight = () => {
-        //TODO: Delete selected light
+        lightService.delete(selectedLight!.mac).then((_) => {
+            window.location.reload();
+        }).catch((err) => {
+            if(err.response.status == 401) setPopupMessage(message_401)
+            else setPopupMessage(err.response.data);
+            setIsSuccess(false);
+            setPopupOpen(true);
+        });
     }
 
     const handleLightDialogClose = () => {
@@ -204,10 +218,12 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                         closeModalCallback={handleDeleteDialogClose}
                                         message={deleteMessage} deleteConfirmedCallback={deleteLight}/>
             <EditLightDialog open={openEditDialog}
+                             lightService={lightService}
                              closeModalCallback={handleEditDialogClose}
                              currentRoom={currentRoom}
                              selectedLight={selectedLight}
                              houses={houses}/>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }

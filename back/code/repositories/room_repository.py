@@ -1,6 +1,7 @@
 from code.models.room import Room
 from code.models.house import House
 from code.utils.db_config import db
+from code.models.light import Light
 
 
 def add(room_name: str, house: House):
@@ -16,6 +17,11 @@ def get_by_id(room_id: int):
 
 def modify(room: Room, newName: str):
     room.name = newName
+    db.session.commit()
+
+
+def move_light(new_room: Room, light: Light):
+    new_room.lights.append(light)
     db.session.commit()
 
 

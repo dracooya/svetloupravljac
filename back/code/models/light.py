@@ -15,6 +15,9 @@ class Light(db.Model):
     maxKelvin: Mapped[int] = mapped_column(nullable=False)
     room_id: Mapped[int] = mapped_column(ForeignKey("room.id"))
 
+    def __eq__(self, other):
+        return self.mac == other.mac
+
     def serialize(self):
         return {
             'mac': self.mac,

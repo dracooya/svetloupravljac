@@ -1,7 +1,7 @@
-import {House} from "../Models/House.ts";
 import axios from "axios";
 import {Light} from "../Models/Light.ts";
 import {NewLights} from "../Models/DTOs/NewLights.ts";
+import {ModifyLight} from "../Models/DTOs/ModifyLight.ts";
 
 export class LightService {
     private API_URL = import.meta.env.VITE_API_URL;
@@ -22,6 +22,28 @@ export class LightService {
             url: `${this.API_URL}lights/add`,
             data: lights
         }).then((chart) => chart.data).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }
+
+    public edit(light: ModifyLight) : Promise<string> {
+        return axios({
+            method: 'PUT',
+            url: `${this.API_URL}lights/modify`,
+            data: light
+        }).then((success) => success.data).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }
+
+
+    public delete(mac: string) : Promise<string> {
+        return axios({
+            method: 'DELETE',
+            url: `${this.API_URL}lights/delete/${mac}`,
+        }).then((success) => success.data).catch((err) => {
             console.log(err);
             throw err;
         });

@@ -22,13 +22,17 @@ import {House} from "../../Models/House.ts";
 import {mdiLightbulbOutline} from "@mdi/js";
 import {Room} from "../../Models/Room.ts";
 import {Light} from "../../Models/Light.ts";
+import {ModifyLight} from "../../Models/DTOs/ModifyLight.ts";
+import {LightService} from "../../Services/LightService.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 
 interface EditLightDialog {
     open: boolean,
     closeModalCallback: () => void,
     selectedLight: Light | undefined,
     houses: House[],
-    currentRoom: Room | undefined
+    currentRoom: Room | undefined,
+    lightService: LightService
 }
 
 interface LightForm {
@@ -36,8 +40,8 @@ interface LightForm {
     room: number
 }
 
-export function EditLightDialog({open, closeModalCallback, selectedLight, houses, currentRoom} : EditLightDialog) {
-    const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<LightForm>({
+export function EditLightDialog({open, closeModalCallback, selectedLight, houses, currentRoom, lightService} : EditLightDialog) {
+    const {register, handleSubmit, setValue, formState: {errors}} = useForm<LightForm>({
         defaultValues: {
             name: "",
             room: houses[0]?.rooms[0]?.id
@@ -45,10 +49,25 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
         mode: "onChange"
     });
     const [selectedRoomId, setSelectedRoomId] = useState<number>();
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const handlePopupClose = () => { setPopupOpen(false); }
+    const message_401 = import.meta.env.VITE_401_MESSAGE;
     const onSubmit = (data : LightForm) => {
-        /*TODO: Modify/delete light */
-        reset();
-        setSelectedRoomId(houses[0].rooms[0].id);
+        const modification : ModifyLight = {
+            mac: selectedLight!.mac,
+            name: data.name,
+            roomId: data.room
+        }
+        lightService.edit(modification).then((_) => {
+            window.location.reload();
+        }).catch((err) => {
+            if(err.response.status == 401) setPopupMessage(message_401)
+            else setPopupMessage(err.response.data);
+            setIsSuccess(false);
+            setPopupOpen(true);
+        });
     };
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
@@ -190,6 +209,7 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
                     </Modal>
                 )}
             </Transition>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }

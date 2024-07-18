@@ -20,7 +20,7 @@ import {
     SvgIcon,
     Typography
 } from "@mui/joy";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Icon from "@mdi/react";
 import {mdiLampOutline, mdiLedStripVariant, mdiLightbulbOutline, mdiReload} from "@mdi/js";
 import {mdilCheck, mdilHelp, mdilHelpCircle, mdilLightbulb} from "@mdi/light-js/mdil";
@@ -28,7 +28,6 @@ import {InfoOutlined, KeyboardArrowDown} from "@mui/icons-material";
 import {useForm} from "react-hook-form";
 import {LightType} from "../../Models/Enums/LightType.ts";
 import {House} from "../../Models/House.ts";
-import {mdilHome} from "@mdi/light-js";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 import {Light} from "../../Models/Light.ts";
 import {LightService} from "../../Services/LightService.ts";
@@ -65,7 +64,6 @@ interface LightForm {
 export function NewLightDialog({open, houses, closeModalCallback, lightService} : NewLightDialogProps) {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [hasFoundLights, setHasFoundLights] = useState<boolean>(false);
-    const [selectedHouse, setSelectedHouse] = useState<House>(houses[0]);
     const [setupLights, setSetupLights] = useState<NewLightSetup[]>([]);
     const [selectedRoomId, setSelectedRoomId] = useState<number>(houses[0]?.rooms[0].id);
     const [selectedType, setSelectedType] = useState<LightType>(LightType.BULB);
@@ -75,9 +73,9 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
+    const message_401 = import.meta.env.VITE_401_MESSAGE;
 
     useEffect(() => {
-        setSelectedHouse(houses[0]);
         setSelectedRoomId(houses[0]?.rooms[0].id);
         setValue("room", houses[0]?.rooms[0].id);
     }, [houses]);
@@ -110,11 +108,6 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
         fetchLights();
     }, [open]);
 
-    const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
-        const selectedHouse = houses.find(house => house.id === selectedHouseId!);
-        setSelectedHouse(selectedHouse!);
-        setSelectedRoomId(selectedHouse!.rooms[0].id);
-    };
 
     const {register, handleSubmit, reset, setValue, formState: {errors}} = useForm<LightForm>({
         defaultValues: {
@@ -168,8 +161,6 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
             setValue("type", selectedLight.type);
             setSelectedType(selectedLight.type);
             setSelectedRoomId(selectedLight.roomId);
-            setSelectedHouse(houses.find(house => house.rooms.some(room => room.id === selectedLight.roomId)));
-            console.log(selectedLight.roomId)
         }
         else {
             setIsModification(false);
@@ -193,10 +184,10 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
             const newLights : NewLights = {
                 lights: transformedLights
             }
-            console.log(newLights)
             lightService.add(newLights).then((_) => {
                 window.location.reload();
             }).catch((err) => {
+                if(err.response.status == 401) setPopupMessage(message_401)
                 setPopupMessage(err.response.data);
                 setIsSuccess(false);
                 setPopupOpen(true);
@@ -332,72 +323,13 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
                                                                     </FormControl>
                                                                 </Grid>
                                                             </Grid>
-                                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} container alignItems={'center'} pt={2}>
-                                                                <Grid xs={12} sm={12} md={6} lg={6} xl={6} pr={{
-                                                                    xl:4,
-                                                                    lg:4,
-                                                                    md:4,
-                                                                    sm:2,
-                                                                    xs:2
-                                                                }}
-                                                                      container alignItems={'center'}>
-                                                                    <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
-                                                                        <Icon path={mdilHome} size={1.5} color={'white'}/>
-                                                                    </Grid>
-                                                                    <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}>
-                                                                        <Select
-                                                                            slotProps={{
-                                                                                listbox: {
-                                                                                    sx: {
-                                                                                        backgroundColor:"#0f171f",
-                                                                                        padding:'0'
-                                                                                    },
-                                                                                },
-                                                                            }}
-                                                                            sx={{
-                                                                                padding:'0.75em 1em',
-                                                                                backgroundColor:"#0f171f",
-                                                                                ":hover": {
-                                                                                    backgroundColor: "#0f171f",
-                                                                                },
-                                                                                [`& .${selectClasses.indicator}`]: {
-                                                                                    transition: '0.2s',
-                                                                                    [`&.${selectClasses.expanded}`]: {
-                                                                                        transform: 'rotate(-180deg)',
-                                                                                    },
-                                                                                },
-                                                                            }}
-                                                                            variant={'outlined'}
-                                                                            onChange={handleHouseChange}
-                                                                            value={selectedHouse?.id}
-                                                                            indicator={<KeyboardArrowDown />}>
-                                                                            {houses?.map((house) => {
-                                                                                return <Option value={house.id} key={house.id}>{house.name}</Option>
-                                                                            })}
-                                                                        </Select>
-                                                                    </Grid>
-                                                                </Grid>
-                                                                <Grid xs={12} sm={12} md={6} lg={6} xl={6}
-                                                                      pr={{
-                                                                          xl:0,
-                                                                          lg:0,
-                                                                          md:0,
-                                                                          sm:2,
-                                                                          xs:2
-                                                                      }}
-                                                                      pt={{
-                                                                          md:0,
-                                                                          sm:4,
-                                                                          xs:4
-                                                                      }}
-                                                                      container alignItems={'center'}>
+                                                            <Grid xs={12} sm={12} md={8} lg={8} xl={8} container alignItems={'center'} pt={2}>
                                                                     <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
                                                                         <SvgIcon color={'warning'} fill="white" sx={{ paddingTop:'0.2em'}}>
                                                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35"><path d="M34.06,1H1.94A.94.94,0,0,0,1,1.94V34.06a.94.94,0,0,0,.94.94H34.06a.94.94,0,0,0,.94-.94V1.94A.94.94,0,0,0,34.06,1ZM18.94,33.11V30.28a.94.94,0,1,0-1.88,0v2.83H2.89V24.58l8.49,0h0a.95.95,0,0,0,0-1.89l-8.5,0V2.89H11.3l.09,9.45a1,1,0,0,0,.94.94h0a1,1,0,0,0,.94-1l-.09-9.43H33.11v8.5H18a.94.94,0,0,0-.94.94V23.67a.94.94,0,0,0,1.88,0V13.28H33.11V33.11Z"/></svg>
                                                                         </SvgIcon>
                                                                     </Grid>
-                                                                    <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}
-                                                                    >
+                                                                    <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}>
                                                                         <Select
                                                                             slotProps={{
                                                                                 listbox: {
@@ -424,12 +356,12 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
                                                                             onChange={handleRoomChange}
                                                                             value={selectedRoomId}
                                                                             indicator={<KeyboardArrowDown />}>
-                                                                            {selectedHouse?.rooms.map((room) => {
-                                                                                return <Option value={room.id} key={room.id}>{room.name}</Option>
-                                                                            })}
+                                                                            {houses.flatMap(house =>  house.rooms.map(room => {
+                                                                                    return <Option value={room.id} key={room.id}>{house.name} - {room.name}</Option>
+                                                                                })
+                                                                            )}
                                                                         </Select>
                                                                     </Grid>
-                                                                </Grid>
                                                             </Grid>
                                                             <Grid xs={12} sm={12} md={8} lg={8} xl={8} pt={4} container alignItems={'center'}>
                                                                 <Grid xs={1} sm={1} md={1} lg={1} xl={1}>

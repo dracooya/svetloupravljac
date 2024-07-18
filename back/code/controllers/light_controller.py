@@ -1,35 +1,21 @@
 from flask import Blueprint, jsonify
 import code.services.light_service as light_service
-import asyncio
-from concurrent.futures import TimeoutError
-from concurrent.futures import ThreadPoolExecutor
 from code.models.dtos.new_lights import NewLights, newLightsSchema
+from code.models.dtos.modify_light import modifyLightSchema, ModifyLight
 from code.utils.request_parser import request_parser
 from code.utils.validation_exception import ValidationException
 from code.models.dtos.new_light import NewLight
+import asyncio
 
 light_blueprint = Blueprint('light_blueprint', __name__)
-executor = ThreadPoolExecutor()
-
-
-def __run_discover(task, timeout):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    try:
-        return loop.run_until_complete(asyncio.wait_for(task, timeout))
-    except asyncio.TimeoutError:
-        return None
 
 
 @light_blueprint.route('/discover', methods=['GET'])
-def discover():
-    future = executor.submit(__run_discover, light_service.discover(), 20)
+async def discover():
     try:
-        lights = future.result()
-        if lights is None:
-            return jsonify([]), 200
+        lights = await asyncio.wait_for(light_service.discover(), timeout=20)
         return jsonify([light.serialize() for light in lights]), 200
-    except TimeoutError:
+    except asyncio.TimeoutError:
         return jsonify([]), 200
 
 
@@ -41,6 +27,27 @@ def add():
         for light in lights.lights:
             message = light_service.add(NewLight(**light))
         return message, 201
+
+    except ValidationException as ex:
+        return ex.message, ex.status_code
+
+
+@light_blueprint.route('/modify', methods=['PUT'])
+def modify():
+    try:
+        data = request_parser(modifyLightSchema, ModifyLight)
+        message = light_service.modify(data)
+        return message, 200
+
+    except ValidationException as ex:
+        return ex.message, ex.status_code
+
+
+@light_blueprint.route('/delete/<light_mac>', methods=['DELETE'])
+def delete(light_mac):
+    try:
+        message = light_service.delete(light_mac)
+        return message, 200
 
     except ValidationException as ex:
         return ex.message, ex.status_code
