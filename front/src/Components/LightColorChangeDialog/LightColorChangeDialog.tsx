@@ -25,14 +25,17 @@ import {ModeCategory} from "../../Models/Enums/ModeCategory.ts";
 import "./LightColorChangeDialog.css";
 import {availableModes} from "../Utils/AvailableModes.ts";
 import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
+import {LightState} from "../../Models/DTOs/LightState.ts";
 
 interface LightColorChangeDialogProps {
     open: boolean,
     closeModalCallback: () => void,
     valueChangeCallback: (_ : ColorOrModeParams) => void,
+    lightState: LightState | undefined
 }
 
-export function LightColorChangeDialog({open, closeModalCallback, valueChangeCallback}: LightColorChangeDialogProps) {
+export function LightColorChangeDialog({open, closeModalCallback, valueChangeCallback, lightState}: LightColorChangeDialogProps) {
+
     const [color, setColor] = useState<RgbColor>({r:255, g:255, b:255});
     const debouncedColor = useDebouncedCallback(
         (value : RgbColor) => {
@@ -114,6 +117,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
         valueChangeCallback(change);
 
     }, [selectedMode]);
+
     const [modeSpeed, setModeSpeed] = useState<number>(50);
     const debouncedSpeed = useDebouncedCallback(
         (value : number) => {
@@ -146,6 +150,32 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
         const b = parseInt(cleanedHex.slice(4, 6), 16);
         return { r, g, b };
     }
+
+    useEffect(() => {
+        if(lightState == undefined) return;
+
+        if(lightState.state.r != -1 && lightState.state.g != -1 && lightState.state.b != -1){
+            const obj = {r: lightState.state.r, g: lightState.state.g, b: lightState.state.b}
+            setColor(obj);
+            setColorHex(rgbToHex(obj.r, obj.g, obj.b));
+        }
+        else {
+            setColor({r: 255, g: 255, b:255})
+            setColorHex("FFFFFF")
+        }
+        if(lightState.state.mode != -1){
+            setSelectedMode(availableModes.find(mode => mode.id == lightState.state.mode))
+            setModeBrightness(lightState.state.brightness);
+            console.log(lightState.state.brightness)
+            setModeSpeed(lightState.state.speed);
+        }
+        else {
+            setSelectedMode(undefined);
+            setModeBrightness(255);
+            setBrightness(lightState.state.brightness);
+            setWhiteKelvin(lightState.state.temperature)
+        }
+    }, [lightState]);
 
     return (
         <>
@@ -218,14 +248,24 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                         <TabPanel value={0} sx={{paddingTop:'0'}}>
                                             <Grid height={'75vh'} xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'} alignContent={'flex-start'}>
                                                 <Grid xs={11} sm={11} md={11} lg={11} xl={11} height={'30vh'}>
+                                                    {lightState?.light.colorChange ?
                                                     <div className={'responsive'}>
-                                                        <RgbColorPicker color={color} onChange={(newColor: RgbColor) => {
+                                                        <RgbColorPicker
+                                                            color={color} onChange={(newColor: RgbColor) => {
                                                             setColor(newColor);
                                                             setColorHex(rgbToHex(newColor.r, newColor.g, newColor.b));
                                                             debouncedColor(newColor);
                                                         }
                                                         } />
                                                     </div>
+                                                : <Grid container xs={12} sm={12} md={12} lg={12} xl={12}
+                                                        alignItems={'center'}
+                                                        height={'100%'}
+                                                        textAlign={'center'}
+                                                        justifyContent={'center'}>
+                                                        <Typography level={'h3'}>Color change is not supported by this light.</Typography>
+                                                    </Grid>
+                                                }
                                                 </Grid>
                                                 <Grid xs={12} sm={8} md={6} lg={6} xl={6} pt={3} pb={3} container alignItems={'center'}>
                                                     <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
@@ -233,6 +273,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                     </Grid>
                                                     <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={3}>
                                                         <Input value={colorHex}
+                                                               disabled={!lightState?.light.colorChange}
                                                                startDecorator={'#'}
                                                                slotProps={{
                                                                    input: {
@@ -268,6 +309,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                               sx={{ background: "linear-gradient(90deg, rgba(2,165,220,1) 0%, rgba(113,224,251,1) 100%);",
                                                             height:'30px', borderRadius:'1em'}}>
                                                             <Slider size="lg"
+                                                                    disabled={!lightState?.light.brightnessChange}
                                                                     sx={{
                                                                         '& .MuiSlider-track': {
                                                                             background:'transparent',
@@ -300,6 +342,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                       height:'50px', borderRadius:'2em'}}
                                                       container alignItems={'center'}>
                                                     <Slider size="lg"
+                                                            disabled={!lightState?.light.temperatureChange}
                                                             sx={{
                                                                 '& .MuiSlider-track': {
                                                                     background:'transparent',
@@ -321,8 +364,8 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                             }}
                                                             value={whiteKelvin}
                                                             step={100}
-                                                            min={2200}
-                                                            max={6500}/>
+                                                            min={lightState?.light.minKelvin}
+                                                            max={lightState?.light.maxKelvin}/>
                                                 </Grid>
                                                     <Grid xs={12} sm={8} md={6} lg={6} xl={6} pt={3}  container alignItems={'center'}>
                                                         <Grid xs={1} sm={1} md={1} lg={1} xl={1}>
@@ -330,6 +373,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                         </Grid>
                                                         <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={3}>
                                                             <Input value={whiteKelvin}
+                                                                   disabled={!lightState?.light.temperatureChange}
                                                                    startDecorator={'~'}
                                                                    type={'number'}
                                                                    endDecorator={'K'}
@@ -450,7 +494,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                             <Avatar
                                                                                 onClick={() => setSelectedMode(basic)}
-                                                                                className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                                                className={selectedMode?.id == basic.id ? 'outline' : 'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
                                                                         </Grid>
                                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
                                                                             {basic.name}
@@ -462,15 +506,15 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                     <Typography level={'h3'}>Functional</Typography>
                                                 </Grid>
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
-                                                    {availableModes.filter(mode => mode.category == ModeCategory.FUNCTIONAL).map((basic) => {
-                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.FUNCTIONAL).map((functional) => {
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={functional.id}>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                 <Avatar
-                                                                    onClick={() => setSelectedMode(basic)}
-                                                                    className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                                    onClick={() => setSelectedMode(functional)}
+                                                                    className={selectedMode?.id == functional.id ? 'outline' : 'clickable'} size="lg" src={"src/assets/icons/modes/" + functional.name + ".png"} />
                                                             </Grid>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
-                                                                {basic.name}
+                                                                {functional.name}
                                                             </Grid>
                                                         </Grid>
                                                     })}
@@ -479,15 +523,15 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                     <Typography level={'h3'}>White</Typography>
                                                 </Grid>
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
-                                                    {availableModes.filter(mode => mode.category == ModeCategory.WHITE).map((basic) => {
-                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.WHITE).map((white) => {
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={white.id}>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                 <Avatar
-                                                                    onClick={() => setSelectedMode(basic)}
-                                                                    className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                                    onClick={() => setSelectedMode(white)}
+                                                                    className={selectedMode?.id == white.id ? 'outline' : 'clickable'} size="lg" src={"src/assets/icons/modes/" + white.name + ".png"} />
                                                             </Grid>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
-                                                                {basic.name}
+                                                                {white.name}
                                                             </Grid>
                                                         </Grid>
                                                     })}
@@ -497,15 +541,15 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                     <Typography level={'h3'}>Color</Typography>
                                                 </Grid>
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3} >
-                                                    {availableModes.filter(mode => mode.category == ModeCategory.COLOR).map((basic) => {
-                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.COLOR).map((color) => {
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={color.id}>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                 <Avatar
-                                                                    onClick={() => setSelectedMode(basic)}
-                                                                    className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                                    onClick={() => setSelectedMode(color)}
+                                                                    className={selectedMode?.id == color.id ? 'outline' : 'clickable'} size="lg" src={"src/assets/icons/modes/" + color.name + ".png"} />
                                                             </Grid>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
-                                                                {basic.name}
+                                                                {color.name}
                                                             </Grid>
                                                         </Grid>
                                                     })}
@@ -515,15 +559,15 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                     <Typography level={'h3'}>Progressive</Typography>
                                                 </Grid>
                                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} container rowGap={3}  pb={15}>
-                                                    {availableModes.filter(mode => mode.category == ModeCategory.PROGRESSIVE).map((basic) => {
-                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={basic.id}>
+                                                    {availableModes.filter(mode => mode.category == ModeCategory.PROGRESSIVE).map((progressive) => {
+                                                        return  <Grid container xs={6} sm={4} md={3} lg={3} xl={3} key={progressive.id}>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container  justifyContent={'center'} pb={2}>
                                                                 <Avatar
-                                                                    onClick={() => setSelectedMode(basic)}
-                                                                    className={'clickable'} size="lg" src={"src/assets/icons/modes/" + basic.name + ".png"} />
+                                                                    onClick={() => setSelectedMode(progressive)}
+                                                                    className={selectedMode?.id == progressive.id ? 'outline' : 'clickable'} size="lg" src={"src/assets/icons/modes/" + progressive.name + ".png"} />
                                                             </Grid>
                                                             <Grid xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
-                                                                {basic.name}
+                                                                {progressive.name}
                                                             </Grid>
                                                         </Grid>
                                                     })}

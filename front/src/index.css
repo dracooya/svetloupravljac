@@ -56,6 +56,10 @@ body {
   padding: 0 !important;
 }
 
+.outline {
+  border:2px solid rgba(255,255,255,0.4);
+}
+
 .pointer {
   cursor: pointer;
 }

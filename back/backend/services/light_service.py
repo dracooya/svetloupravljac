@@ -1,5 +1,10 @@
+from typing import List
+
+from backend.models.dtos.light_basic_info_with_status import LightBasicInfoWithStatus
 from backend.utils.get_broadcast_address import get_broadcast_address
 from pywizlight import wizlight, discovery, PilotBuilder
+from pywizlight.exceptions import WizLightConnectionError
+
 from backend.models.dtos.new_light import NewLight
 import backend.repositories.room_repository as room_repository
 import backend.repositories.light_repository as light_repository
@@ -79,20 +84,48 @@ async def ping(ip: str):
 
 
 async def trigger_command(command: Command):
-    light = wizlight(command.ip)
-    if command.r > -1 and command.g > -1 and command.b > 1:
-        await light.turn_on(PilotBuilder(rgb=(command.r, command.g, command.b)))
-    elif command.mode > -1:
-        await light.turn_on(PilotBuilder(scene=command.mode))
-    elif command.temperature > -1:
-        await light.turn_on(PilotBuilder(colortemp=command.temperature))
-    elif command.brightness > -1:
-        await light.turn_on(PilotBuilder(brightness=command.brightness))
-    elif command.speed > -1:
-        await light.send({"method": "setPilot", "params": {"speed": command.speed}})
-    else:
-        pass
     try:
-        del wizlight.__del__
-    except AttributeError:
+        light = wizlight(command.ip)
+        if command.r > -1 and command.g > -1 and command.b > 1:
+            await light.turn_on(PilotBuilder(rgb=(command.r, command.g, command.b)))
+        elif command.mode > -1:
+            await light.turn_on(PilotBuilder(scene=command.mode))
+        elif command.temperature > -1:
+            await light.turn_on(PilotBuilder(colortemp=command.temperature))
+        elif command.brightness > -1:
+            await light.turn_on(PilotBuilder(brightness=command.brightness))
+        elif command.speed > -1:
+            await light.send({"method": "setPilot", "params": {"speed": command.speed}})
+        else:
+            pass
+        try:
+            del wizlight.__del__
+        except AttributeError:
+            pass
+    except WizLightConnectionError:
         pass
+
+
+async def get_lights_states(lights_ips: List[str]):
+    states = []
+    for ip in lights_ips:
+        try:
+            light = wizlight(ip)
+            current_state = await light.updateState()
+            state = LightBasicInfoWithStatus(isOn=current_state.get_state(),
+                                             ip=ip,
+                                             r=current_state.get_rgb()[0] if current_state.get_rgb()[0] is not None else -1,
+                                             g=current_state.get_rgb()[1] if current_state.get_rgb()[1] is not None else -1,
+                                             b=current_state.get_rgb()[2] if current_state.get_rgb()[2] is not None else -1,
+                                             brightness=current_state.get_brightness(),
+                                             mode=current_state.get_scene_id() if current_state.get_scene() is not None else -1,
+                                             temperature=current_state.get_colortemp(),
+                                             speed=50 if current_state.get_speed() is None else current_state.get_speed())
+            states.append(state)
+            try:
+                del wizlight.__del__
+            except AttributeError:
+                pass
+        except WizLightConnectionError:
+            pass
+    return states
