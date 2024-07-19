@@ -1,5 +1,5 @@
-from code.models.room import Room
-from code.utils.db_config import db
+from backend.models.room import Room
+from backend.utils.db_config import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
 

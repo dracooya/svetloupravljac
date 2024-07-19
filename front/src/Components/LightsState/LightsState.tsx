@@ -29,6 +29,8 @@ import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 import {Light} from "../../Models/Light.ts";
 import {LightService} from "../../Services/LightService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
+import {io} from "socket.io-client";
+import {Command} from "../../Models/DTOs/Command.ts";
 
 interface LightsStateProps {
     lights: Light[] | undefined,
@@ -37,6 +39,7 @@ interface LightsStateProps {
     lightService: LightService
 }
 
+const socket = io('http://localhost:5000');
 export function LightsState({lights, houses, currentRoom, lightService}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
     const [openNewLightDialog, setOpenNewLightDialog] = useState<boolean>(false);
@@ -45,18 +48,32 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
     const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
     const [deleteMessage, setDeleteMessage] = useState<string>("");
-
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
     const handlePopupClose = () => { setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE;
 
+    const sendMessage = (command: Command) => {
+        console.log(command);
+        socket.emit('command', JSON.stringify(command));
+    }
+
     const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
     const handleEditDialogClose = () => setOpenEditDialog(false);
 
     const handleColorChange = (config: ColorOrModeParams) => {
-        //TODO: send commands
+        const command : Command = {
+            r: config.r,
+            g: config.g,
+            b: config.b,
+            temperature: config.temperature,
+            mode: config.mode,
+            brightness: config.brightness,
+            speed: config.speed,
+            ip: selectedLight!.ip
+        }
+        sendMessage(command)
     }
 
     const deleteLight = () => {
@@ -128,7 +145,9 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
                                                         <Card sx={{backgroundColor:'#0f171f', borderRadius:'2em', cursor: 'pointer'}}>
                                                             <Grid xs={12} sm={12} lg={12} md={12} xl={12} container alignItems={'center'}>
-                                                                    <Grid xs={2} sm={2} md={2} lg={2} xl={2} onClick={() => setOpenLightColorChangeDialog(true)}>
+                                                                    <Grid xs={2} sm={2} md={2} lg={2} xl={2} onClick={() => {
+                                                                        setSelectedLight(light);
+                                                                        setOpenLightColorChangeDialog(true);}}>
                                                                         {light.type == LightType.BULB?
                                                                             <Icon path={mdiLightbulbOutline} size={1.5} /> :
                                                                             light.type == LightType.STRIP ? <Icon path={mdiLedStripVariant} size={1.5} /> :
@@ -137,7 +156,9 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                                                         }
                                                                     </Grid>
                                                                 <Grid pl={2} xs={6} sm={6} md={6} lg={6} xl={6} container alignItems={'center'} justifyContent={'flex-start'}>
-                                                                    <Grid onClick={() => setOpenLightColorChangeDialog(true)}>
+                                                                    <Grid onClick={() => {
+                                                                        setSelectedLight(light);
+                                                                        setOpenLightColorChangeDialog(true);}}>
                                                                         {light.name}
                                                                     </Grid>
                                                                     </Grid>

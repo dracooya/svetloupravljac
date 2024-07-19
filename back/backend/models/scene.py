@@ -1,5 +1,5 @@
-from code.models.light_color_config import LightColorConfig
-from code.utils.db_config import db
+from backend.models.light_color_config import LightColorConfig
+from backend.utils.db_config import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
 

@@ -1,7 +1,7 @@
-from code.models.room import Room
-from code.models.house import House
-from code.utils.db_config import db
-from code.models.light import Light
+from backend.models.room import Room
+from backend.models.house import House
+from backend.utils.db_config import db
+from backend.models.light import Light
 
 
 def add(room_name: str, house: House):

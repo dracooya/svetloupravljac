@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify
-from code.utils.validation_exception import ValidationException
-from code.utils.request_parser import request_parser
-import code.services.house_service as house_service
-from code.models.dtos.new_house import newHouseSchema, NewHouse
-from code.models.dtos.modify_house_or_room import modifyHouseOrRoomSchema, ModifyHouseOrRoom
+from backend.utils.validation_exception import ValidationException
+from backend.utils.request_parser import request_parser
+import backend.services.house_service as house_service
+from backend.models.dtos.new_house import newHouseSchema, NewHouse
+from backend.models.dtos.modify_house_or_room import modifyHouseOrRoomSchema, ModifyHouseOrRoom
 
 
 house_blueprint = Blueprint('house_blueprint', __name__)

@@ -1,8 +1,8 @@
-import code.repositories.room_repository as room_repository
-import code.repositories.house_repository as house_repository
-from code.models.dtos.modify_house_or_room import ModifyHouseOrRoom
-from code.models.dtos.new_room import NewRoom
-from code.utils.validation_exception import ValidationException
+import backend.repositories.room_repository as room_repository
+import backend.repositories.house_repository as house_repository
+from backend.models.dtos.modify_house_or_room import ModifyHouseOrRoom
+from backend.models.dtos.new_room import NewRoom
+from backend.utils.validation_exception import ValidationException
 
 
 def add(new_room: NewRoom):

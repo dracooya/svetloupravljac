@@ -1,7 +1,7 @@
-from code.utils.errors_messages_flattener import format_errors
+from backend.utils.errors_messages_flattener import format_errors
 from flask import request
 from marshmallow import ValidationError
-from code.utils.validation_exception import ValidationException
+from backend.utils.validation_exception import ValidationException
 
 
 def request_parser(schema, object_class):

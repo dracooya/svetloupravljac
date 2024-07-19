@@ -1,11 +1,12 @@
-from code.utils.get_broadcast_address import get_broadcast_address
+from backend.utils.get_broadcast_address import get_broadcast_address
 from pywizlight import wizlight, discovery, PilotBuilder
-from code.models.dtos.new_light import NewLight
-import code.repositories.room_repository as room_repository
-import code.repositories.light_repository as light_repository
+from backend.models.dtos.new_light import NewLight
+import backend.repositories.room_repository as room_repository
+import backend.repositories.light_repository as light_repository
 from flask import current_app
-from code.utils.validation_exception import ValidationException
-from code.models.dtos.modify_light import ModifyLight
+from backend.utils.validation_exception import ValidationException
+from backend.models.dtos.modify_light import ModifyLight
+from backend.models.dtos.command import Command
 
 
 async def discover():
@@ -75,3 +76,23 @@ def delete(mac: str):
 async def ping(ip: str):
     light = wizlight(ip)
     await light.turn_on(PilotBuilder())
+
+
+async def trigger_command(command: Command):
+    light = wizlight(command.ip)
+    if command.r > -1 and command.g > -1 and command.b > 1:
+        await light.turn_on(PilotBuilder(rgb=(command.r, command.g, command.b)))
+    elif command.mode > -1:
+        await light.turn_on(PilotBuilder(scene=command.mode))
+    elif command.temperature > -1:
+        await light.turn_on(PilotBuilder(colortemp=command.temperature))
+    elif command.brightness > -1:
+        await light.turn_on(PilotBuilder(brightness=command.brightness))
+    elif command.speed > -1:
+        await light.send({"method": "setPilot", "params": {"speed": command.speed}})
+    else:
+        pass
+    try:
+        del wizlight.__del__
+    except AttributeError:
+        pass

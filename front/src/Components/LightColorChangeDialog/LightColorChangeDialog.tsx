@@ -29,7 +29,7 @@ import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 interface LightColorChangeDialogProps {
     open: boolean,
     closeModalCallback: () => void,
-    valueChangeCallback: (_ : ColorOrModeParams) => void
+    valueChangeCallback: (_ : ColorOrModeParams) => void,
 }
 
 export function LightColorChangeDialog({open, closeModalCallback, valueChangeCallback}: LightColorChangeDialogProps) {
@@ -83,7 +83,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
         },
         100
     );
-    const [modeBrightness, setModeBrightness] = useState<number>(100);
+    const [modeBrightness, setModeBrightness] = useState<number>(255);
     const debouncedModeBrightness = useDebouncedCallback(
         (value : number) => {
             const change : ColorOrModeParams = {
@@ -288,7 +288,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                                     value={brightness}
                                                                     step={1}
                                                                     min={0}
-                                                                    max={100}/>
+                                                                    max={255}/>
                                                         </Grid>
                                                         <Grid xs={1} sm={1} md={1} lg={1} xl={1} container justifyContent={'center'} alignItems={'center'}>
                                                             <Icon path={mdiWhiteBalanceSunny} size={1} />
@@ -395,7 +395,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                                     value={modeBrightness}
                                                                     step={1}
                                                                     min={0}
-                                                                    max={100}/>
+                                                                    max={255}/>
                                                         </Grid>
                                                         <Grid xs={1} sm={1} md={1} lg={1} xl={1} container justifyContent={'center'} alignItems={'center'}>
                                                             <Icon path={mdiWhiteBalanceSunny} size={1} />
@@ -431,8 +431,8 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                                     }}
                                                                     value={modeSpeed}
                                                                     step={1}
-                                                                    min={0}
-                                                                    max={100}/>
+                                                                    min={10}
+                                                                    max={200}/>
                                                         </Grid>
                                                         <Grid xs={1} sm={1} md={1} lg={1} xl={1} container justifyContent={'center'} alignItems={'center'}>
                                                             <Icon path={mdiRabbit} size={1} />

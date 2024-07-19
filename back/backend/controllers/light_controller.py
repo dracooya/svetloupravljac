@@ -1,11 +1,14 @@
-from flask import Blueprint, jsonify
-import code.services.light_service as light_service
-from code.models.dtos.new_lights import NewLights, newLightsSchema
-from code.models.dtos.modify_light import modifyLightSchema, ModifyLight
-from code.utils.request_parser import request_parser
-from code.utils.validation_exception import ValidationException
-from code.models.dtos.new_light import NewLight
+from flask import Blueprint, jsonify, json
+import backend.services.light_service as light_service
+from backend.models.dtos.new_lights import NewLights, newLightsSchema
+from backend.models.dtos.modify_light import modifyLightSchema, ModifyLight
+from backend.utils.request_parser import request_parser
+from backend.utils.validation_exception import ValidationException
+from backend.models.dtos.new_light import NewLight
 import asyncio
+from backend.utils.socket_instance import socket
+from flask_socketio import emit, join_room, leave_room
+from backend.models.dtos.command import Command
 
 light_blueprint = Blueprint('light_blueprint', __name__)
 
@@ -59,3 +62,6 @@ async def ping(light_ip):
     return '', 201
 
 
+@socket.on('command')
+def trigger_command(command):
+    asyncio.run(light_service.trigger_command(Command(**json.loads(command))))

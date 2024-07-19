@@ -1,6 +1,6 @@
-from code.models.dtos.password import Password
+from backend.models.dtos.password import Password
 import bcrypt
-from code.utils.validation_exception import ValidationException
+from backend.utils.validation_exception import ValidationException
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 

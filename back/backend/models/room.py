@@ -1,5 +1,5 @@
-from code.models.light import Light
-from code.utils.db_config import db
+from backend.models.light import Light
+from backend.utils.db_config import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 from typing import List

@@ -1,7 +1,7 @@
-from code.models.dtos.new_light import NewLight
-from code.models.room import Room
-from code.models.light import Light
-from code.utils.db_config import db
+from backend.models.dtos.new_light import NewLight
+from backend.models.room import Room
+from backend.models.light import Light
+from backend.utils.db_config import db
 from sqlalchemy.exc import IntegrityError
 
 

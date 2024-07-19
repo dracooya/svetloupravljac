@@ -1,5 +1,5 @@
-from code.models.house import House
-from code.utils.db_config import db
+from backend.models.house import House
+from backend.utils.db_config import db
 
 
 def get_all():

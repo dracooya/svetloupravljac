@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields
 from marshmallow.validate import Range
-from code.models.dtos.new_light import NewLightSchema
+from backend.models.dtos.new_light import NewLightSchema
 
 
 class NewLights:

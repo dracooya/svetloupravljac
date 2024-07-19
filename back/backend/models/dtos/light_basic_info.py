@@ -1,4 +1,4 @@
-from code.utils.db_config import db
+from backend.utils.db_config import db
 from sqlalchemy.orm import Mapped, mapped_column
 
 
