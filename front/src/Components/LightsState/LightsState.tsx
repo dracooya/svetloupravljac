@@ -63,6 +63,17 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
         socket.emit('command', JSON.stringify(command));
     }
 
+    const toggleLight = (ip: string, turnOn: boolean) => {
+        if(turnOn) {socket.emit('turn_on', ip);}
+        else { socket.emit('turn_off', ip);}
+    }
+
+    const toggleAllLights = (turnOn: boolean) => {
+        const ips = lights?.map(light => light.ip)
+        if(turnOn) {socket.emit('turn_on_all', ips);}
+        else { socket.emit('turn_off_all', ips);}
+    }
+
 
     useEffect(() => {
         if(!shouldGetStates.current) return;
@@ -105,7 +116,6 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
     }, [lightsOn]);
 
     const handleColorChange = (config: ColorOrModeParams) => {
-        if(!lightsWithStatus.find(light => light.light.ip == selectedLight!.ip).isOn) return;
         const command : Command = {
             r: config.r,
             g: config.g,
@@ -171,7 +181,8 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                                         size={'lg'}
                                                         checked={roomLightsOn}
                                                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                                            setRoomLightsOn(event.target.checked)
+                                                            toggleAllLights(event.target.checked);
+                                                            setRoomLightsOn(event.target.checked);
                                                         }
                                                         }
                                                         color={roomLightsOn ? 'primary' : 'neutral'}
@@ -221,6 +232,7 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                                                             checked={lightsOn.length == 0 ? false : lightsOn[idx]}
                                                                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                                                                 updateLightsOn(idx, event.target.checked)
+                                                                                toggleLight(light.ip,event.target.checked)
                                                                             }
                                                                             }
                                                                             color={lightsOn[idx] ? 'primary' : 'neutral'}

@@ -59,7 +59,7 @@ def delete(light_mac):
 
 @light_blueprint.route('/ping/<light_ip>', methods=['GET'])
 async def ping(light_ip):
-    await light_service.ping(light_ip)
+    await light_service.turn_on(light_ip)
     return '', 201
 
 
@@ -73,3 +73,23 @@ def get_lights_states(lights_ips):
     states = asyncio.run(light_service.get_lights_states(json.loads(lights_ips)))
     transformed_states = [state.serialize() for state in states]
     emit('states', {"states":transformed_states})
+
+
+@socket.on('turn_off')
+def turn_off(light_ip):
+    asyncio.run(light_service.turn_off(light_ip))
+
+
+@socket.on('turn_off_all')
+def turn_off_all(lights_ips):
+    asyncio.run(light_service.turn_off_all(lights_ips))
+
+
+@socket.on('turn_on')
+def turn_on(light_ip):
+    asyncio.run(light_service.turn_on(light_ip))
+
+
+@socket.on('turn_on_all')
+def turn_on_all(lights_ips):
+    asyncio.run(light_service.turn_on_all(lights_ips))

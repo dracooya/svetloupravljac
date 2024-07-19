@@ -153,7 +153,6 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
 
     useEffect(() => {
         if(lightState == undefined) return;
-
         if(lightState.state.r != -1 && lightState.state.g != -1 && lightState.state.b != -1){
             const obj = {r: lightState.state.r, g: lightState.state.g, b: lightState.state.b}
             setColor(obj);

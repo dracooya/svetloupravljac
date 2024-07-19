@@ -78,11 +78,6 @@ def delete(mac: str):
         return "Light successfully removed!"
 
 
-async def ping(ip: str):
-    light = wizlight(ip)
-    await light.turn_on(PilotBuilder())
-
-
 async def trigger_command(command: Command):
     try:
         light = wizlight(command.ip)
@@ -129,3 +124,30 @@ async def get_lights_states(lights_ips: List[str]):
         except WizLightConnectionError:
             pass
     return states
+
+
+async def turn_off(light_ip: str):
+    try:
+        light = wizlight(light_ip)
+        await light.turn_off()
+        try:
+            del wizlight.__del__
+        except AttributeError:
+            pass
+    except WizLightConnectionError:
+        pass
+
+
+async def turn_off_all(lights_ips: List[str]):
+    for ip in lights_ips:
+        await turn_off(ip)
+
+
+async def turn_on(ip: str):
+    light = wizlight(ip)
+    await light.turn_on(PilotBuilder())
+
+
+async def turn_on_all(lights_ips: List[str]):
+    for ip in lights_ips:
+        await turn_on(ip)
