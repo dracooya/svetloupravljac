@@ -1,5 +1,5 @@
 from code.utils.get_broadcast_address import get_broadcast_address
-from pywizlight import wizlight, discovery
+from pywizlight import wizlight, discovery, PilotBuilder
 from code.models.dtos.new_light import NewLight
 import code.repositories.room_repository as room_repository
 import code.repositories.light_repository as light_repository
@@ -15,10 +15,8 @@ async def discover():
     broadcast_address = get_broadcast_address()
     lights = await discovery.discover_lights(broadcast_space=broadcast_address)
     for light in lights:
-        print(light.ip)
         if any(light.mac in vars(existing_light).values() for existing_light in all_lights):
             continue
-        print("yes")
         light_type = await light.get_bulbtype()
         light_initialized = NewLight(mac=light.mac,
                                      ip=light.ip,
@@ -72,3 +70,8 @@ def delete(mac: str):
     else:
         light_repository.delete(light)
         return "Light successfully removed!"
+
+
+async def ping(ip: str):
+    light = wizlight(ip)
+    await light.turn_on(PilotBuilder())

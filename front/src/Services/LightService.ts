@@ -48,4 +48,14 @@ export class LightService {
             throw err;
         });
     }
+
+    public ping(ip: string): Promise<void> {
+        return axios({
+            method: 'GET',
+            url: `${this.API_URL}lights/ping/${ip}`,
+        }).then((_) => {} ).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }
 }

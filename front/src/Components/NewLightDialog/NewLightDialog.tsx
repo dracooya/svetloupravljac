@@ -274,18 +274,30 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
                                                             {foundLights.map((light) => {
                                                                 return <Grid xs={4} sm={4} md={3} lg={3} xl={3} pb={1} key={light.mac} container height={'fit-content'} border={selectedLight == light ? '1px solid #12467b' : 'none'} sx={{borderRadius:'1em'}}>
                                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} mt={2} container justifyContent={'center'}>
-                                                                            <Badge badgeContent={light.isSetup? '✓' : ''}  color={light.isSetup? "success" : "primary"} onClick={() => handleSelectedLightChange(light)}>
-                                                                                {light.isSetup ? light.type == LightType.BULB?
-                                                                                            <Icon path={mdiLightbulbOutline} size={2.5} className={'clickable'}/> :
-                                                                                            light.type == LightType.STRIP ? <Icon path={mdiLedStripVariant} size={2.5} className={'clickable'}/> :
-                                                                                                <Icon path={mdiLampOutline} size={2.5} className={'clickable'}/>
-                                                                                    :
-                                                                                <Icon path={mdilHelpCircle} size={2.5} className={'clickable'}/>
-                                                                                }
+                                                                                <Badge badgeContent={light.isSetup? '✓' : ''}  color={light.isSetup? "success" : "primary"} onClick={() => handleSelectedLightChange(light)}>
+                                                                                    {light.isSetup ? light.type == LightType.BULB?
+                                                                                                <Icon path={mdiLightbulbOutline} size={2.5} className={'clickable'}/> :
+                                                                                                light.type == LightType.STRIP ? <Icon path={mdiLedStripVariant} size={2.5} className={'clickable'}/> :
+                                                                                                    <Icon path={mdiLampOutline} size={2.5} className={'clickable'}/>
+                                                                                        :
+                                                                                    <Icon path={mdilHelpCircle} size={2.5} className={'clickable'}/>
+                                                                                    }
                                                                             </Badge>
                                                                         </Grid>
                                                                         <Grid pt={1} xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent={'center'}>
-                                                                            {light.isSetup? light.name : light.mac.substring(0,7).concat('...')}
+                                                                                {light.isSetup? light.name : light.mac.substring(0,7).concat('...')}
+                                                                                <Badge badgeContent={'?'}
+                                                                                       className={'pointer'}
+                                                                                       sx={{
+                                                                                           paddingLeft:'1em'
+                                                                                       }}
+                                                                                       anchorOrigin={{
+                                                                                           vertical: 'top',
+                                                                                           horizontal: 'right',
+                                                                                       }}
+                                                                                       color={"warning"}
+                                                                                       onClick={() => lightService.ping(light.ip)}>
+                                                                                </Badge>
                                                                         </Grid>
                                                                 </Grid>
                                                             })}

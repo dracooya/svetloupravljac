@@ -51,3 +51,11 @@ def delete(light_mac):
 
     except ValidationException as ex:
         return ex.message, ex.status_code
+
+
+@light_blueprint.route('/ping/<light_ip>', methods=['GET'])
+async def ping(light_ip):
+    await light_service.ping(light_ip)
+    return '', 201
+
+
