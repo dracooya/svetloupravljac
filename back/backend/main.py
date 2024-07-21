@@ -13,6 +13,7 @@ from backend.models.scene import Scene
 from backend.models.room import Room
 from backend.models.house import House
 from backend.utils.socket_instance import socket
+from backend.services.light_service import run_update_ips
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/svetloupravljac'
@@ -22,6 +23,7 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 db.init_app(app)
 socket.init_app(app)
 
+run_update_ips(app)
 
 app.register_blueprint(entry_blueprint, url_prefix='/enter')
 app.register_blueprint(house_blueprint, url_prefix='/houses')

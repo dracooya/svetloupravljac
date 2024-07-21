@@ -13,6 +13,50 @@ from backend.utils.validation_exception import ValidationException
 from backend.models.dtos.modify_light import ModifyLight
 from backend.models.dtos.command import Command
 
+import threading
+import asyncio
+
+
+async def update_ips(app):
+    while True:
+        print("Updating IP addresses")
+        with app.app_context():
+            all_lights = light_repository.get_all()
+        broadcast_address = get_broadcast_address()
+        discovered_lights = await discovery.discover_lights(broadcast_space=broadcast_address, wait_time=1.0)
+        for light in discovered_lights:
+            match = next((light_init for light_init in all_lights if light.mac == light_init.mac), None)
+            if match.ip != light.ip:
+                with app.app_context():
+                    light_repository.update_ip(match, light.ip, app)
+        await asyncio.sleep(300)
+
+
+def __start_background_ip_updating(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+
+def run_update_ips(app):
+    loop = asyncio.new_event_loop()
+    t = threading.Thread(target=__start_background_ip_updating, args=(loop,))
+    t.daemon = True
+    t.start()
+
+    asyncio.run_coroutine_threadsafe(update_ips(app), loop)
+
+
+async def __wrapper(function, **kwargs):
+    try:
+        ret_val = await function(**kwargs)
+        try:
+            del wizlight.__del__
+        except AttributeError:
+            pass
+        return ret_val
+    except WizLightConnectionError:
+        pass
+
 
 async def discover():
     with current_app.app_context():
@@ -79,7 +123,7 @@ def delete(mac: str):
 
 
 async def trigger_command(command: Command):
-    try:
+    async def execute(command: Command):
         light = wizlight(command.ip)
         if command.r > -1 and command.g > -1 and command.b > 1:
             await light.turn_on(PilotBuilder(rgb=(command.r, command.g, command.b)))
@@ -93,61 +137,62 @@ async def trigger_command(command: Command):
             await light.send({"method": "setPilot", "params": {"speed": command.speed}})
         else:
             pass
-        try:
-            del wizlight.__del__
-        except AttributeError:
-            pass
-    except WizLightConnectionError:
-        pass
+
+    await __wrapper(execute, command=command)
 
 
 async def get_lights_states(lights_ips: List[str]):
+    async def execute(light_ip: str):
+        light = wizlight(light_ip)
+        current_state = await light.updateState()
+        return LightBasicInfoWithStatus(isOn=current_state.get_state(),
+                                        ip=light_ip,
+                                        r=current_state.get_rgb()[0] if current_state.get_rgb()[
+                                                                            0] is not None else -1,
+                                        g=current_state.get_rgb()[1] if current_state.get_rgb()[
+                                                                            1] is not None else -1,
+                                        b=current_state.get_rgb()[2] if current_state.get_rgb()[
+                                                                            2] is not None else -1,
+                                        brightness=current_state.get_brightness(),
+                                        mode=current_state.get_scene_id() if current_state.get_scene() is not None else -1,
+                                        temperature=current_state.get_colortemp(),
+                                        speed=50 if current_state.get_speed() is None else current_state.get_speed())
+
     states = []
     for ip in lights_ips:
-        try:
-            light = wizlight(ip)
-            current_state = await light.updateState()
-            state = LightBasicInfoWithStatus(isOn=current_state.get_state(),
-                                             ip=ip,
-                                             r=current_state.get_rgb()[0] if current_state.get_rgb()[0] is not None else -1,
-                                             g=current_state.get_rgb()[1] if current_state.get_rgb()[1] is not None else -1,
-                                             b=current_state.get_rgb()[2] if current_state.get_rgb()[2] is not None else -1,
-                                             brightness=current_state.get_brightness(),
-                                             mode=current_state.get_scene_id() if current_state.get_scene() is not None else -1,
-                                             temperature=current_state.get_colortemp(),
-                                             speed=50 if current_state.get_speed() is None else current_state.get_speed())
+        state = await __wrapper(execute, light_ip=ip)
+        if state is not None:
             states.append(state)
-            try:
-                del wizlight.__del__
-            except AttributeError:
-                pass
-        except WizLightConnectionError:
-            pass
     return states
 
 
 async def turn_off(light_ip: str):
-    try:
+    async def execute(light_ip: str):
         light = wizlight(light_ip)
         await light.turn_off()
-        try:
-            del wizlight.__del__
-        except AttributeError:
-            pass
-    except WizLightConnectionError:
-        pass
+
+    await __wrapper(execute, light_ip=light_ip)
 
 
 async def turn_off_all(lights_ips: List[str]):
-    for ip in lights_ips:
-        await turn_off(ip)
+    async def execute(lights_ips: List[str]):
+        for ip in lights_ips:
+            await turn_off(ip)
+
+    await __wrapper(execute, lights_ips=lights_ips)
 
 
 async def turn_on(ip: str):
-    light = wizlight(ip)
-    await light.turn_on(PilotBuilder())
+    async def execute(ip: str):
+        light = wizlight(ip)
+        await light.turn_on(PilotBuilder())
+
+    await __wrapper(execute, ip=ip)
 
 
 async def turn_on_all(lights_ips: List[str]):
-    for ip in lights_ips:
-        await turn_on(ip)
+    async def execute(lights_ips: List[str]):
+        for ip in lights_ips:
+            await turn_on(ip)
+
+    await __wrapper(execute, lights_ips=lights_ips)

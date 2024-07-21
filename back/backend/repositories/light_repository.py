@@ -1,3 +1,5 @@
+from sqlalchemy.orm import sessionmaker
+
 from backend.models.dtos.new_light import NewLight
 from backend.models.room import Room
 from backend.models.light import Light
@@ -11,6 +13,14 @@ def get_all():
 
 def get_by_mac(mac: str):
     return Light.query.filter_by(mac=mac).first()
+
+
+def update_ip(light: Light, ip: str, app):
+    light.ip = ip
+    with app.app_context():
+        session = sessionmaker(bind=db.engine)()
+        session.add(light)
+        session.commit()
 
 
 def add(info: NewLight, room: Room):

@@ -72,6 +72,7 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
         const ips = lights?.map(light => light.ip)
         if(turnOn) {socket.emit('turn_on_all', ips);}
         else { socket.emit('turn_off_all', ips);}
+        setLightsOn(lightsOn.map((_) => turnOn))
     }
 
 
@@ -128,7 +129,7 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
         }
         sendMessage(command);
         const idx = lights?.findIndex(light => light.ip == selectedLight!.ip)
-        updateLightsOn(idx, true);
+        updateLightsOn(idx!, true);
     }
 
     const  updateLightsOn = (idx: number, val: boolean) => {
