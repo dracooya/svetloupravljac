@@ -27,6 +27,7 @@ async def update_ips(app):
         for light in discovered_lights:
             match = next((light_init for light_init in all_lights if light.mac == light_init.mac), None)
             if match.ip != light.ip:
+                print(match.ip)
                 with app.app_context():
                     light_repository.update_ip(match, light.ip, app)
         await asyncio.sleep(300)

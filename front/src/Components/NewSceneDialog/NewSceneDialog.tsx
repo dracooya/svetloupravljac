@@ -26,15 +26,23 @@ import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 import {LightColorChangeDialog} from "../LightColorChangeDialog/LightColorChangeDialog.tsx";
 import {availableModes} from "../Utils/AvailableModes.ts";
 import {Scene} from "../../Models/Scene.ts";
-import {LightBasicInfo} from "../../Models/LightBasicInfo.ts";
 import {kelvinToRgb} from "../Utils/KelvinsToRgbConversionTable.ts";
+import {Command} from "../../Models/DTOs/Command.ts";
+import {sendCommand} from "../Utils/Socket.ts";
+import {Light} from "../../Models/Light.ts";
+import {LightState} from "../../Models/DTOs/LightState.ts";
+import {SceneService} from "../../Services/SceneService.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
+import {NewScene} from "../../Models/DTOs/NewScene.ts";
+import {LightColorConfigBasic} from "../../Models/DTOs/LightColorConfigBasic.ts";
 
 interface NewSceneDialogProps {
     open: boolean,
     closeModalCallback: () => void,
     houses: House[],
     isModification: boolean,
-    selectedScene: Scene | undefined
+    selectedScene: Scene | undefined,
+    sceneService: SceneService
 }
 
 interface SceneForm {
@@ -43,13 +51,13 @@ interface SceneForm {
 }
 
 interface LightIncluded {
-    light: LightBasicInfo,
+    light: Light,
     included: boolean,
     mode: ColorOrModeParams | undefined,
 }
 
-export function NewSceneDialog({open, closeModalCallback, houses, isModification, selectedScene}: NewSceneDialogProps) {
-    const {register, handleSubmit, setValue, reset,trigger, formState: {errors}} = useForm<SceneForm>({
+export function NewSceneDialog({open, closeModalCallback, houses, isModification, selectedScene, sceneService}: NewSceneDialogProps) {
+    const {register, handleSubmit, setValue,trigger, getValues, formState: {errors}} = useForm<SceneForm>({
         defaultValues: {
             name: "",
             room: houses[0]?.rooms[0]?.id
@@ -62,12 +70,79 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const [activeStep, setActiveStep] = useState<number>(0);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
     const [selectedLight, setSelectedLight] = useState<LightIncluded>();
+    const [selectedLightTransformed, setSelectedLightTransformed] = useState<LightState>();
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const handlePopupClose = () => { setPopupOpen(false); }
+    const message_401 = import.meta.env.VITE_401_MESSAGE
     const handleLightColorChangeDialogClose = () => setOpenLightColorChangeDialog(false);
 
+    useEffect(() => {
+        setSelectedRoom(houses[0]?.rooms[0])
+    }, [houses]);
+
+    useEffect(() => {
+        if(selectedLight == undefined) return;
+        const transformed : LightState = {
+            light: selectedLight!.light,
+            isOn: false,
+            state: {
+                ip: selectedLight!.light.ip,
+                r: -1, g: -1, b: -1, brightness: 255, temperature: selectedLight!.light.minKelvin, speed: -1, mode: -1
+            }
+        }
+        setSelectedLightTransformed(transformed);
+    }, [selectedLight]);
     const handleColorChangeCallback = (change: ColorOrModeParams) => {
-        if(change.mode == -1 && change.r == -1 && change.temperature == -1) return;
+        const command : Command = {
+            r: change.r,
+            g: change.g,
+            b: change.b,
+            temperature: change.temperature,
+            mode: change.mode,
+            brightness: change.brightness,
+            speed: change.speed,
+            ip: selectedLight!.light.ip
+        }
+        sendCommand(command);
+        if(selectedLight?.mode == undefined) selectedLight.mode = change;
+        else {
+            if (change.mode != -1) {
+                if(selectedLight!.mode!.mode == -1) {
+                    selectedLight!.mode!.speed = 95;
+                    selectedLight!.mode!.brightness = 255;
+                }
+                selectedLight!.mode!.r = -1;
+                selectedLight!.mode!.g = -1;
+                selectedLight!.mode!.b = -1;
+                selectedLight!.mode!.mode = change.mode;
+                selectedLight!.mode!.temperature = -1;
+            }
+            if (change.brightness != -1) selectedLight!.mode!.brightness = change.brightness;
+            if (change.speed != -1) selectedLight!.mode!.speed = change.speed;
+
+            if (change.r != -1 && change.g != -1 && change.b != -1) {
+                selectedLight!.mode!.r = change.r;
+                selectedLight!.mode!.g = change.g;
+                selectedLight!.mode!.b = change.b;
+                selectedLight!.mode!.temperature = -1;
+                selectedLight!.mode!.speed = -1;
+                selectedLight!.mode!.mode = -1;
+            }
+            if (change.temperature != -1) {
+                selectedLight!.mode!.temperature = change.temperature;
+                selectedLight!.mode!.r = -1;
+                selectedLight!.mode!.g = -1;
+                selectedLight!.mode!.b = -1;
+                selectedLight!.mode!.speed = -1;
+                selectedLight!.mode!.mode = -1;
+            }
+
+        }
+        setSelectedLight(selectedLight);
         const update = includedLights.map(lightOld =>
-            lightOld.light.id == selectedLight?.light.id ? { ...lightOld, mode: change } : lightOld);
+            lightOld.light.mac == selectedLight?.light.mac ? { ...lightOld, mode: selectedLight.mode } : lightOld);
         setIncludedLights(update);
     }
 
@@ -80,12 +155,45 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     };
 
     const addScene = () => {
+        let lightsConfig : LightColorConfigBasic[] = []
+
+        includedLights.forEach((light) => {
+            const config : LightColorConfigBasic = {
+                lightMac: light.light.mac,
+                config: {
+                    r: -1,
+                    g: -1,
+                    b: -1,
+                    brightness: -1,
+                    temperature: -1,
+                    speed: -1,
+                    mode: -1
+                }
+            }
+            if(light.mode != undefined) {
+                config.config = light.mode
+            }
+            lightsConfig.push(config)
+        })
+
+        const newScene: NewScene = {
+            name: getValues("name"),
+            config: lightsConfig
+        }
+        sceneService.add(newScene).then((_) => {
+            window.location.reload();
+        }).catch((err) => {
+            if(err.response.status == 401) setPopupMessage(message_401)
+            else setPopupMessage(err.response.data);
+            setIsSuccess(false);
+            setPopupOpen(true);
+        });
         //TODO: add/edit scene
-        reset();
+        /*reset();
         setSelectedRoom(houses[0].rooms[0]);
         setIncludedLights([]);
         setActiveStep(0);
-        closeModalCallback();
+        closeModalCallback();*/
     }
 
     useEffect(() => {
@@ -108,7 +216,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
         }
     }, [isModification]);
 
-    const onSubmit = (data : SceneForm) => {
+    const onSubmit = (_ : SceneForm) => {
         setActiveStep(1);
     };
 
@@ -346,7 +454,9 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
             </Transition>
             <LightColorChangeDialog open={openLightColorChangeDialog}
                                     valueChangeCallback={handleColorChangeCallback}
-                                    closeModalCallback={handleLightColorChangeDialogClose}/>
+                                    closeModalCallback={handleLightColorChangeDialogClose}
+                                    lightState={selectedLightTransformed}/>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }

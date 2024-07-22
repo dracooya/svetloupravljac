@@ -11,30 +11,53 @@ import {Scene} from "../../Models/Scene.ts";
 import "../Main/Main.css"
 import Icon from "@mdi/react";
 import {mdilPencil, mdilPlus} from "@mdi/light-js";
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {MoreVert} from "@mui/icons-material";
 import {mdilDelete} from "@mdi/light-js/mdil";
 import {DeletionConfirmationDialog} from "../DeletionConfirmationDialog/DeletionConfirmationDialog.tsx";
 import {NewSceneDialog} from "../NewSceneDialog/NewSceneDialog.tsx";
 import {House} from "../../Models/House.ts";
 import {mdiMovieOpenPlayOutline} from "@mdi/js";
+import {SceneService} from "../../Services/SceneService.ts";
+import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 
 interface ScenesProps {
-    scenes: Scene[],
-    houses: House[]
+    houses: House[],
+    sceneService: SceneService
 }
 
-export function Scenes({scenes, houses} : ScenesProps) {
+export function Scenes({houses, sceneService} : ScenesProps) {
+    const [scenes, setScenes] = useState<Scene[]>([]);
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
     const [deleteMessage, setDeleteMessage] = useState<string>("");
     const [selectedScene, setSelectedScene] = useState<Scene>();
     const [openNewDialog, setOpenNewDialog] = useState<boolean>(false);
     const [isModification, setIsModification] = useState<boolean>(false);
+    const shouldLoad = useRef(true);
+    const [popupOpen, setPopupOpen] = useState<boolean>(false);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const handlePopupClose = () => { setPopupOpen(false); }
+    const message_401 = import.meta.env.VITE_401_MESSAGE
     const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
     const handleNewDialogClose = () => setOpenNewDialog(false);
     const deleteScene = () => {
         //TODO: Delete scene
     }
+
+    useEffect(() => {
+        if(!shouldLoad.current) return;
+        sceneService.getAll().then((scenes) => {
+            setScenes(scenes);
+        }).catch((err) => {
+            if(err.response.status == 401) {
+                setPopupMessage(message_401);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            }
+        });
+        shouldLoad.current = false;
+    }, []);
 
     return (
         <>
@@ -99,10 +122,12 @@ export function Scenes({scenes, houses} : ScenesProps) {
                                         closeModalCallback={handleDeleteDialogClose}
                                         message={deleteMessage} deleteConfirmedCallback={deleteScene}/>
             <NewSceneDialog open={openNewDialog}
+                            sceneService={sceneService}
                             selectedScene={selectedScene}
                             closeModalCallback={handleNewDialogClose}
                             houses={houses}
                             isModification={isModification}/>
+            <PopupMessage message={popupMessage} isError={!isSuccess} isOpen={popupOpen} handleClose={handlePopupClose}/>
         </>
     );
 }

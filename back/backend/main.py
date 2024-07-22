@@ -1,4 +1,6 @@
 from flask import Flask, request
+
+from backend.controllers.scene_controller import scene_blueprint
 from backend.utils.db_config import db
 from flask_cors import CORS
 from backend.controllers.entry_controller import entry_blueprint
@@ -29,6 +31,7 @@ app.register_blueprint(entry_blueprint, url_prefix='/enter')
 app.register_blueprint(house_blueprint, url_prefix='/houses')
 app.register_blueprint(room_blueprint, url_prefix='/rooms')
 app.register_blueprint(light_blueprint, url_prefix='/lights')
+app.register_blueprint(scene_blueprint, url_prefix='/scenes')
 
 
 with app.app_context():

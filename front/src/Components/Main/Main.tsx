@@ -3,21 +3,22 @@ import React, {useEffect, useRef, useState} from "react";
 import {HomeAndRoomConfig} from "../HomeAndRoomConfig/HomeAndRoomConfig.tsx";
 import {House} from "../../Models/House.ts";
 import {Scenes} from "../Scenes/Scenes.tsx";
-import {Scene} from "../../Models/Scene.ts";
 import {LightsState} from "../LightsState/LightsState.tsx";
 import {Room} from "../../Models/Room.ts";
 import {HouseService} from "../../Services/HouseService.ts";
 import {RoomService} from "../../Services/RoomService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 import {LightService} from "../../Services/LightService.ts";
+import {SceneService} from "../../Services/SceneService.ts";
 
 interface MainProps {
     houseService: HouseService,
     roomService: RoomService,
-    lightService: LightService
+    lightService: LightService,
+    sceneService: SceneService
 }
 
-export function Main({houseService, roomService, lightService} : MainProps) {
+export function Main({houseService, roomService, lightService, sceneService} : MainProps) {
 
     const [selectedRoom, setSelectedRoom] = useState<Room>();
     const [houses, setHouses] = useState<House[]>([]);
@@ -51,52 +52,6 @@ export function Main({houseService, roomService, lightService} : MainProps) {
         setSelectedRoom(room);
     }
 
-
-    const [scenes, setScenes] = useState<Scene[]>([
-
-        /*{
-            id: 1,
-            name: 'PulsyBoi',
-            lightsConfig: [
-                {
-                    light: {
-                        id: 1,
-                        ip: "192.168.0.115",
-                        name: "Gooby",
-                        type: LightType.BULB,
-                    },
-                    config: {
-                        r: -1,
-                        g: -1,
-                        b: -1,
-                        brightness: 100,
-                        temperature: -1,
-                        speed: -1,
-                        mode: 6
-                    }
-                },
-                {
-                    light: {
-                        id: 2,
-                        ip: "192.168.0.115",
-                        name: "Booby",
-                        type: LightType.BULB
-                    },
-                    config: {
-                        r: -1,
-                        g: -1,
-                        b: -1,
-                        brightness: 100,
-                        temperature: -1,
-                        speed: -1,
-                        mode: 6
-                    }
-                },
-            ]
-        },*/
-
-
-    ])
     return (
         <>
             <CssVarsProvider
@@ -125,7 +80,7 @@ export function Main({houseService, roomService, lightService} : MainProps) {
                                                houseService={houseService}
                                                setSelectedRoomParent={handleRoomSelectionChange}/>
                         <Grid mt={6} xs={12} sm={12} md={12} lg={12} xl={12}>
-                            <Scenes scenes={scenes} houses={houses}/>
+                            <Scenes houses={houses} sceneService={sceneService}/>
                         </Grid>
                     </Grid>
                     <Grid pl={8} pr={3} container xs={12} sm={12} md={6} lg={8} xl={8} mt={{

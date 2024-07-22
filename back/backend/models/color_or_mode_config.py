@@ -12,3 +12,15 @@ class ColorOrModeConfig(db.Model):
     temperature: Mapped[int] = mapped_column()
     speed: Mapped[int] = mapped_column()
     mode: Mapped[int] = mapped_column()
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "r": self.r,
+            "g": self.g,
+            "b": self.b,
+            "brightness": self.brightness,
+            "temperature": self.temperature,
+            "speed": self.speed,
+            "mode": self.mode,
+        }

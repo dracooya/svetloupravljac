@@ -118,7 +118,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
 
     }, [selectedMode]);
 
-    const [modeSpeed, setModeSpeed] = useState<number>(50);
+    const [modeSpeed, setModeSpeed] = useState<number>(95);
     const debouncedSpeed = useDebouncedCallback(
         (value : number) => {
             const change : ColorOrModeParams = {
@@ -432,6 +432,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                                         },
                                                                     }}
                                                                     onChange={(event, newValue) => {
+                                                                        setBrightness(newValue);
                                                                         setModeBrightness(newValue);
                                                                         debouncedModeBrightness(newValue);
                                                                     }}

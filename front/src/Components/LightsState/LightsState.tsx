@@ -29,10 +29,10 @@ import {ColorOrModeParams} from "../../Models/ColorOrModeParams.ts";
 import {Light} from "../../Models/Light.ts";
 import {LightService} from "../../Services/LightService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
-import {io} from "socket.io-client";
 import {Command} from "../../Models/DTOs/Command.ts";
 import {LightState} from "../../Models/DTOs/LightState.ts";
 import {BasicLightState} from "../../Models/DTOs/BasicLightState.ts";
+import {sendCommand, socket} from "../Utils/Socket.ts";
 
 interface LightsStateProps {
     lights: Light[] | undefined,
@@ -41,7 +41,6 @@ interface LightsStateProps {
     lightService: LightService
 }
 
-const socket = io('http://localhost:5000');
 export function LightsState({lights, houses, currentRoom, lightService}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
     const [lightsOn, setLightsOn] = React.useState<boolean[]>([]);
@@ -58,10 +57,6 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
     const shouldGetStates = useRef(true)
     const handlePopupClose = () => { setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE;
-
-    const sendMessage = (command: Command) => {
-        socket.emit('command', JSON.stringify(command));
-    }
 
     const toggleLight = (ip: string, turnOn: boolean) => {
         if(turnOn) {socket.emit('turn_on', ip);}
@@ -127,7 +122,7 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
             speed: config.speed,
             ip: selectedLight!.ip
         }
-        sendMessage(command);
+        sendCommand(command);
         const idx = lights?.findIndex(light => light.ip == selectedLight!.ip)
         updateLightsOn(idx!, true);
     }
