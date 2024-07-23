@@ -76,8 +76,14 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
     const message_401 = import.meta.env.VITE_401_MESSAGE;
 
     useEffect(() => {
-        setSelectedRoomId(houses[0]?.rooms[0].id);
-        setValue("room", houses[0]?.rooms[0].id);
+        if(localStorage.getItem("room") != null && localStorage.getItem("room") != "undefined") {
+            setSelectedRoomId(+localStorage.getItem("room"))
+            setValue("room",+localStorage.getItem("room"));
+        }
+        else {
+            setSelectedRoomId(houses[0]?.rooms[0].id);
+            setValue("room", houses[0]?.rooms[0].id);
+        }
     }, [houses]);
 
     const fetchLights = async () => {
@@ -191,7 +197,8 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
                 lights: transformedLights
             }
             console.log(transformedLights)
-            lightService.add(newLights).then((_) => {
+            lightService.add(newLights).then((msg) => {
+                localStorage.setItem("message", msg);
                 window.location.reload();
             }).catch((err) => {
                 if(err.response.status == 401) setPopupMessage(message_401)

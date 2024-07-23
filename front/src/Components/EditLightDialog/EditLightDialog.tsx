@@ -60,7 +60,8 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
             name: data.name,
             roomId: data.room
         }
-        lightService.edit(modification).then((_) => {
+        lightService.edit(modification).then((msg) => {
+            localStorage.setItem("message", msg);
             window.location.reload();
         }).catch((err) => {
             if(err.response.status == 401) setPopupMessage(message_401)
@@ -79,8 +80,14 @@ export function EditLightDialog({open, closeModalCallback, selectedLight, houses
     useEffect(() => {
         // noinspection TypeScriptValidateTypes
         setValue("name", selectedLight?.name);
-        setValue("room", currentRoom?.id);
-        setSelectedRoomId(currentRoom?.id);
+        if(localStorage.getItem("room") != null && localStorage.getItem("room") != "undefined") {
+            setSelectedRoomId(+localStorage.getItem("room"))
+            setValue("room",+localStorage.getItem("room"));
+        }
+        else {
+            setValue("room", currentRoom?.id);
+            setSelectedRoomId(currentRoom?.id);
+        }
     }, [open]);
 
     return (

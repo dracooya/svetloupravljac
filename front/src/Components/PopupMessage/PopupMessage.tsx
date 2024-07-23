@@ -20,6 +20,7 @@ export function PopupMessage({isError, isOpen, handleClose, message} : PopupMess
                 variant="soft"
                 color={isError? "danger" : "success"}
                 open={isOpen}
+                autoHideDuration={5000}
                 size={'lg'}
                 onClose={handleClose}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}

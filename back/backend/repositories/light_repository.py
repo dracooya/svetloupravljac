@@ -41,6 +41,8 @@ def add(info: NewLight, room: Room):
     except IntegrityError:
         db.session.rollback()
         raise Exception()
+    finally:
+        db.session.close()
 
 
 def modify(light: Light, newName: str):

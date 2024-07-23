@@ -180,7 +180,8 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
     }
 
     const deleteLight = () => {
-        lightService.delete(selectedLight!.mac).then((_) => {
+        lightService.delete(selectedLight!.mac).then((msg) => {
+            localStorage.setItem("message", msg);
             window.location.reload();
         }).catch((err) => {
             if(err.response.status == 401) setPopupMessage(message_401)

@@ -35,7 +35,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
-    const handlePopupClose = () => { setPopupOpen(false); }
+    const handlePopupClose = () => {setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE;
 
     useEffect(() => {
@@ -43,21 +43,45 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
     }, []);
 
     useEffect(() => {
-        setSelectedHouse(houses[0]);
-        setSelectedRoom(houses[0]?.rooms[0]);
+        if(houses.length == 0) return;
+        let house;
+        if(localStorage.getItem("house") != null && localStorage.getItem("house") != "undefined") {
+            house = houses.find(house => house.id == +localStorage.getItem("house"));
+            if(house == undefined) {
+                house = houses[0];
+                setSelectedHouse(houses[0]);
+                localStorage.setItem("house", houses[0]?.id.toString());
+            }
+            else setSelectedHouse(house)
+        }
+        else {
+            house = houses[0];
+            setSelectedHouse(houses[0]);
+            localStorage.setItem("house", houses[0]?.id.toString());
+        }
+        if(localStorage.getItem("room") != null && localStorage.getItem("room") != "undefined") {
+            setSelectedRoom(house.rooms.find(room => room.id == +localStorage.getItem("room")))
+        }
+        else {
+            setSelectedRoom(house.rooms[0]);
+            localStorage.setItem("room", house.rooms[0].id.toString());
+        }
     }, [houses]);
 
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
         const selectedHouse = houses.find(house => house.id === selectedHouseId!);
         setSelectedHouse(selectedHouse!);
+        localStorage.setItem("house",selectedHouse!.id.toString());
         setSelectedRoom(selectedHouse!.rooms[0]);
         setSelectedRoomParent(selectedHouse!.rooms[0]);
+        localStorage.setItem("room", selectedHouse!.rooms[0].id.toString());
         setIsModificationHouse(false);
     };
 
     const handleRoomChange = (_: React.SyntheticEvent | null, selectedRoomId: number | null) => {
         const room = selectedHouse!.rooms.find(room => room.id === selectedRoomId);
         setSelectedRoom(room!);
+        localStorage.setItem("room", room!.id.toString());
         setSelectedRoomParent(room!);
         setIsModificationRoom(false);
     };
@@ -79,7 +103,9 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
     }
 
     const deleteSelectedRoom = () => {
-        roomService.delete(selectedRoom!.id).then((_) => {
+        roomService.delete(selectedRoom!.id).then((msg) => {
+            localStorage.setItem("message", msg);
+            localStorage.setItem("room","undefined");
             window.location.reload();
         }).catch((err) => {
             if(err.response.status == 401) setPopupMessage(message_401)
@@ -90,7 +116,10 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
     }
 
     const deleteSelectedHouse = () => {
-        houseService.delete(selectedHouse!.id).then((_) => {
+        houseService.delete(selectedHouse!.id).then((msg) => {
+            localStorage.setItem("message", msg);
+            localStorage.setItem("house","undefined");
+            localStorage.setItem("room","undefined");
             window.location.reload();
         }).catch((err) => {
             if(err.response.status == 401) setPopupMessage(message_401)

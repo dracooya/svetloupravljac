@@ -18,7 +18,7 @@ import {House} from "../../Models/House.ts";
 import Icon from "@mdi/react";
 import {mdilHome} from "@mdi/light-js";
 import {Room} from "../../Models/Room.ts";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {ModifyHouseOrRoom} from "../../Models/DTOs/ModifyHouseOrRoom.ts";
 import {RoomService} from "../../Services/RoomService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
@@ -48,6 +48,8 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
+
+
     const handlePopupClose = () => { setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE;
 
@@ -58,7 +60,9 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
     }, [isModification]);
 
     useEffect(() => {
-        setSelectedHouseId(houses[0]?.id)
+        if(localStorage.getItem("house") != null && localStorage.getItem("house") != "undefined")
+            setSelectedHouseId(+localStorage.getItem("house"))
+        else setSelectedHouseId(houses[0]?.id)
     }, [houses]);
 
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
@@ -72,7 +76,8 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
                 id: selectedRoom!.id,
                 name: data.name
             }
-            roomService.edit(editRoom).then((_) => {
+            roomService.edit(editRoom).then((msg) => {
+                localStorage.setItem("message", msg);
                 window.location.reload();
             }).catch((err) => {
                 if(err.response.status == 401) setPopupMessage(message_401)
@@ -86,7 +91,8 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
                 name: data.name.trim(),
                 houseId: selectedHouseId!
             }
-            roomService.add(newRoom).then((_) => {
+            roomService.add(newRoom).then((msg) => {
+                localStorage.setItem("message", msg);
                 window.location.reload();
             }).catch((err) => {
                 if(err.response.status == 401) setPopupMessage(message_401)

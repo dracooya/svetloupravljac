@@ -71,7 +71,9 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
-    const handlePopupClose = () => { setPopupOpen(false); }
+    const handlePopupClose = () => {
+        if(localStorage.getItem("message") != null) localStorage.removeItem("message");
+        setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE
     const handleLightColorChangeDialogClose = () => setOpenLightColorChangeDialog(false);
 
@@ -79,7 +81,15 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     }, [selectedScene]);
 
     useEffect(() => {
-        setSelectedRoom(houses[0]?.rooms[0])
+        if(localStorage.getItem("room") != null && localStorage.getItem("room") != "undefined") {
+            console.log(houses.flatMap(house => house.rooms).find(room => room.id === +localStorage.getItem("room")))
+            setSelectedRoom(houses.flatMap(house => house.rooms).find(room => room.id === +localStorage.getItem("room")))
+            setValue("room",+localStorage.getItem("room"));
+        }
+        else {
+            setSelectedRoom(houses[0]?.rooms[0]);
+            setValue("room", houses[0]?.rooms[0].id);
+        }
     }, [houses]);
 
     useEffect(() => {
@@ -183,7 +193,8 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                 console.log(light.mode)
 
             });
-            sceneService.edit({id: selectedScene!.id, modifications: {name: getValues("name"), config: lightsConfig}}).then((_) => {
+            sceneService.edit({id: selectedScene!.id, modifications: {name: getValues("name"), config: lightsConfig}}).then((msg) => {
+                localStorage.setItem("message", msg);
                 window.location.reload();
             }).catch((err) => {
                 if (err.response.status == 401) setPopupMessage(message_401)
@@ -203,7 +214,8 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                 if (light.mode != undefined)
                     lightsConfig.push({light_mac: light.light.mac, config: light.mode})
             });
-            sceneService.add({name: getValues("name"), config: lightsConfig}).then((_) => {
+            sceneService.add({name: getValues("name"), config: lightsConfig}).then((msg) => {
+                localStorage.setItem("message", msg);
                 window.location.reload();
             }).catch((err) => {
                 if (err.response.status == 401) setPopupMessage(message_401)

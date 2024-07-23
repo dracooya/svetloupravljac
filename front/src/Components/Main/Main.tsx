@@ -26,8 +26,22 @@ export function Main({houseService, roomService, lightService, sceneService} : M
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
-    const handlePopupClose = () => { setPopupOpen(false); }
+    const shouldShowMessage = useRef(true);
+    const handlePopupClose = () => {
+        if(localStorage.getItem("message") != null) localStorage.removeItem("message");
+        setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE
+
+    useEffect(() => {
+        if(!shouldShowMessage.current) return;
+        if(localStorage.getItem("message") != null) {
+            setPopupMessage(localStorage.getItem("message"));
+            localStorage.removeItem("message");
+            setIsSuccess(true);
+            setPopupOpen(true);
+        }
+        shouldShowMessage.current = false;
+    }, []);
 
     useEffect(() => {
         if(!shouldLoad.current) return;
@@ -44,7 +58,24 @@ export function Main({houseService, roomService, lightService, sceneService} : M
     }, []);
 
     useEffect(() => {
-        setSelectedRoom(houses[0]?.rooms[0])
+        if(houses.length == 0) return;
+        let house;
+        if(localStorage.getItem("house") != null && localStorage.getItem("house") != "undefined") {
+            house = houses.find(house => house.id == +localStorage.getItem("house"));
+            if(house == undefined) {
+                house = houses[0];
+            }
+        }
+        else {
+            house = houses[0];
+        }
+        if(localStorage.getItem("room") != null && localStorage.getItem("room") != "undefined") {
+            setSelectedRoom(house.rooms.find(room => room.id == +localStorage.getItem("room")))
+        }
+        else {
+            setSelectedRoom(house.rooms[0]);
+            localStorage.setItem("room", house.rooms[0].id.toString());
+        }
     }, [houses]);
 
 

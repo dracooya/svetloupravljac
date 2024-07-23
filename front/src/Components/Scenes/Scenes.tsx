@@ -43,7 +43,8 @@ export function Scenes({houses, sceneService} : ScenesProps) {
     const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
     const handleNewDialogClose = () => setOpenNewDialog(false);
     const deleteScene = () => {
-        sceneService.delete(selectedScene!.id).then((_) => {
+        sceneService.delete(selectedScene!.id).then((msg) => {
+            localStorage.setItem("message", msg);
             window.location.reload();
         }).catch((err) => {
             if(err.response.status == 401) setPopupMessage(message_401)

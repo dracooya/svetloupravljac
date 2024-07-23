@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 
 entry_password = b"$2a$12$gMsubuEng/BWoDZuIh6EdejWPYOaE2OtGQ8LVcSdw9D1.uttDy/Oa"
-authorized = True
+authorized = False
 scheduler = BackgroundScheduler()
 scheduler.start()
 

@@ -48,8 +48,9 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
-    const handlePopupClose = () => { setPopupOpen(false); }
+    const handlePopupClose = () => {setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE;
+
 
     const onSubmit = (data : HouseForm) => {
         if(isModification) {
@@ -57,7 +58,8 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
                 id: selectedHouse!.id,
                 name: data.name
             }
-            houseService.edit(editHouse).then((_) => {
+            houseService.edit(editHouse).then((msg) => {
+                localStorage.setItem("message", msg);
                 window.location.reload();
             }).catch((err) => {
                 if(err.response.status == 401) setPopupMessage(message_401)
@@ -71,7 +73,8 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
                 houseName: data.name.trim(),
                 roomName: data.room.trim()
             }
-            houseService.add(newHouse).then((_) => {
+            houseService.add(newHouse).then((msg) => {
+                localStorage.setItem("message", msg);
                 window.location.reload();
             }).catch((err) => {
                 console.log(err)

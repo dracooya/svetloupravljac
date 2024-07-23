@@ -92,6 +92,7 @@ async def discover():
     broadcast_address = get_broadcast_address()
     lights = await discovery.discover_lights(broadcast_space=broadcast_address)
     for light in lights:
+        print(light.ip)
         if any(light.mac in vars(existing_light).values() for existing_light in all_lights):
             continue
         light_type = await light.get_bulbtype()
