@@ -1,5 +1,5 @@
 from backend.utils.db_config import db
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
 
@@ -14,6 +14,7 @@ class Light(db.Model):
     minKelvin: Mapped[int] = mapped_column(nullable=False)
     maxKelvin: Mapped[int] = mapped_column(nullable=False)
     room_id: Mapped[int] = mapped_column(ForeignKey("room.id"))
+    configs: Mapped[list["LightColorConfig"]] = relationship("LightColorConfig", back_populates="light",  cascade="all, delete-orphan")
 
     def __eq__(self, other):
         return self.mac == other.mac

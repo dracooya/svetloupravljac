@@ -1,6 +1,9 @@
+import traceback
 from typing import List
 
+
 from backend.models.dtos.light_basic_info_with_status import LightBasicInfoWithStatus
+from backend.models.light import Light
 from backend.utils.get_broadcast_address import get_broadcast_address
 from pywizlight import wizlight, discovery, PilotBuilder
 from pywizlight.exceptions import WizLightConnectionError
@@ -9,6 +12,8 @@ from backend.models.dtos.new_light import NewLight
 import backend.repositories.room_repository as room_repository
 import backend.repositories.light_repository as light_repository
 from flask import current_app
+
+from backend.utils.socket_instance import socket
 from backend.utils.validation_exception import ValidationException
 from backend.models.dtos.modify_light import ModifyLight
 from backend.models.dtos.command import Command
@@ -16,12 +21,19 @@ from backend.models.dtos.command import Command
 import threading
 import asyncio
 
+all_lights: List[Light] = []
+
+
+def init_all_lights(app):
+    global all_lights
+    with app.app_context():
+        all_lights = light_repository.get_all()
+
 
 async def update_ips(app):
+    global all_lights
     while True:
         print("Updating IP addresses")
-        with app.app_context():
-            all_lights = light_repository.get_all()
         broadcast_address = get_broadcast_address()
         discovered_lights = await discovery.discover_lights(broadcast_space=broadcast_address, wait_time=1.0)
         for light in discovered_lights:
@@ -33,18 +45,32 @@ async def update_ips(app):
         await asyncio.sleep(300)
 
 
-def __start_background_ip_updating(loop):
+async def get_states(app):
+    global all_lights
+    while True:
+        try:
+            print("Getting light states")
+            states = await get_lights_states([light.ip for light in all_lights])
+            transformed_states = [state.serialize() for state in states]
+            with app.app_context():
+                socket.emit('states', {"states": transformed_states})
+        except Exception:
+            traceback.print_exc()
+        await asyncio.sleep(10)
+
+
+def __start_background_task(loop):
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
 
-def run_update_ips(app):
+def run_background_task(app, task):
     loop = asyncio.new_event_loop()
-    t = threading.Thread(target=__start_background_ip_updating, args=(loop,))
+    t = threading.Thread(target=__start_background_task, args=(loop,))
     t.daemon = True
     t.start()
 
-    asyncio.run_coroutine_threadsafe(update_ips(app), loop)
+    asyncio.run_coroutine_threadsafe(task(app), loop)
 
 
 async def __wrapper(function, **kwargs):
@@ -88,12 +114,14 @@ async def discover():
 
 
 def add(light: NewLight):
+    global all_lights
     room = room_repository.get_by_id(light.roomId)
     if room is None:
         raise ValidationException("Room with the specified ID does not exist!", 404)
     else:
         try:
-            light_repository.add(light, room)
+            new_light = light_repository.add(light, room)
+            all_lights.append(new_light)
             return "Light successfully added!"
         except Exception:
             raise ValidationException("Light with the specified MAC address already exists!", 404)
@@ -115,11 +143,13 @@ def modify(modifications: ModifyLight):
 
 
 def delete(mac: str):
+    global all_lights
     light = light_repository.get_by_mac(mac)
     if light is None:
         raise ValidationException("Light with the specified ID does not exist!", 404)
     else:
         light_repository.delete(light)
+        all_lights.remove(light)
         return "Light successfully removed!"
 
 

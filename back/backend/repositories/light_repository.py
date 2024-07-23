@@ -36,6 +36,8 @@ def add(info: NewLight, room: Room):
                       maxKelvin=info.maxKelvin)
         room.lights.append(light)
         db.session.commit()
+        db.session.refresh(light)
+        return light
     except IntegrityError:
         db.session.rollback()
         raise Exception()

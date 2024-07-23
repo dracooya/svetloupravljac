@@ -118,6 +118,12 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
         mode: "onChange"
     });
     const onSubmit = (data : LightForm) => {
+        if(selectedLight == undefined) {
+            setPopupMessage("Please select a light!");
+            setIsSuccess(false);
+            setPopupOpen(true);
+            return;
+        }
         const setupLight : NewLightSetup = {
             ip: selectedLight?.ip,
             mac: selectedLight?.mac,
@@ -184,6 +190,7 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
             const newLights : NewLights = {
                 lights: transformedLights
             }
+            console.log(transformedLights)
             lightService.add(newLights).then((_) => {
                 window.location.reload();
             }).catch((err) => {
@@ -274,7 +281,7 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
                                                             {foundLights.map((light) => {
                                                                 return <Grid xs={4} sm={4} md={3} lg={3} xl={3} pb={1} key={light.mac} container height={'fit-content'} border={selectedLight == light ? '1px solid #12467b' : 'none'} sx={{borderRadius:'1em'}}>
                                                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} mt={2} container justifyContent={'center'}>
-                                                                                <Badge badgeContent={light.isSetup? '✓' : ''}  color={light.isSetup? "success" : "primary"} onClick={() => handleSelectedLightChange(light)}>
+                                                                                <Badge badgeContent={light.isSetup? '✓' : ''}  color={light.isSetup? "success" : "primary"} sx={{ height:'100%'}} onClick={() => handleSelectedLightChange(light)}>
                                                                                     {light.isSetup ? light.type == LightType.BULB?
                                                                                                 <Icon path={mdiLightbulbOutline} size={2.5} className={'clickable'}/> :
                                                                                                 light.type == LightType.STRIP ? <Icon path={mdiLedStripVariant} size={2.5} className={'clickable'}/> :

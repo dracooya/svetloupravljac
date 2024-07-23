@@ -31,7 +31,6 @@ import {LightService} from "../../Services/LightService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 import {Command} from "../../Models/DTOs/Command.ts";
 import {LightState} from "../../Models/DTOs/LightState.ts";
-import {BasicLightState} from "../../Models/DTOs/BasicLightState.ts";
 import {sendCommand, socket} from "../Utils/Socket.ts";
 
 interface LightsStateProps {
@@ -43,10 +42,11 @@ interface LightsStateProps {
 
 export function LightsState({lights, houses, currentRoom, lightService}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
-    const [lightsOn, setLightsOn] = React.useState<boolean[]>([]);
+    const [lightsOn, setLightsOn] = useState<Map<string, boolean>>(new Map());
     const [openNewLightDialog, setOpenNewLightDialog] = useState<boolean>(false);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
     const [selectedLight, setSelectedLight] = useState<Light>();
+    const [selectedLightState, setSelectedLightState] = useState<LightState>();
     const [lightsWithStatus, setLightsWithStatus] = useState<LightState[]>([]);
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
     const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
@@ -54,56 +54,110 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
-    const shouldGetStates = useRef(true)
+
+    const lightsOnRef = useRef<Map<string, boolean>>(lightsOn);
+    const lightsWithStatusRef = useRef<LightState[]>(lightsWithStatus);
+
     const handlePopupClose = () => { setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE;
 
-    const toggleLight = (ip: string, turnOn: boolean) => {
-        if(turnOn) {socket.emit('turn_on', ip);}
-        else { socket.emit('turn_off', ip);}
-    }
-
-    const toggleAllLights = (turnOn: boolean) => {
-        const ips = lights?.map(light => light.ip)
-        if(turnOn) {socket.emit('turn_on_all', ips);}
-        else { socket.emit('turn_off_all', ips);}
-        setLightsOn(lightsOn.map((_) => turnOn))
-    }
-
+    useEffect(() => {
+        lightsOnRef.current = lightsOn;
+    }, [lightsOn]);
 
     useEffect(() => {
-        if(!shouldGetStates.current) return;
-        if(lights?.length == 0 || lights == undefined) return;
-        socket.emit('get_states', JSON.stringify(lights?.map(light => light.ip)));
-        socket.on('states', (data) => {
-            data.states.forEach(state => {
-                const casted_state = state as BasicLightState;
-                const transformed_state : LightState = {
-                    light: lights!.find(light => light.ip == state.ip)!,
-                    isOn: casted_state.isOn,
-                    state: {
-                        r: casted_state.r,
-                        g: casted_state.g,
-                        b: casted_state.b,
-                        brightness: casted_state.brightness,
-                        temperature: casted_state.temperature,
-                        mode: casted_state.mode,
-                        speed: casted_state.speed
-                    } as Command
+        lightsWithStatusRef.current = lightsWithStatus;
+    }, [lightsWithStatus]);
+
+    useEffect(() => {
+        setSelectedLightState(lightsWithStatus.find(light => light.light.ip === selectedLight?.ip));
+    }, [selectedLight, lightsWithStatus]);
+
+    useEffect(() => {
+        setLightsWithStatus([]);
+        setLightsOn(new Map());
+        setRoomLightsOn(false);
+        if (!lights) return;
+
+        const handleStates = (data: any) => {
+            data.states.forEach((state) => {
+                const light = lights.find(light => light.ip === state.ip);
+                if (light) {
+                    const transformed_state: LightState = {
+                        light: light,
+                        isOn: state.isOn,
+                        state: {
+                            r: state.r,
+                            g: state.g,
+                            b: state.b,
+                            brightness: state.brightness,
+                            temperature: state.temperature,
+                            mode: state.mode,
+                            speed: state.speed
+                        } as Command
+                    };
+
+                    setLightsWithStatus(prev => {
+                        if(prev.length === 0)
+                            return [transformed_state]
+                        if(!prev.find(s => s.light.mac === light.mac)) {
+                            prev.push(transformed_state)
+                            return prev
+                        }
+                        else
+                             return prev.map(s => s.light.mac === light.mac ? transformed_state : s);
+                    });
+
+                    setLightsOn(prevMap => {
+                        const newMap = new Map(prevMap);
+                        newMap.set(light.mac, state.isOn);
+                        return newMap;
+                    });
                 }
-                setLightsWithStatus(prevList => [...prevList, transformed_state]);
             });
-            setLightsOn(data.states.map(state => state.isOn));
-        });
-        shouldGetStates.current = false;
+        };
+
+        socket.on('states', handleStates);
+
+        return () => {
+            socket.off('states', handleStates);
+        };
     }, [lights]);
+
+    useEffect(() => {
+        if (lightsOn.size === 0) return;
+        setRoomLightsOn(Array.from(lightsOn.values()).every(value => value));
+    }, [lightsOn]);
+
+    const toggleLight = (mac: string, ip: string, turnOn: boolean) => {
+        if (turnOn) { socket.emit('turn_on', ip); }
+        else { socket.emit('turn_off', ip); }
+        setLightsOn(prev => {
+            const updated = new Map(prev);
+            updated.set(mac, turnOn);
+            return updated;
+        });
+    };
+
+    const toggleAllLights = (turnOn: boolean) => {
+        const ips = lights?.map(light => light.ip);
+        if (turnOn) { socket.emit('turn_on_all', ips); }
+        else { socket.emit('turn_off_all', ips); }
+        setLightsOn(prev => {
+            const updated = new Map(prev);
+            updated.forEach((value, key) => {
+                updated.set(key, turnOn);
+            });
+            return updated;
+        });
+    };
 
     const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
     const handleEditDialogClose = () => setOpenEditDialog(false);
 
     useEffect(() => {
-        if(lightsOn.length == 0) return;
-        if(lightsOn.every((value) => value)) {
+        if(lightsOn.size == 0) return;
+        if(Array.from(lightsOn.values()).every(value => value)) {
             setRoomLightsOn(true);
         }
         else {
@@ -123,14 +177,6 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
             ip: selectedLight!.ip
         }
         sendCommand(command);
-        const idx = lights?.findIndex(light => light.ip == selectedLight!.ip)
-        updateLightsOn(idx!, true);
-    }
-
-    const  updateLightsOn = (idx: number, val: boolean) => {
-        const listCopy = [...lightsOn];
-        listCopy[idx] = val;
-        setLightsOn(listCopy);
     }
 
     const deleteLight = () => {
@@ -178,7 +224,6 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                                         checked={roomLightsOn}
                                                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                                             toggleAllLights(event.target.checked);
-                                                            setRoomLightsOn(event.target.checked);
                                                         }
                                                         }
                                                         color={roomLightsOn ? 'primary' : 'neutral'}
@@ -198,7 +243,7 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                       alignContent={'flex-start'}
                                       sx={{height:'45vh', overflowX:'hidden', overflowY:'auto'}}
                                       columnSpacing={3} rowSpacing={2}>
-                                    {lights?.map((light, idx) => {
+                                    {lights?.map((light) => {
                                         return <Grid container xs={12} sm={12} md={12} lg={4} xl={4} key={light.name}>
                                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
                                                         <Card sx={{backgroundColor:'#0f171f', borderRadius:'2em', cursor: 'pointer'}}>
@@ -225,14 +270,13 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                                                             sx={{
                                                                             }}
                                                                             size={'lg'}
-                                                                            checked={lightsOn.length == 0 ? false : lightsOn[idx]}
+                                                                            checked={lightsOn.get(light.mac) == undefined ? false : lightsOn.get(light.mac)}
                                                                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                                                                updateLightsOn(idx, event.target.checked)
-                                                                                toggleLight(light.ip,event.target.checked)
+                                                                                toggleLight(light.mac,light.ip,event.target.checked)
                                                                             }
                                                                             }
-                                                                            color={lightsOn[idx] ? 'primary' : 'neutral'}
-                                                                            variant={lightsOn[idx] ? 'solid' : 'outlined'}/>
+                                                                            color={!(lightsOn) || lightsOn.get(light.mac) ? 'primary' : 'neutral'}
+                                                                            variant={!(lightsOn) || lightsOn.get(light.mac) ? 'solid' : 'outlined'}/>
                                                                     </Grid>
                                                                 <Grid xs={2} sm={2} md={1} lg={2} xl={2} pl={{
                                                                     md:1,
@@ -255,8 +299,7 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                                                                                 onClick={() => {
                                                                                     setSelectedLight(light);
                                                                                     setDeleteMessage(" <b>Are you sure you want to remove " + light.name + "?</b>" +
-                                                                                        " This will also remove it from scenes where it's included." +
-                                                                                        " <b>This may cause some scenes to become empty</b> and, therefore, <b>deleted</b>.");
+                                                                                        " This will also remove it from scenes where it's included.");
                                                                                     setOpenDeleteDialog(true);
                                                                                 }}><Icon path={mdilDelete} size={1}/>Delete</MenuItem>
                                                                         </Menu>
@@ -293,7 +336,7 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
                             closeModalCallback={handleLightDialogClose}/>
             <LightColorChangeDialog open={openLightColorChangeDialog}
                                     light={selectedLight}
-                                    lightState={lightsWithStatus.find(light => light.light.ip == selectedLight?.ip)}
+                                    lightState={selectedLightState}
                                     valueChangeCallback={handleColorChange}
                                     closeModalCallback={handleLightColorChangeDialogClose}/>
             <DeletionConfirmationDialog open={openDeleteDialog}

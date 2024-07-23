@@ -162,16 +162,18 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
             setColor({r: 255, g: 255, b:255})
             setColorHex("FFFFFF")
         }
-        if(lightState.state.mode != -1){
+        if(lightState.state.mode != -1) {
             setSelectedMode(availableModes.find(mode => mode.id == lightState.state.mode))
             setModeBrightness(lightState.state.brightness);
-            console.log(lightState.state.brightness)
             setModeSpeed(lightState.state.speed);
         }
         else {
             setSelectedMode(undefined);
             setModeBrightness(255);
             setBrightness(lightState.state.brightness);
+
+        }
+        if(lightState.state.temperature != -1) {
             setWhiteKelvin(lightState.state.temperature)
         }
     }, [lightState]);

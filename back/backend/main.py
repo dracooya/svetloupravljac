@@ -15,7 +15,7 @@ from backend.models.scene import Scene
 from backend.models.room import Room
 from backend.models.house import House
 from backend.utils.socket_instance import socket
-from backend.services.light_service import run_update_ips
+from backend.services.light_service import run_background_task, get_states, update_ips, init_all_lights
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/svetloupravljac'
@@ -25,18 +25,20 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 db.init_app(app)
 socket.init_app(app)
 
-run_update_ips(app)
+with app.app_context():
+    db.create_all()
+    print("Tables created")
+
+
+init_all_lights(app)
+run_background_task(app, update_ips)
+run_background_task(app, get_states)
 
 app.register_blueprint(entry_blueprint, url_prefix='/enter')
 app.register_blueprint(house_blueprint, url_prefix='/houses')
 app.register_blueprint(room_blueprint, url_prefix='/rooms')
 app.register_blueprint(light_blueprint, url_prefix='/lights')
 app.register_blueprint(scene_blueprint, url_prefix='/scenes')
-
-
-with app.app_context():
-    db.create_all()
-    print("Tables created")
 
 
 @app.before_request

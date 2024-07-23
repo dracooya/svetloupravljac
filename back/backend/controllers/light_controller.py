@@ -68,11 +68,11 @@ def trigger_command(command):
     asyncio.run(light_service.trigger_command(Command(**json.loads(command))))
 
 
-@socket.on('get_states')
-def get_lights_states(lights_ips):
-    states = asyncio.run(light_service.get_lights_states(json.loads(lights_ips)))
-    transformed_states = [state.serialize() for state in states]
-    emit('states', {"states":transformed_states})
+# @socket.on('get_states')
+# def get_lights_states(lights_ips):
+#     states = asyncio.run(light_service.get_lights_states(json.loads(lights_ips)))
+#     transformed_states = [state.serialize() for state in states]
+#     emit('states', {"states":transformed_states})
 
 
 @socket.on('turn_off')

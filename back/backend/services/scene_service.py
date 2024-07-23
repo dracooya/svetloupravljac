@@ -68,7 +68,7 @@ async def turn_on(id: int):
             for config in scene.lightsConfig:
                 light = wizlight(config.light.ip)
                 if config.config.r != -1 and config.config.g != -1 and config.config.b != -1:
-                    await light.turn_on(PilotBuilder(rgb=(0, 128, 255), brightness=config.config.brightness))
+                    await light.turn_on(PilotBuilder(rgb=(config.config.r, config.config.g, config.config.b), brightness=config.config.brightness))
                 if config.config.temperature != -1:
                     await light.turn_on(PilotBuilder(colortemp=config.config.temperature, brightness=config.config.brightness))
                 if config.config.mode != -1:
