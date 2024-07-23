@@ -22,7 +22,7 @@ interface HomeAndRoomConfigProps {
 
 export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, roomService} : HomeAndRoomConfigProps) {
     const [selectedHouse, setSelectedHouse] = useState<House | undefined>(houses[0]);
-    const [selectedRoom, setSelectedRoom] = useState<Room | undefined>(houses[0]?.rooms[0]);
+    const [selectedRoom, setSelectedRoom] = useState<Room | undefined>();
     const [openNewHouseDialog, setOpenNewHouseDialog] = useState<boolean>(false);
     const [openNewRoomDialog, setOpenNewRoomDialog] = useState<boolean>(false);
     const [houseDeleteMessage, setHouseDeleteMessage] = useState<string>("");
@@ -38,14 +38,11 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
     const handlePopupClose = () => {setPopupOpen(false); }
     const message_401 = import.meta.env.VITE_401_MESSAGE;
 
-    useEffect(() => {
-        setSelectedRoomParent(selectedRoom);
-    }, []);
 
     useEffect(() => {
         if(houses.length == 0) return;
         let house;
-        if(localStorage.getItem("house") != null && localStorage.getItem("house") != "undefined") {
+        if(localStorage.getItem("house") != "null" && localStorage.getItem("house") != "undefined") {
             house = houses.find(house => house.id == +localStorage.getItem("house"));
             if(house == undefined) {
                 house = houses[0];
@@ -59,13 +56,15 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
             setSelectedHouse(houses[0]);
             localStorage.setItem("house", houses[0]?.id.toString());
         }
-        if(localStorage.getItem("room") != null && localStorage.getItem("room") != "undefined") {
+        if(localStorage.getItem("room") != "null" && localStorage.getItem("room") != "undefined") {
             setSelectedRoom(house.rooms.find(room => room.id == +localStorage.getItem("room")))
+            setSelectedRoomParent(house.rooms.find(room => room.id == +localStorage.getItem("room")));
         }
         else {
             setSelectedRoom(house.rooms[0]);
             localStorage.setItem("room", house.rooms[0].id.toString());
         }
+
     }, [houses]);
 
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
@@ -105,7 +104,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
     const deleteSelectedRoom = () => {
         roomService.delete(selectedRoom!.id).then((msg) => {
             localStorage.setItem("message", msg);
-            localStorage.setItem("room","undefined");
+            localStorage.removeItem("room");
             window.location.reload();
         }).catch((err) => {
             if(err.response.status == 401) setPopupMessage(message_401)
@@ -118,8 +117,8 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
     const deleteSelectedHouse = () => {
         houseService.delete(selectedHouse!.id).then((msg) => {
             localStorage.setItem("message", msg);
-            localStorage.setItem("house","undefined");
-            localStorage.setItem("room","undefined");
+            localStorage.removeItem("house");
+            localStorage.removeItem("room");
             window.location.reload();
         }).catch((err) => {
             if(err.response.status == 401) setPopupMessage(message_401)
@@ -276,6 +275,7 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
                            roomService={roomService}
                            isModification={isModificationRoom}
                            selectedRoom={selectedRoom}
+                           currentHouse={selectedHouse}
                            houses={houses}
                            closeModalCallback={handleRoomDialogClose}/>
             <NewHouseDialog open={openNewHouseDialog}

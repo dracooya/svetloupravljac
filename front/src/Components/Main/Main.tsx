@@ -44,6 +44,10 @@ export function Main({houseService, roomService, lightService, sceneService} : M
     }, []);
 
     useEffect(() => {
+
+    }, [selectedRoom]);
+
+    useEffect(() => {
         if(!shouldLoad.current) return;
         houseService.getAll().then((houses) => {
             setHouses(houses);
@@ -74,7 +78,6 @@ export function Main({houseService, roomService, lightService, sceneService} : M
         }
         else {
             setSelectedRoom(house.rooms[0]);
-            localStorage.setItem("room", house.rooms[0].id.toString());
         }
     }, [houses]);
 

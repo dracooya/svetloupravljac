@@ -33,6 +33,7 @@ import {Light} from "../../Models/Light.ts";
 import {LightService} from "../../Services/LightService.ts";
 import {NewLights} from "../../Models/DTOs/NewLights.ts";
 import {NewLight} from "../../Models/DTOs/NewLight.ts";
+import {useLocalStorage} from "@uidotdev/usehooks";
 
 interface NewLightDialogProps {
     open: boolean,
@@ -62,10 +63,12 @@ interface LightForm {
 }
 
 export function NewLightDialog({open, houses, closeModalCallback, lightService} : NewLightDialogProps) {
+
+    const [selectedRoomStorage] = useLocalStorage("room", localStorage.getItem("room"));
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [hasFoundLights, setHasFoundLights] = useState<boolean>(false);
     const [setupLights, setSetupLights] = useState<NewLightSetup[]>([]);
-    const [selectedRoomId, setSelectedRoomId] = useState<number>(houses[0]?.rooms[0].id);
+    const [selectedRoomId, setSelectedRoomId] = useState<number>();
     const [selectedType, setSelectedType] = useState<LightType>(LightType.BULB);
     const [selectedLight, setSelectedLight] = useState<Light>();
     const [isModification, setIsModification] = useState<boolean>(false);
@@ -76,15 +79,8 @@ export function NewLightDialog({open, houses, closeModalCallback, lightService} 
     const message_401 = import.meta.env.VITE_401_MESSAGE;
 
     useEffect(() => {
-        if(localStorage.getItem("room") != null && localStorage.getItem("room") != "undefined") {
-            setSelectedRoomId(+localStorage.getItem("room"))
-            setValue("room",+localStorage.getItem("room"));
-        }
-        else {
-            setSelectedRoomId(houses[0]?.rooms[0].id);
-            setValue("room", houses[0]?.rooms[0].id);
-        }
-    }, [houses]);
+        setSelectedRoomId(+localStorage.getItem("room"));
+    }, [selectedRoomStorage]);
 
     const fetchLights = async () => {
         setIsSearching(true);

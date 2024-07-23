@@ -16,6 +16,7 @@ import {
 import {InfoOutlined, KeyboardArrowDown} from "@mui/icons-material";
 import Icon from "@mdi/react";
 import {Transition} from "react-transition-group";
+import { useLocalStorage } from "@uidotdev/usehooks";
 import {House} from "../../Models/House.ts";
 import {useForm} from "react-hook-form";
 import {mdiLampOutline, mdiLedStripVariant, mdiLightbulbOutline, mdiMoviePlayOutline, mdiPalette} from "@mdi/js";
@@ -62,7 +63,8 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
         mode: "onChange"
     });
 
-    const [selectedRoom, setSelectedRoom] = useState<Room | undefined>(houses[0]?.rooms[0]);
+    const [selectedRoomStorage] = useLocalStorage("room", localStorage.getItem("room"));
+    const [selectedRoom, setSelectedRoom] = useState<Room>();
     const [includedLights, setIncludedLights] = useState<LightIncluded[]>([]);
     const [activeStep, setActiveStep] = useState<number>(0);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
@@ -78,11 +80,8 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const handleLightColorChangeDialogClose = () => setOpenLightColorChangeDialog(false);
 
     useEffect(() => {
-    }, [selectedScene]);
-
-    useEffect(() => {
-        if(localStorage.getItem("room") != null && localStorage.getItem("room") != "undefined") {
-            console.log(houses.flatMap(house => house.rooms).find(room => room.id === +localStorage.getItem("room")))
+        if(houses.length == 0) return;
+        if(localStorage.getItem("room") != "null" && localStorage.getItem("room") != "undefined") {
             setSelectedRoom(houses.flatMap(house => house.rooms).find(room => room.id === +localStorage.getItem("room")))
             setValue("room",+localStorage.getItem("room"));
         }
@@ -90,7 +89,9 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
             setSelectedRoom(houses[0]?.rooms[0]);
             setValue("room", houses[0]?.rooms[0].id);
         }
-    }, [houses]);
+    }, [selectedRoomStorage, houses]);
+
+
 
     useEffect(() => {
         if(selectedLight == undefined) return;
@@ -190,7 +191,6 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
             includedLights.forEach((light) => {
                 if (light.included)
                     lightsConfig.push({light_mac: light.light.mac, config: light.mode!})
-                console.log(light.mode)
 
             });
             sceneService.edit({id: selectedScene!.id, modifications: {name: getValues("name"), config: lightsConfig}}).then((msg) => {

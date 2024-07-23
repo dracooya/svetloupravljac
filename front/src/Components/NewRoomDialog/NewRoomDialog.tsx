@@ -17,19 +17,18 @@ import {InfoOutlined, KeyboardArrowDown} from "@mui/icons-material";
 import {House} from "../../Models/House.ts";
 import Icon from "@mdi/react";
 import {mdilHome} from "@mdi/light-js";
-import {Room} from "../../Models/Room.ts";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {ModifyHouseOrRoom} from "../../Models/DTOs/ModifyHouseOrRoom.ts";
 import {RoomService} from "../../Services/RoomService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 import {NewRoom} from "../../Models/DTOs/NewRoom.ts";
+import {useLocalStorage} from "@uidotdev/usehooks";
 
 interface NewRoomDialogProps {
     open: boolean,
     closeModalCallback: () => void,
     houses: House[],
     isModification: boolean,
-    selectedRoom: Room | undefined,
     roomService: RoomService
 }
 
@@ -37,6 +36,7 @@ interface RoomForm {
     name: string,
 }
 export function NewRoomDialog({open, closeModalCallback, houses, isModification, selectedRoom, roomService}: NewRoomDialogProps) {
+    const [selectedHouseStorage] = useLocalStorage("house", localStorage.getItem("house"));
     const [selectedHouseId, setSelectedHouseId] = useState<number | undefined>();
     const {register, handleSubmit, setValue, formState: {errors}} = useForm<RoomForm>({
         defaultValues: {
@@ -44,6 +44,7 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
         },
         mode: "onChange"
     });
+
 
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
@@ -59,11 +60,11 @@ export function NewRoomDialog({open, closeModalCallback, houses, isModification,
         setValue("name", roomName);
     }, [isModification]);
 
+
+
     useEffect(() => {
-        if(localStorage.getItem("house") != null && localStorage.getItem("house") != "undefined")
-            setSelectedHouseId(+localStorage.getItem("house"))
-        else setSelectedHouseId(houses[0]?.id)
-    }, [houses]);
+        setSelectedHouseId(+localStorage.getItem("house"));
+    }, [selectedHouseStorage]);
 
     const handleHouseChange = (_: React.SyntheticEvent | null, selectedHouseId: number | null) => {
         // noinspection TypeScriptValidateTypes
