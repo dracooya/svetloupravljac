@@ -44,7 +44,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                 r: value.r,
                 g: value.g,
                 b: value.b,
-                brightness: -1,
+                brightness: brightness,
                 temperature: -1,
                 speed: -1,
                 mode: -1
@@ -61,7 +61,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                 r: -1,
                 g: -1,
                 b: -1,
-                brightness: -1,
+                brightness: brightness,
                 temperature: value,
                 speed: -1,
                 mode: -1
@@ -109,9 +109,9 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
             r: -1,
             g: -1,
             b: -1,
-            brightness:-1,
+            brightness:brightness,
             temperature: -1,
-            speed: -1,
+            speed: modeSpeed,
             mode: selectedMode.id
         }
         valueChangeCallback(change);

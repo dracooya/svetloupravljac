@@ -20,6 +20,7 @@ import {House} from "../../Models/House.ts";
 import {mdiMovieOpenPlayOutline} from "@mdi/js";
 import {SceneService} from "../../Services/SceneService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
+import {socket} from "../Utils/Socket.ts";
 
 interface ScenesProps {
     houses: House[],
@@ -90,7 +91,16 @@ export function Scenes({houses, sceneService} : ScenesProps) {
                         return  <Grid container xs={6} sm={4} md={4} lg={4} xl={4} p={1}  key={scene.name}>
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12}
                                           container justifyContent={'center'}>
-                                        <Grid p={1} container alignItems={'center'} justifyContent={'center'} sx={{borderRadius:'50%', border:'1px solid #12467b'}} className={'clickable'}>
+                                        <Grid p={1}
+                                              container
+                                              alignItems={'center'}
+                                              justifyContent={'center'}
+                                              onClick={() => {
+                                                  setSelectedScene(scene);
+                                                  socket.emit('turn_on_scene', scene.id)
+                                              }}
+                                              sx={{borderRadius:'50%', border:'1px solid #12467b'}}
+                                              className={'clickable'}>
                                             <Icon className={'pointer'} path={mdiMovieOpenPlayOutline} size={1.5} />
                                         </Grid>
                                     </Grid>

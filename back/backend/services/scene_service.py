@@ -1,3 +1,6 @@
+from flask import current_app
+from pywizlight import wizlight, PilotBuilder
+
 from backend.models.color_or_mode_config import ColorOrModeConfig
 from backend.models.dtos.color_or_mode_config_basic import ColorOrModeConfigBasic
 from backend.models.dtos.lights_color_config_basic import LightColorConfigBasic
@@ -6,6 +9,7 @@ from backend.models.dtos.new_scene import NewScene
 from backend.models.light_color_config import LightColorConfig
 from backend.models.scene import Scene
 from backend.repositories import light_repository, scene_repository
+from backend.services.light_service import __wrapper
 from backend.utils.validation_exception import ValidationException
 
 
@@ -53,3 +57,24 @@ def delete(scene_id: int):
     else:
         scene_repository.delete(scene)
         return "Scene successfully removed!"
+
+
+async def turn_on(id: int):
+    async def execute(id: int):
+        with current_app.app_context():
+            scene = scene_repository.get_by_id(id)
+            if scene is None:
+                return
+            for config in scene.lightsConfig:
+                light = wizlight(config.light.ip)
+                if config.config.r != -1 and config.config.g != -1 and config.config.b != -1:
+                    await light.turn_on(PilotBuilder(rgb=(0, 128, 255), brightness=config.config.brightness))
+                if config.config.temperature != -1:
+                    await light.turn_on(PilotBuilder(colortemp=config.config.temperature, brightness=config.config.brightness))
+                if config.config.mode != -1:
+                    if config.config.speed != -1:
+                        await light.turn_on(PilotBuilder(scene=config.config.mode, brightness=config.config.brightness, speed=config.config.speed))
+                    else:
+                        await light.turn_on(PilotBuilder(scene=config.config.mode, brightness=config.config.brightness))
+
+    await __wrapper(execute, id=id)

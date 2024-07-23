@@ -1,9 +1,12 @@
+import asyncio
+
 from flask import Blueprint, jsonify
 
 from backend.models.dtos.modify_scene import ModifyScene, modifySceneSchema
 from backend.models.dtos.new_scene import newSceneSchema, NewScene
 from backend.services import scene_service
 from backend.utils.request_parser import request_parser
+from backend.utils.socket_instance import socket
 from backend.utils.validation_exception import ValidationException
 
 scene_blueprint = Blueprint('scene_blueprint', __name__)
@@ -45,3 +48,8 @@ def delete(scene_id):
 
     except ValidationException as ex:
         return ex.message, ex.status_code
+
+
+@socket.on('turn_on_scene')
+def get_lights_states(scene_id):
+    asyncio.run(scene_service.turn_on(scene_id))
