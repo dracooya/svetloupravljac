@@ -1,6 +1,6 @@
 import {ColorOrModeParams} from "../ColorOrModeParams.ts";
 
 export interface LightColorConfigBasic {
-    lightMac: string,
+    light_mac: string,
     config: ColorOrModeParams
 }

@@ -42,7 +42,14 @@ export function Scenes({houses, sceneService} : ScenesProps) {
     const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
     const handleNewDialogClose = () => setOpenNewDialog(false);
     const deleteScene = () => {
-        //TODO: Delete scene
+        sceneService.delete(selectedScene!.id).then((_) => {
+            window.location.reload();
+        }).catch((err) => {
+            if(err.response.status == 401) setPopupMessage(message_401)
+            else setPopupMessage(err.response.data);
+            setIsSuccess(false);
+            setPopupOpen(true);
+        });
     }
 
     useEffect(() => {

@@ -1,5 +1,4 @@
 from marshmallow import fields, Schema, validate
-from marshmallow.validate import Range
 
 from backend.models.dtos.lights_color_config_basic import LightColorConfigBasicSchema
 

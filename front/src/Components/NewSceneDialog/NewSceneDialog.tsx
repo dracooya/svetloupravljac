@@ -27,13 +27,10 @@ import {LightColorChangeDialog} from "../LightColorChangeDialog/LightColorChange
 import {availableModes} from "../Utils/AvailableModes.ts";
 import {Scene} from "../../Models/Scene.ts";
 import {kelvinToRgb} from "../Utils/KelvinsToRgbConversionTable.ts";
-import {Command} from "../../Models/DTOs/Command.ts";
-import {sendCommand} from "../Utils/Socket.ts";
 import {Light} from "../../Models/Light.ts";
 import {LightState} from "../../Models/DTOs/LightState.ts";
 import {SceneService} from "../../Services/SceneService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
-import {NewScene} from "../../Models/DTOs/NewScene.ts";
 import {LightColorConfigBasic} from "../../Models/DTOs/LightColorConfigBasic.ts";
 
 interface NewSceneDialogProps {
@@ -65,7 +62,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
         mode: "onChange"
     });
 
-    const [selectedRoom, setSelectedRoom] = useState<Room>(houses[0]?.rooms[0]);
+    const [selectedRoom, setSelectedRoom] = useState<Room | undefined>(houses[0]?.rooms[0]);
     const [includedLights, setIncludedLights] = useState<LightIncluded[]>([]);
     const [activeStep, setActiveStep] = useState<number>(0);
     const [openLightColorChangeDialog, setOpenLightColorChangeDialog] = useState<boolean>(false);
@@ -79,33 +76,48 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
     const handleLightColorChangeDialogClose = () => setOpenLightColorChangeDialog(false);
 
     useEffect(() => {
+    }, [selectedScene]);
+
+    useEffect(() => {
         setSelectedRoom(houses[0]?.rooms[0])
     }, [houses]);
 
     useEffect(() => {
         if(selectedLight == undefined) return;
-        const transformed : LightState = {
-            light: selectedLight!.light,
-            isOn: false,
-            state: {
-                ip: selectedLight!.light.ip,
-                r: -1, g: -1, b: -1, brightness: 255, temperature: selectedLight!.light.minKelvin, speed: -1, mode: -1
-            }
+        if(isModification) {
+            setSelectedLightTransformed({
+                light: selectedLight!.light,
+                isOn: false,
+                state: {
+                    ip: selectedLight!.light.ip,
+                    r: selectedLight!.mode!.r,
+                    g: selectedLight!.mode!.g,
+                    b: selectedLight!.mode!.b,
+                    brightness: selectedLight!.mode!.brightness,
+                    temperature: selectedLight!.mode!.temperature,
+                    speed: selectedLight!.mode!.speed,
+                    mode: selectedLight!.mode!.mode
+                }
+            });
         }
-        setSelectedLightTransformed(transformed);
+        else {
+            setSelectedLightTransformed({
+                light: selectedLight!.light,
+                isOn: false,
+                state: {
+                    ip: selectedLight!.light.ip,
+                    r: -1,
+                    g: -1,
+                    b: -1,
+                    brightness: 255,
+                    temperature: selectedLight!.light.minKelvin,
+                    speed: -1,
+                    mode: -1
+                }
+            });
+        }
     }, [selectedLight]);
     const handleColorChangeCallback = (change: ColorOrModeParams) => {
-        const command : Command = {
-            r: change.r,
-            g: change.g,
-            b: change.b,
-            temperature: change.temperature,
-            mode: change.mode,
-            brightness: change.brightness,
-            speed: change.speed,
-            ip: selectedLight!.light.ip
-        }
-        sendCommand(command);
         if(selectedLight?.mode == undefined) selectedLight.mode = change;
         else {
             if (change.mode != -1) {
@@ -154,46 +166,52 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
 
     };
 
+
+
     const addScene = () => {
-        let lightsConfig : LightColorConfigBasic[] = []
-
-        includedLights.forEach((light) => {
-            const config : LightColorConfigBasic = {
-                lightMac: light.light.mac,
-                config: {
-                    r: -1,
-                    g: -1,
-                    b: -1,
-                    brightness: -1,
-                    temperature: -1,
-                    speed: -1,
-                    mode: -1
-                }
+        let lightsConfig : LightColorConfigBasic[] = [];
+        if(isModification) {
+            if(!includedLights.some(light => light.included)) {
+                setPopupMessage("Scene has to have included lights!");
+                setIsSuccess(false);
+                setPopupOpen(true);
+                return;
             }
-            if(light.mode != undefined) {
-                config.config = light.mode
-            }
-            lightsConfig.push(config)
-        })
+            includedLights.forEach((light) => {
+                if (light.included)
+                    lightsConfig.push({light_mac: light.light.mac, config: light.mode!})
+                console.log(light.mode)
 
-        const newScene: NewScene = {
-            name: getValues("name"),
-            config: lightsConfig
+            });
+            sceneService.edit({id: selectedScene!.id, modifications: {name: getValues("name"), config: lightsConfig}}).then((_) => {
+                window.location.reload();
+            }).catch((err) => {
+                if (err.response.status == 401) setPopupMessage(message_401)
+                else setPopupMessage(err.response.data);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            });
         }
-        sceneService.add(newScene).then((_) => {
-            window.location.reload();
-        }).catch((err) => {
-            if(err.response.status == 401) setPopupMessage(message_401)
-            else setPopupMessage(err.response.data);
-            setIsSuccess(false);
-            setPopupOpen(true);
-        });
-        //TODO: add/edit scene
-        /*reset();
-        setSelectedRoom(houses[0].rooms[0]);
-        setIncludedLights([]);
-        setActiveStep(0);
-        closeModalCallback();*/
+        else {
+            if(!includedLights.some(light => light.mode != undefined)) {
+                setPopupMessage("Scene has to have at least one light that is not off!");
+                setIsSuccess(false);
+                setPopupOpen(true);
+                return;
+            }
+            includedLights.forEach((light) => {
+                if (light.mode != undefined)
+                    lightsConfig.push({light_mac: light.light.mac, config: light.mode})
+            });
+            sceneService.add({name: getValues("name"), config: lightsConfig}).then((_) => {
+                window.location.reload();
+            }).catch((err) => {
+                if (err.response.status == 401) setPopupMessage(message_401)
+                else setPopupMessage(err.response.data);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            });
+        }
     }
 
     useEffect(() => {
@@ -397,7 +415,8 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                                                                             </Grid>
                                                                         </Grid>
                                                                         <Grid xs={2} sm={2} md={2} lg={2} xl={2}>
-                                                                            { light.mode == undefined ? <Grid>Off</Grid> :
+                                                                            { light.mode == undefined ||
+                                                                                (light.mode.r == -1 && light.mode.temperature == -1 && light.mode.mode == -1) ? <Grid>Off</Grid> :
                                                                             light.mode?.mode !== -1 ?
                                                                             <Avatar size={'sm'}  src={"src/assets/icons/modes/" + availableModes.find(mode => mode.id === light.mode?.mode)?.name + ".png"}></Avatar>
                                                                          :

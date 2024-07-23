@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 
+from backend.models.dtos.modify_scene import ModifyScene, modifySceneSchema
 from backend.models.dtos.new_scene import newSceneSchema, NewScene
 from backend.services import scene_service
 from backend.utils.request_parser import request_parser
@@ -20,6 +21,27 @@ def add():
         data = request_parser(newSceneSchema, NewScene)
         message = scene_service.add(data)
         return message, 201
+
+    except ValidationException as ex:
+        return ex.message, ex.status_code
+
+
+@scene_blueprint.route('/modify', methods=['PUT'])
+def modify():
+    try:
+        data = request_parser(modifySceneSchema, ModifyScene)
+        message = scene_service.modify(data)
+        return message, 200
+
+    except ValidationException as ex:
+        return ex.message, ex.status_code
+
+
+@scene_blueprint.route('/delete/<scene_id>', methods=['DELETE'])
+def delete(scene_id):
+    try:
+        message = scene_service.delete(scene_id)
+        return message, 200
 
     except ValidationException as ex:
         return ex.message, ex.status_code

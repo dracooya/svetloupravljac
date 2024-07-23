@@ -1,6 +1,7 @@
 from backend.models.color_or_mode_config import ColorOrModeConfig
 from backend.models.dtos.color_or_mode_config_basic import ColorOrModeConfigBasic
 from backend.models.dtos.lights_color_config_basic import LightColorConfigBasic
+from backend.models.dtos.modify_scene import ModifyScene
 from backend.models.dtos.new_scene import NewScene
 from backend.models.light_color_config import LightColorConfig
 from backend.models.scene import Scene
@@ -16,7 +17,7 @@ def add(scene: NewScene):
     lights_config = []
     for light_config in scene.config:
         light_config = LightColorConfigBasic(**light_config)
-        light = light_repository.get_by_mac(light_config.lightMac)
+        light = light_repository.get_by_mac(light_config.light_mac)
         if light is None:
             raise ValidationException("Light with the specified MAC address does not exist!", 404)
         else:
@@ -33,3 +34,22 @@ def add(scene: NewScene):
 
     scene_repository.add(Scene(name=scene.name, lightsConfig=lights_config))
     return "Scene successfully added!"
+
+
+def modify(modifications: ModifyScene):
+    scene = scene_repository.get_by_id(modifications.id)
+    if scene is None:
+        raise ValidationException("Scene with the specified ID does not exist!", 404)
+    else:
+        params = NewScene(**modifications.modifications)
+        scene_repository.modify(scene, params.name, params.config)
+        return "Scene successfully modified!"
+
+
+def delete(scene_id: int):
+    scene = scene_repository.get_by_id(scene_id)
+    if scene is None:
+        raise ValidationException("Scene with the specified ID does not exist!", 404)
+    else:
+        scene_repository.delete(scene)
+        return "Scene successfully removed!"

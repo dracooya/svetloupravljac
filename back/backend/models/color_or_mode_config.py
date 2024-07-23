@@ -15,7 +15,6 @@ class ColorOrModeConfig(db.Model):
 
     def serialize(self):
         return {
-            "id": self.id,
             "r": self.r,
             "g": self.g,
             "b": self.b,
