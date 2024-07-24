@@ -10,6 +10,7 @@ import {RoomService} from "../../Services/RoomService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 import {LightService} from "../../Services/LightService.ts";
 import {SceneService} from "../../Services/SceneService.ts";
+import {io} from "socket.io-client";
 
 interface MainProps {
     houseService: HouseService,
@@ -18,8 +19,9 @@ interface MainProps {
     sceneService: SceneService
 }
 
-export function Main({houseService, roomService, lightService, sceneService} : MainProps) {
 
+export function Main({houseService, roomService, lightService, sceneService} : MainProps) {
+    const socket = io('http://localhost:5000');
     const [selectedRoom, setSelectedRoom] = useState<Room>();
     const [houses, setHouses] = useState<House[]>([]);
     const shouldLoad = useRef(true);
@@ -114,7 +116,7 @@ export function Main({houseService, roomService, lightService, sceneService} : M
                                                houseService={houseService}
                                                setSelectedRoomParent={handleRoomSelectionChange}/>
                         <Grid mt={6} xs={12} sm={12} md={12} lg={12} xl={12}>
-                            <Scenes houses={houses} sceneService={sceneService}/>
+                            <Scenes houses={houses} sceneService={sceneService} socket={socket}/>
                         </Grid>
                     </Grid>
                     <Grid pl={8} pr={3} container xs={12} sm={12} md={6} lg={8} xl={8} mt={{
@@ -127,6 +129,7 @@ export function Main({houseService, roomService, lightService, sceneService} : M
                         <LightsState lights={selectedRoom?.lights}
                                      lightService={lightService}
                                      houses={houses}
+                                     socket={socket}
                                      currentRoom={selectedRoom}/>
                     </Grid>
                 </Grid>

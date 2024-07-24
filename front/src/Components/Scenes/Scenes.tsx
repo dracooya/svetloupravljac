@@ -20,14 +20,15 @@ import {House} from "../../Models/House.ts";
 import {mdiMovieOpenPlayOutline} from "@mdi/js";
 import {SceneService} from "../../Services/SceneService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
-import {socket} from "../Utils/Socket.ts";
+import {Socket} from "socket.io-client";
 
 interface ScenesProps {
     houses: House[],
-    sceneService: SceneService
+    sceneService: SceneService,
+    socket: Socket
 }
 
-export function Scenes({houses, sceneService} : ScenesProps) {
+export function Scenes({houses, sceneService, socket} : ScenesProps) {
     const [scenes, setScenes] = useState<Scene[]>([]);
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
     const [deleteMessage, setDeleteMessage] = useState<string>("");

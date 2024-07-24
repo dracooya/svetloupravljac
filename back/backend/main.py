@@ -46,11 +46,8 @@ def before_request_func():
     if request.method == 'OPTIONS':
         return '', 204
 
-    if 'enter' in request.endpoint or 'check' in request.endpoint or request.endpoint is None:
+    if 'enter' in request.endpoint or 'check' in request.endpoint:
         return
 
     if not entry_service.authorized:
         return "Session expired! Please enter password again.", 401
-
-
-

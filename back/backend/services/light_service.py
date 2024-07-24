@@ -13,6 +13,7 @@ import backend.repositories.room_repository as room_repository
 import backend.repositories.light_repository as light_repository
 from flask import current_app
 
+from backend.utils.socket_authorization_decorator import authorize
 from backend.utils.socket_instance import socket
 from backend.utils.validation_exception import ValidationException
 from backend.models.dtos.modify_light import ModifyLight

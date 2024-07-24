@@ -31,16 +31,17 @@ import {LightService} from "../../Services/LightService.ts";
 import {PopupMessage} from "../PopupMessage/PopupMessage.tsx";
 import {Command} from "../../Models/DTOs/Command.ts";
 import {LightState} from "../../Models/DTOs/LightState.ts";
-import {sendCommand, socket} from "../Utils/Socket.ts";
+import {Socket} from "socket.io-client";
 
 interface LightsStateProps {
     lights: Light[] | undefined,
     houses: House[],
     currentRoom: Room | undefined,
     lightService: LightService
+    socket: Socket
 }
 
-export function LightsState({lights, houses, currentRoom, lightService}: LightsStateProps) {
+export function LightsState({lights, houses, currentRoom, lightService, socket}: LightsStateProps) {
     const [roomLightsOn, setRoomLightsOn] = React.useState<boolean>(false);
     const [lightsOn, setLightsOn] = useState<Map<string, boolean>>(new Map());
     const [openNewLightDialog, setOpenNewLightDialog] = useState<boolean>(false);
@@ -176,7 +177,7 @@ export function LightsState({lights, houses, currentRoom, lightService}: LightsS
             speed: config.speed,
             ip: selectedLight!.ip
         }
-        sendCommand(command);
+        socket.emit('command', JSON.stringify(command));
     }
 
     const deleteLight = () => {

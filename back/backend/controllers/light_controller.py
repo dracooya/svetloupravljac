@@ -4,6 +4,7 @@ import backend.services.light_service as light_service
 from backend.models.dtos.new_lights import NewLights, newLightsSchema
 from backend.models.dtos.modify_light import modifyLightSchema, ModifyLight
 from backend.utils.request_parser import request_parser
+from backend.utils.socket_authorization_decorator import authorize
 from backend.utils.validation_exception import ValidationException
 from backend.models.dtos.new_light import NewLight
 import asyncio
@@ -64,32 +65,30 @@ async def ping(light_ip):
 
 
 @socket.on('command')
+@authorize
 def trigger_command(command):
     asyncio.run(light_service.trigger_command(Command(**json.loads(command))))
 
 
-# @socket.on('get_states')
-# def get_lights_states(lights_ips):
-#     states = asyncio.run(light_service.get_lights_states(json.loads(lights_ips)))
-#     transformed_states = [state.serialize() for state in states]
-#     emit('states', {"states":transformed_states})
-
-
 @socket.on('turn_off')
+@authorize
 def turn_off(light_ip):
     asyncio.run(light_service.turn_off(light_ip))
 
 
 @socket.on('turn_off_all')
+@authorize
 def turn_off_all(lights_ips):
     asyncio.run(light_service.turn_off_all(lights_ips))
 
 
 @socket.on('turn_on')
+@authorize
 def turn_on(light_ip):
     asyncio.run(light_service.turn_on(light_ip))
 
 
 @socket.on('turn_on_all')
+@authorize
 def turn_on_all(lights_ips):
     asyncio.run(light_service.turn_on_all(lights_ips))
