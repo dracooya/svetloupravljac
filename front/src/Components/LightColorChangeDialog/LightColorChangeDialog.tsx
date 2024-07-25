@@ -391,9 +391,10 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                                            num = Math.ceil(num / 100) * 100;
                                                                            if(num > 6500) num = 6500;
                                                                            if (num < 2200) num = 2200;
+                                                                           debouncedKelvin(num);
                                                                        }
                                                                        setWhiteKelvin(num);
-                                                                       debouncedKelvin(num);
+
                                                                    }}
                                                                    sx={{
                                                                        backgroundColor:'transparent',

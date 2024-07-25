@@ -18,7 +18,7 @@ light_blueprint = Blueprint('light_blueprint', __name__)
 @light_blueprint.route('/discover', methods=['GET'])
 async def discover():
     try:
-        lights = await asyncio.wait_for(light_service.discover(), timeout=20)
+        lights = await asyncio.wait_for(light_service.discover(), timeout=30)
         return jsonify([light.serialize() for light in lights]), 200
     except asyncio.TimeoutError:
         return jsonify([]), 200
