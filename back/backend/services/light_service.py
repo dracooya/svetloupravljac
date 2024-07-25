@@ -158,7 +158,7 @@ def delete(mac: str):
 async def trigger_command(command: Command):
     async def execute(command: Command):
         light = wizlight(command.ip)
-        if command.r > -1 and command.g > -1 and command.b > 1:
+        if command.r > -1 and command.g > -1 and command.b > -1:
             await light.turn_on(PilotBuilder(rgb=(command.r, command.g, command.b)))
         elif command.mode > -1:
             await light.turn_on(PilotBuilder(scene=command.mode))

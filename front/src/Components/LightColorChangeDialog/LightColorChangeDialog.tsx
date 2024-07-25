@@ -39,6 +39,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
     const [color, setColor] = useState<RgbColor>({r:255, g:255, b:255});
     const debouncedColor = useDebouncedCallback(
         (value : RgbColor) => {
+            console.log(value)
             setColorHex(rgbToHex(value.r, value.g, value.b));
             const change : ColorOrModeParams = {
                 r: value.r,
@@ -51,7 +52,7 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
             }
             valueChangeCallback(change);
         },
-        200
+        100
     );
     const [colorHex, setColorHex] = useState<string>("FFFFFF");
     const [whiteKelvin, setWhiteKelvin] = useState<number>(2200);
@@ -289,7 +290,9 @@ export function LightColorChangeDialog({open, closeModalCallback, valueChangeCal
                                                                        const converted = hexToRgb(event.target.value)
                                                                        setColor(converted);
                                                                        setColorHex(event.target.value);
-                                                                       debouncedColor(converted as RgbColor);
+                                                                       if(converted != null) {
+                                                                           debouncedColor(converted as RgbColor);
+                                                                       }
                                                                    }
 
                                                                }}
