@@ -21,6 +21,7 @@ def update_ip(light: Light, ip: str, app):
         session = sessionmaker(bind=db.engine)()
         session.add(light)
         session.commit()
+        session.refresh(light)
 
 
 def add(info: NewLight, room: Room):
