@@ -1,3 +1,4 @@
+import socketio
 from flask import Blueprint, jsonify, json
 import backend.services.light_service as light_service
 from backend.models.dtos.new_lights import NewLights, newLightsSchema
@@ -8,6 +9,7 @@ from backend.utils.validation_exception import ValidationException
 from backend.models.dtos.new_light import NewLight
 import asyncio
 from backend.utils.socket_instance import socket
+from flask_socketio import emit
 from backend.models.dtos.command import Command
 
 light_blueprint = Blueprint('light_blueprint', __name__)

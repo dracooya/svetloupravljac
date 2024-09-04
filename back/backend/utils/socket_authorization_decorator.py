@@ -13,4 +13,5 @@ def authorize(f):
             disconnect()
             return False
         return f(*args, **kwargs)
+
     return decorated_function

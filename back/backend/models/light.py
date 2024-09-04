@@ -14,7 +14,7 @@ class Light(db.Model):
     minKelvin: Mapped[int] = mapped_column(nullable=False)
     maxKelvin: Mapped[int] = mapped_column(nullable=False)
     room_id: Mapped[int] = mapped_column(ForeignKey("room.id"))
-    configs: Mapped[list["SceneLightConfig"]] = relationship("SceneLightConfig", back_populates="light",  cascade="all, delete-orphan")
+    configs: Mapped[list["LightColorConfig"]] = relationship("LightColorConfig", back_populates="light",  cascade="all, delete-orphan")
 
     def __eq__(self, other):
         return self.mac == other.mac

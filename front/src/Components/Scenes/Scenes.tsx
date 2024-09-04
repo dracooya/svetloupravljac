@@ -25,17 +25,17 @@ import {Socket} from "socket.io-client";
 interface ScenesProps {
     houses: House[],
     sceneService: SceneService,
-    socket: Socket,
-    currentHouseScenes: Scene[]
+    socket: Socket
 }
 
-export function Scenes({houses, sceneService, socket, currentHouseScenes} : ScenesProps) {
-    const [scenes, setScenes] = useState<Scene[]>(currentHouseScenes);
+export function Scenes({houses, sceneService, socket} : ScenesProps) {
+    const [scenes, setScenes] = useState<Scene[]>([]);
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
     const [deleteMessage, setDeleteMessage] = useState<string>("");
     const [selectedScene, setSelectedScene] = useState<Scene>();
     const [openNewDialog, setOpenNewDialog] = useState<boolean>(false);
     const [isModification, setIsModification] = useState<boolean>(false);
+    const shouldLoad = useRef(true);
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
@@ -56,8 +56,18 @@ export function Scenes({houses, sceneService, socket, currentHouseScenes} : Scen
     }
 
     useEffect(() => {
-        setScenes(currentHouseScenes);
-    }, [currentHouseScenes]);
+        if(!shouldLoad.current) return;
+        sceneService.getAll().then((scenes) => {
+            setScenes(scenes);
+        }).catch((err) => {
+            if(err.response.status == 401) {
+                setPopupMessage(message_401);
+                setIsSuccess(false);
+                setPopupOpen(true);
+            }
+        });
+        shouldLoad.current = false;
+    }, []);
 
     return (
         <>
@@ -79,7 +89,7 @@ export function Scenes({houses, sceneService, socket, currentHouseScenes} : Scen
                   fontFamily={'Inter'}
                   sx={{height:'33vh', overflowY:'auto'}}>
                 <Grid container xs={12} sm={12} md={12} lg={12} xl={12} rowGap={3}>
-                    {scenes?.map((scene) => {
+                    {scenes.map((scene) => {
                         return  <Grid container xs={6} sm={4} md={4} lg={4} xl={4} p={1}  key={scene.name}>
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12}
                                           container justifyContent={'center'}>

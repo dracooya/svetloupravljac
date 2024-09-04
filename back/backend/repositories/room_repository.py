@@ -11,11 +11,6 @@ def add(room_name: str, house: House):
     return room
 
 
-def add_scene(room,scene):
-    room.scenes.append(scene)
-    db.session.commit()
-
-
 def get_by_id(room_id: int):
     return Room.query.filter_by(id=room_id).first()
 

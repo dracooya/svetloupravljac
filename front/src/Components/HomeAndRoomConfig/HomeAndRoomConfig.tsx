@@ -190,9 +190,9 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
                                      sx={{border:'1px solid #12467b'}}
                                      onClick={() => {
                                          setHouseDeleteMessage(" <b>Are you sure you want to remove " + selectedHouse!.name + "?</b> This action will: <br/> <br/>\n" +
-                                             "                                        - <b>Remove all the rooms</b> associated with the home <br/>\n" +
+                                             "                                        - <b>Remove all the rooms</b> associated with the house <br/>\n" +
                                              "                                        - <b>Remove lights from rooms </b> that have been removed <br/>\n" +
-                                             "                                        - <b>Remove scenes associated with rooms</b> that have been removed<br/>\n"
+                                             "                                        - <b>Remove lights from scenes where they are included <br/>\n"
                                                                                   );
                                          setOpenHouseDeleteDialog(true);
                                      }}
@@ -263,8 +263,8 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
                                     onClick={() => {
                                         setRoomDeleteMessage(" <b>Are you sure you want to remove " +  selectedRoom!.name + "?</b> This action will: <br/> <br/>\n" +
                                             "                                        - <b>Remove all the lights</b> associated with the room <br/>\n" +
-                                            "                                        - <b>Remove all the scenes</b> associated with the room <br/>\n" +
-                                            "                                        - <b>Remove homes that have become empty</b> as a result of this action <br/>");
+                                            "                                        - <b>Remove those lights from scenes</b> where they are included <br/>\n" +
+                                            "                                        - <b>Remove houses that have become empty</b> as a result of this action <br/>");
                                         setOpenRoomDeleteDialog(true);
                                     }}
                         ><Icon path={mdilDelete} size={0.9}/></IconButton>

@@ -138,7 +138,7 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
                             <DialogContent>
                                 <Grid container xs={12} sm={12} md={12} lg={12} xl={12} justifyContent={'center'} pb={2}>
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} textAlign={'center'} pb={7}>
-                                        <Typography level={'h1'}>{isModification? "Edit Home" : "Add New Home"}</Typography>
+                                        <Typography level={'h1'}>{isModification? "Edit House" : "Add New House"}</Typography>
                                     </Grid>
                                     <Grid container xs={12} sm={12} md={8} lg={8} xl={8} justifyContent={'center'}>
                                         <Grid pb={3} xs={12} sm={12} md={12} lg={12} xl={12} container>
@@ -147,7 +147,7 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
                                             </Grid>
                                             <Grid xs={11} sm={11} md={11} lg={11} xl={11} pl={2}>
                                                 <FormControl error={!!errors.name}>
-                                                    <Input placeholder="Home Name"
+                                                    <Input placeholder="House Name"
                                                            type={'text'}
                                                            sx={{
                                                                backgroundColor:'transparent'
@@ -156,7 +156,7 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
                                                            size="lg"
                                                            {...register("name",
                                                                {
-                                                                   required: "Home name is a required field!",
+                                                                   required: "House name is a required field!",
                                                                })}
                                                     />
                                                     <FormHelperText>
@@ -184,7 +184,7 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
                                                            size="lg"
                                                            {...register("room",
                                                                {
-                                                                   required: "New home must have at least one room!",
+                                                                   required: "New house must have at least one room!",
                                                                })}
                                                     />
                                                     <FormHelperText>
@@ -196,7 +196,7 @@ export function NewHouseDialog({open, closeModalCallback, isModification, select
                                         </Grid>
                                         }
                                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} pt={4} container justifyContent={'center'}>
-                                            <Button onClick={handleSubmit(onSubmit)} variant={'outlined'} size={'lg'}>{isModification? "Edit" : "Add Home"}</Button>
+                                            <Button onClick={handleSubmit(onSubmit)} variant={'outlined'} size={'lg'}>{isModification? "Edit" : "Add House"}</Button>
                                         </Grid>
                                     </Grid>
                                 </Grid>

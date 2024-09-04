@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 
 entry_password = b"$2a$12$gMsubuEng/BWoDZuIh6EdejWPYOaE2OtGQ8LVcSdw9D1.uttDy/Oa"
-authorized = False
+authorized = True
 scheduler = BackgroundScheduler()
 scheduler.start()
 
@@ -13,6 +13,10 @@ scheduler.start()
 def __cancel_authorization():
     global authorized
     authorized = False
+
+
+def is_authorized():
+    return authorized
 
 
 def enter_app(password: Password):

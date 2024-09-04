@@ -1,7 +1,6 @@
 import {LightColorConfigBasic} from "./LightColorConfigBasic.ts";
 
 export interface NewScene {
-    name: string,
-    roomId: number,
+    name: string
     config: LightColorConfigBasic[]
 }

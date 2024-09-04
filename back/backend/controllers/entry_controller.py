@@ -11,7 +11,8 @@ entry_blueprint = Blueprint('entry_blueprint', __name__)
 
 @entry_blueprint.route('/check', methods=['GET'])
 def check_if_authorized():
-    return json.dumps(entry_service.authorized), 200
+    is_authorized = entry_service.is_authorized()
+    return json.dumps(is_authorized), 200
 
 
 @entry_blueprint.route('', methods=['POST'])
