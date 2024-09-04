@@ -13,7 +13,6 @@ import backend.repositories.room_repository as room_repository
 import backend.repositories.light_repository as light_repository
 from flask import current_app
 
-from backend.utils.socket_authorization_decorator import authorize
 from backend.utils.socket_instance import socket
 from backend.utils.validation_exception import ValidationException
 from backend.models.dtos.modify_light import ModifyLight
@@ -40,7 +39,7 @@ async def update_ips(app):
         for light in discovered_lights:
             match = next((light_init for light_init in all_lights if light.mac == light_init.mac), None)
             if match.ip != light.ip:
-                print(match.ip)
+                print("Match: " + str(match.ip))
                 with app.app_context():
                     light_repository.update_ip(match, light.ip, app)
         await asyncio.sleep(300)
@@ -93,7 +92,6 @@ async def discover():
     broadcast_address = get_broadcast_address()
     lights = await discovery.discover_lights(broadcast_space=broadcast_address)
     for light in lights:
-        print(light.ip)
         if any(light.mac in vars(existing_light).values() for existing_light in all_lights):
             continue
         light_type = await light.get_bulbtype()
@@ -170,7 +168,6 @@ async def trigger_command(command: Command):
             await light.send({"method": "setPilot", "params": {"speed": command.speed}})
         else:
             pass
-
     await __wrapper(execute, command=command)
 
 
@@ -219,7 +216,6 @@ async def turn_on(ip: str):
     async def execute(ip: str):
         light = wizlight(ip)
         await light.turn_on(PilotBuilder())
-
     await __wrapper(execute, ip=ip)
 
 

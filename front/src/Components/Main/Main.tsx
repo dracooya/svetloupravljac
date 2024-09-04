@@ -52,6 +52,7 @@ export function Main({houseService, roomService, lightService, sceneService} : M
     useEffect(() => {
         if(!shouldLoad.current) return;
         houseService.getAll().then((houses) => {
+            console.log(houses)
             setHouses(houses);
         }).catch((err) => {
             if(err.response.status == 401) {
@@ -116,7 +117,7 @@ export function Main({houseService, roomService, lightService, sceneService} : M
                                                houseService={houseService}
                                                setSelectedRoomParent={handleRoomSelectionChange}/>
                         <Grid mt={6} xs={12} sm={12} md={12} lg={12} xl={12}>
-                            <Scenes houses={houses} sceneService={sceneService} socket={socket}/>
+                            <Scenes houses={houses} sceneService={sceneService} socket={socket} currentHouseScenes={selectedRoom?.scenes}/>
                         </Grid>
                     </Grid>
                     <Grid pl={8} pr={3} container xs={12} sm={12} md={6} lg={8} xl={8} mt={{

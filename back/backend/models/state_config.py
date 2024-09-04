@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
 
 
-class ColorOrModeConfig(db.Model):
+class StateConfig(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     r: Mapped[int] = mapped_column()
     g: Mapped[int] = mapped_column()

@@ -4,5 +4,5 @@ import {Light} from "./Light.ts";
 
 export interface LightColorConfig {
     light : Light,
-    config: ColorOrModeParams
+    state: ColorOrModeParams
 }
