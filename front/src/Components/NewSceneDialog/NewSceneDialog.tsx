@@ -214,7 +214,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
                 if (light.mode != undefined)
                     lightsConfig.push({light_mac: light.light.mac, config: light.mode})
             });
-            sceneService.add({name: getValues("name"), config: lightsConfig}).then((msg) => {
+            sceneService.add({name: getValues("name"), roomId:selectedRoom?.id , config: lightsConfig}).then((msg) => {
                 localStorage.setItem("message", msg);
                 window.location.reload();
             }).catch((err) => {
@@ -237,7 +237,7 @@ export function NewSceneDialog({open, closeModalCallback, houses, isModification
         if(isModification) {
             const includedLights = selectedScene?.lightsConfig.map(
                 (config) => {
-                    return {light: config.light, included: true, mode: config.config}
+                    return {light: config.light, included: true, mode: config.state}
                 });
             setIncludedLights(includedLights);
         }

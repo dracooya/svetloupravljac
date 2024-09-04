@@ -9,8 +9,8 @@ from backend.controllers.room_controller import room_blueprint
 from backend.controllers.light_controller import light_blueprint
 import backend.services.entry_service as entry_service
 from backend.models.light import Light
-from backend.models.light_color_config import LightColorConfig
-from backend.models.color_or_mode_config import ColorOrModeConfig
+from backend.models.scene_light_config import SceneLightConfig
+from backend.models.state_config import StateConfig
 from backend.models.scene import Scene
 from backend.models.room import Room
 from backend.models.house import House
