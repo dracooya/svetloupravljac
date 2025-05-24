@@ -38,6 +38,7 @@ export function Entry({entryService} : EntryProps) {
     useEffect(() => {
         if(!shouldCheck.current) return;
         entryService.isAuthorized().then((isAuthorized) => {
+            console.log(isAuthorized);
             if(isAuthorized) navigation('/main')
         })
         shouldCheck.current = false;

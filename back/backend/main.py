@@ -18,7 +18,7 @@ from backend.utils.socket_instance import socket
 from backend.services.light_service import run_background_task, get_states, update_ips, init_all_lights
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/svetloupravljac'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@db:5432/svetloupravljac'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})

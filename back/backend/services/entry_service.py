@@ -3,8 +3,9 @@ import bcrypt
 from backend.utils.validation_exception import ValidationException
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
+import sys
 
-entry_password = b"$2a$12$gMsubuEng/BWoDZuIh6EdejWPYOaE2OtGQ8LVcSdw9D1.uttDy/Oa"
+entry_password = b"$2a$12$djDeWiQ.s1PnfHJRDTw7lOObKrUHRvdagZhORo.FhtMwWZ2X/PUpi"
 authorized = False
 scheduler = BackgroundScheduler()
 scheduler.start()

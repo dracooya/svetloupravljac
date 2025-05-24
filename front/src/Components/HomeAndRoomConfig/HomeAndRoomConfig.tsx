@@ -165,7 +165,8 @@ export function HomeAndRoomConfig({houses, setSelectedRoomParent, houseService, 
                         onChange={handleHouseChange}
                         value={selectedHouse?.id}
                         indicator={<KeyboardArrowDown />}>
-                        {houses.map((house) => {
+                        {
+                            houses.map((house) => {
                             return <Option value={house.id} key={house.id}>{house.name}</Option>
                         })}
                     </Select>

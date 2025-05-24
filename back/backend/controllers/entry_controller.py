@@ -5,6 +5,7 @@ from backend.models.dtos.password import passwordSchema, Password
 from backend.utils.request_parser import request_parser
 from backend.utils.validation_exception import ValidationException
 import backend.services.entry_service as entry_service
+import sys
 
 entry_blueprint = Blueprint('entry_blueprint', __name__)
 

@@ -65,6 +65,8 @@ export function Main({houseService, roomService, lightService, sceneService} : M
     }, []);
 
     useEffect(() => {
+        console.log("inside")
+        console.log(houses.length)
         if(houses.length == 0) return;
         let house;
         if(localStorage.getItem("house") != null && localStorage.getItem("house") != "undefined") {
@@ -72,6 +74,7 @@ export function Main({houseService, roomService, lightService, sceneService} : M
             if(house == undefined) {
                 house = houses[0];
             }
+            console.log(house)
         }
         else {
             house = houses[0];
@@ -82,6 +85,7 @@ export function Main({houseService, roomService, lightService, sceneService} : M
         else {
             setSelectedRoom(house.rooms[0]);
         }
+        console.log(selectedRoom)
     }, [houses]);
 
 
